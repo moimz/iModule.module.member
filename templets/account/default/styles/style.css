@@ -1,0 +1,135 @@
+html, body {padding:0px; margin:0px; background:#fcfcfc;}
+#iModuleWrapper {}
+
+.ModuleMemberAccountDefault {width:100%; overflow-x:hidden;}
+.ModuleMemberAccountDefault header {height:110px; background:#fff;}
+.ModuleMemberAccountDefault header .top {height:40px; padding:10px; font-size:0px;}
+.ModuleMemberAccountDefault header h1 {width:200px; height:40px; padding:0px; margin:0px; display:inline-block; background-size:contain; background-repeat:no-repeat; font-size:0px;}
+.ModuleMemberAccountDefault header h1 a {display:block; width:200px; height:40px;}
+
+.ModuleMemberAccountDefault .accountTitle {height:50px;}
+.ModuleMemberAccountDefault .accountTitle aside .title {height:48px; border:1px solid #dadada; border-left:0px; border-right:0px; font-size:18px; background:#f7f7f7; line-height:48px; padding:0px 15px;}
+.ModuleMemberAccountDefault .accountTitle aside {border-right-color:#3975d8 !important;}
+.ModuleMemberAccountDefault .accountTitle section {width:100%; height:50px; font-size:0px; background:#4084f3;}
+.ModuleMemberAccountDefault .accountTitle section i.fa-bars {width:50px; height:50px; font-size:20px; color:#fff; display:none; vertical-align:middle; line-height:50px; text-align:center; cursor:pointer; margin-right:-15px;}
+.ModuleMemberAccountDefault .accountTitle section h2 {color:#fff; height:50px; display:inline-block; margin:0px; padding:0px; line-height:50px; padding:0px 15px; font-size:18px; font-weight:400; vertical-align:middle;}
+
+body.fixed .ModuleMemberAccountDefault .accountTitle {position:fixed; top:0; left:0; width:100%; z-index:10;}
+
+.ModuleMemberAccountDefault .accountLayout {display:table; width:100%; table-layout:fixed;}
+.ModuleMemberAccountDefault .accountLayout > aside, .ModuleMemberAccountDefault .accountLayout > section {display:table-cell; vertical-align:top;}
+.ModuleMemberAccountDefault .accountLayout > aside {width:240px; background:#fff; box-sizing:border-box; border-right:1px solid #dfdfdf; overflow:hidden;}
+.ModuleMemberAccountDefault .accountLayout > aside ul {list-style:none; width:240px; padding:10px 0px; margin:0px;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li {display:block; height:auto;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li a, .ModuleMemberAccountDefault .accountLayout > aside ul li span {display:block;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li.group {padding:3px 0px; margin-top:20px;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li.group a {text-decoration:none; color:rgba(0,0,0,0.87); font-size:15px; padding:5px 20px; padding-left:16px; border-left:4px solid transparent;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li.group span {color:rgba(0,0,0,0.87); font-size:15px; padding:5px 20px; padding-left:16px; margin-bottom:10px; border-left:4px solid transparent;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li.page {padding:3px 0px;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li.page a {text-decoration:none; color:rgba(0,0,0,0.54); font-size:13px; padding:5px 20px; padding-left:36px; border-left:4px solid transparent;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li a:hover {color:#437ff3;}
+.ModuleMemberAccountDefault .accountLayout > aside ul li a.selected {border-color:#427ef3; color:#437ff3;}
+.ModuleMemberAccountDefault .accountLayout > section {width:100%;}
+.ModuleMemberAccountDefault .accountLayout > section .panelWrapper {width:100%; padding:10px; box-sizing:border-box; max-width:1000px; margin:0px auto;}
+
+.ModuleMemberAccountDefault .inputControl {height:42px; border-radius:0px; font-size:15px; padding:6px 15px;}
+.ModuleMemberAccountDefault section.column {display:table; width:100%; table-layout:fixed; margin-top:30px;}
+.ModuleMemberAccountDefault section.column > aside {width:40%; display:table-cell; vertical-align:top; padding-right:30px;}
+.ModuleMemberAccountDefault section.column > section {width:60%; display:table-cell; vertical-align:top;}
+
+.ModuleMemberAccountDefault section.row {width:100%; margin-top:30px;}
+.ModuleMemberAccountDefault section.row > section {margin-top:20px;}
+
+.ModuleMemberAccountDefault section > aside h4 {font-size:36px; font-weight:400; color:rgba(0, 0, 0, 0.870588); padding:0px; margin:0px; margin-bottom:30px;}
+.ModuleMemberAccountDefault section > aside div {font-size:16px; font-weight:200; color:rgba(0, 0, 0, 0.541176); line-height:1.8; text-align:justify;}
+
+.ModuleMemberAccountDefault .formBox {margin-bottom:15px; background:#fff; box-shadow:rgba(0, 0, 0, 0.258824) 0px 2px 5px 0px;}
+.ModuleMemberAccountDefault .formBox .inputBox {display:table; width:100%; min-height:60px; table-layout:fixed; border-bottom:1px solid #e1e1e1;}
+.ModuleMemberAccountDefault .formBox .inputBox:last-child {border-bottom:0px;}
+.ModuleMemberAccountDefault .formBox .inputBox > label {display:table-cell; width:100px; vertical-align:top; padding:15px;}
+.ModuleMemberAccountDefault .formBox .inputBox > label > div {height:40px; line-height:40px; font-size:15px; color:#181818;}
+.ModuleMemberAccountDefault .formBox .inputBox > .inputBlock {display:table-cell; width:100%; vertical-align:middle; padding:15px; position:relative;}
+.ModuleMemberAccountDefault .formBox .inputBox > .inputBlock .text {height:42px; line-height:42px; color:#737373; display:inline-block; font-size:15px;}
+.ModuleMemberAccountDefault .formBox .inputBox > .inputBlock .fa-angle-right {color:#737373; width:30px; height:30px; line-height:30px; position:absolute; top:calc(50% - 15px); right:0px; font-size:16px;}
+.ModuleMemberAccountDefault .formBox .inputBox > .inputBlock .helpBlock {font-size:12px;}
+.ModuleMemberAccountDefault .formBox .inputBox .memberPhoto {width:150px; height:150px;}
+.ModuleMemberAccountDefault .formBox .clickBlock {cursor:pointer;}
+
+.ModuleMemberAccountDefault .gridBox {margin-bottom:15px; background:#fff; box-shadow:rgba(0, 0, 0, 0.258824) 0px 2px 5px 0px;}
+.ModuleMemberAccountDefault .gridBox a {text-decoration:none; color:#4983f5;}
+.ModuleMemberAccountDefault .gridBox > table {width:100%; table-layout:fixed; border-collapse: collapse;}
+.ModuleMemberAccountDefault .gridBox > table td {border-right:1px solid #ebebeb;}
+.ModuleMemberAccountDefault .gridBox > table td:last-child {border-right:0px;}
+.ModuleMemberAccountDefault .gridBox > table > thead > tr {background:#f5f5f5; border-bottom:1px solid #ebebeb;}
+.ModuleMemberAccountDefault .gridBox > table > thead > tr > td {height:50px; line-height:50px; white-space:nowrap; text-overflow:ellipsis; padding:0px 10px; font-size:13px; color:#222; font-weight:bold; overflow:hidden;}
+.ModuleMemberAccountDefault .gridBox > table > tbody > tr {background:#fff; border-bottom:1px solid #ebebeb;}
+.ModuleMemberAccountDefault .gridBox > table > tbody > tr > td {height:46px; line-height:46px; white-space:nowrap; text-overflow:ellipsis; padding:0px 10px; font-size:12px; color:#666; overflow:hidden;}
+.ModuleMemberAccountDefault .gridBox > table > tbody > tr > td.number {font-family:OpenSans; font-weight:300;}
+
+.ModuleMemberAccountDefault .gridBox table.push thead button {float:right; height:30px; line-height:30px; background:#427ff3; color:#fff; padding:0px 10px; font-size:12px; cursor:pointer; border:0px; margin-top:10px;}
+.ModuleMemberAccountDefault .gridBox table.push .image {font-size:0px; line-height:0 !important; padding:6px;}
+.ModuleMemberAccountDefault .gridBox table.push .image > img {width:38px; height:38px;}
+.ModuleMemberAccountDefault .gridBox table.push .content {padding:8px 10px 8px 0px; overflow:auto; text-overflow:clip; white-space:normal;}
+.ModuleMemberAccountDefault .gridBox table.push .content .reg_date {font-family:OpenSans; font-size:11px; color:#4983f5;}
+.ModuleMemberAccountDefault .gridBox table.push tbody td {height:auto; border-right:0px; vertical-align:top; line-height:1.6;}
+.ModuleMemberAccountDefault .gridBox table.push .unread {background:#edeff6; cursor:pointer;}
+.ModuleMemberAccountDefault .gridBox table.push .unread td {border-bottom:1px solid #ddd;}
+.ModuleMemberAccountDefault .gridBox table.push .readed {background:#fff; cursor:pointer;}
+.ModuleMemberAccountDefault .gridBox table.push .notarget {background:#f5f5f5 !important; cursor:not-allowed !important;}
+
+.ModuleMemberAccountDefault section[data-role=form] button[type=submit] {width:100%; height:40px; border:1px solid #3079ed; color:#fff; text-shadow:0 1px rgba(0,0,0,0.1); background-color:#4d90fe; background-image:-webkit-linear-gradient(top,#4d90fe,#4787ed); background-image:-moz-linear-gradient(top,#4d90fe,#4787ed); background-image:-ms-linear-gradient(top,#4d90fe,#4787ed); background-image:-o-linear-gradient(top,#4d90fe,#4787ed); background-image:linear-gradient(top,#4d90fe,#4787ed); font-size:15px; cursor:pointer;}
+.ModuleMemberAccountDefault section[data-role=form] button[type=submit]:hover {border:1px solid #2f5bb7; background-color:#357ae8; background-image:-webkit-linear-gradient(top,#4d90fe,#357ae8); background-image:-moz-linear-gradient(top,#4d90fe,#357ae8); background-image:-ms-linear-gradient(top,#4d90fe,#357ae8); background-image:-o-linear-gradient(top,#4d90fe,#357ae8); background-image:linear-gradient(top,#4d90fe,#357ae8);}
+.ModuleMemberAccountDefault section[data-role=form] button[type=submit][disabled] {opacity:0.8; background-color:#4d90fe !important; background-image:none !important; cursor:not-allowed;}
+
+.ModuleMemberAccountDefault .login {margin:50px 0px; text-align:center;}
+.ModuleMemberAccountDefault .login h4 {width:200px; height:50px; display:block; margin:0px; background-size:contain; background-repeat:no-repeat; margin:20px auto; font-size:0px; background-position:50% 50%;}
+.ModuleMemberAccountDefault .login p {color:#666; font-size:13px; line-height:2.0; margin-bottom:10px;}
+.ModuleMemberAccountDefault .login .formBox {width:400px; margin:0 auto; background:#fff; box-shadow:rgba(0, 0, 0, 0.258824) 0px 2px 5px 0px; padding:40px; box-sizing:border-box;}
+.ModuleMemberAccountDefault .login .formBox .photo {width:90px; height:90px; border-radius:50%; background-size:cover; margin:0px auto; margin-bottom:20px; border:1px solid #ccc;}
+.ModuleMemberAccountDefault .login .formBox .name {font-size:15px; font-weight:bold; color:#404040; text-align:center; height:26px; line-height:26px;}
+.ModuleMemberAccountDefault .login .formBox .email {font-size:15px; font-family:OpenSans; font-weight:400; color:#404040; text-align:center; height:26px; line-height:26px; margin-bottom:10px;}
+.ModuleMemberAccountDefault .login .formBox .inputBlock {margin-bottom:10px;}
+.ModuleMemberAccountDefault .login .formBox .helpBlock {text-align:left; font-size:12px;}
+.ModuleMemberAccountDefault .login .formBox button {width:100%; height:40px; border:1px solid #3079ed; color:#fff; text-shadow:0 1px rgba(0,0,0,0.1); background-color:#4d90fe; background-image:-webkit-linear-gradient(top,#4d90fe,#4787ed); background-image:-moz-linear-gradient(top,#4d90fe,#4787ed); background-image:-ms-linear-gradient(top,#4d90fe,#4787ed); background-image:-o-linear-gradient(top,#4d90fe,#4787ed); background-image:linear-gradient(top,#4d90fe,#4787ed); font-size:15px; cursor:pointer;}
+.ModuleMemberAccountDefault .login .formBox button:hover {border:1px solid #2f5bb7; background-color:#357ae8; background-image:-webkit-linear-gradient(top,#4d90fe,#357ae8); background-image:-moz-linear-gradient(top,#4d90fe,#357ae8); background-image:-ms-linear-gradient(top,#4d90fe,#357ae8); background-image:-o-linear-gradient(top,#4d90fe,#357ae8); background-image:linear-gradient(top,#4d90fe,#357ae8);}
+.ModuleMemberAccountDefault .login .formBox button[disabled] {opacity:0.8; background-color:#4d90fe !important; background-image:none !important; cursor:not-allowed;}
+.ModuleMemberAccountDefault .login ul {padding:0px; margin:0px; list-style:none; display:table; width:100%; table-layout:fixed;}
+.ModuleMemberAccountDefault .login ul li {display:table-cell; width:50%; padding:10px 0px;}
+.ModuleMemberAccountDefault .login ul li a {color:#427fed; font-size:12px; text-decoration:none;}
+.ModuleMemberAccountDefault .login ul li:last-child {text-align:right;}
+
+
+@media (max-width:767px) {
+	.ModuleMemberAccountDefault .accountLayout aside {display:none;}
+	.ModuleMemberAccountDefault .accountTitle section i.fa-bars {display:inline-block;}
+	
+	.ModuleMemberAccountDefault section.column {display:block;}
+	.ModuleMemberAccountDefault section.column > aside, .ModuleMemberAccountDefault section.column > section {display:block; width:100%; max-width:600px; margin:0 auto; padding:0px;}
+	.ModuleMemberAccountDefault section.column > aside {margin-bottom:20px;}
+	
+	.ModuleMemberAccountDefault section > aside h4 {font-size:24px;}
+	.ModuleMemberAccountDefault section > aside div {font-size:14px;}
+	
+	.ModuleMemberAccountDefault .formBox .inputBox {display:block;}
+	.ModuleMemberAccountDefault .formBox .inputBox > label, .ModuleMemberAccountDefault .formBox .inputBox > .inputBlock {display:block; width:100%; box-sizing:border-box;}
+	.ModuleMemberAccountDefault .formBox .inputBox > label > div {height:auto; line-height:1; padding-top:5px; padding-bottom:0px; margin-bottom:-5px;}
+	.ModuleMemberAccountDefault .formBox .inputBox > .inputBlock {padding:8px 15px;}
+	
+	.ModuleMemberAccountDefault .login .formBox {width:300px; padding:15px;}
+}
+@media (min-width:768px) and (max-width:991px) {
+	.ModuleMemberAccountDefault .accountLayout aside {display:none;}
+	.ModuleMemberAccountDefault .accountTitle section i.fa-bars {display:inline-block;}
+	
+	.ModuleMemberAccountDefault section.column {display:block;}
+	.ModuleMemberAccountDefault section.column > aside, .ModuleMemberAccountDefault section.column > section {display:block; width:100%; max-width:600px; margin:0 auto; padding:0px;}
+	.ModuleMemberAccountDefault section.column > aside {margin-bottom:20px;}
+	
+}
+@media (min-width:992px) and (max-width:1199px) {
+	.ModuleMemberAccountDefault .accountLayout aside {display:none;}
+	.ModuleMemberAccountDefault .accountTitle section i.fa-bars {display:inline-block;}
+}
+@media (min-width:1200px) {
+	.hidden-lg {display:none !important;}
+}

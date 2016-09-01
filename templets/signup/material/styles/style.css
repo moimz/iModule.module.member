@@ -1,0 +1,33 @@
+.ModuleMemberSignUpMaterial {width:100%; max-width:650px; margin:50px auto; background:#fff; box-shadow:rgba(0, 0, 0, 0.298039) 0px 2px 2px 0px;}
+
+.ModuleMemberSignUpMaterial ul.stepbar {width:100%; height:60px; margin:0px 0px 20px 0px; list-style:none; font-size:0px;}
+.ModuleMemberSignUpMaterial ul.stepbar li {width:25%; height:60px; display:inline-block; background:#c0c3c4; vertical-align:middle; border:1px solid #aeb0b3;  -webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box; border-right:0px; text-align:center; color:#fff; font-weight:bold;}
+.ModuleMemberSignUpMaterial ul.stepbar li i.fa {color:#eee; font-size:20px; height:60px; vertical-align:middle; display:inline-block; line-height:60px; margin-right:5px;}
+.ModuleMemberSignUpMaterial ul.stepbar li span {font-size:13px; height:60px; vertical-align:middle; display:inline-block; line-height:58px;}
+.ModuleMemberSignUpMaterial ul.stepbar li.current {border-color:#363739; background:#4c4f53; color:#ffe333;}
+.ModuleMemberSignUpMaterial ul.stepbar li.current i.fa {color:#fff;}
+
+.ModuleMemberSignUpMaterial .box {padding:15px;}
+
+.ModuleMemberSignUpMaterial h4 {font-size:13px; font-weight:bold; display:block; padding:10px 0px; border-bottom:2px solid #373737; background:#fff;}
+.ModuleMemberSignUpMaterial .terms {border:1px solid #e5e5e5; padding:10px; line-height:1.6; height:400px; overflow-y:scroll;}
+.ModuleMemberSignUpMaterial .buttons {margin-top:10px; text-align:right;}
+
+.ModuleMemberSignUpMaterial .formTable {table-layout:fixed; width:100%; border-spacing:0px; border-collapse:collapse;}
+.ModuleMemberSignUpMaterial .formTable .info {padding:10px; line-height:1.8; background:#e4f5fd; border-bottom:1px solid #98c1e5; color:#4680ae;}
+.ModuleMemberSignUpMaterial .formTable td.label {width:120px; background:#f4f4f4; font-size:12px; font-weight:bold; padding:0px 10px;}
+.ModuleMemberSignUpMaterial .formTable td.input {width:100%;}
+.ModuleMemberSignUpMaterial .formTable td.input .inputBlock {font-size:12px; line-height:1.6; background:#fff; padding:8px; border-left:1px dotted #ccc;}
+.ModuleMemberSignUpMaterial .formTable td.input .inputBlock input {max-width:100%;}
+.ModuleMemberSignUpMaterial .formTable tr.split {background:#e5e5e5; height:1px; font-size:0px;}
+.ModuleMemberSignUpMaterial .formTable tr.splitBottom {height:4px;}
+.ModuleMemberSignUpMaterial .formTable tr.splitBottom div {border-top:1px solid #ccc; background:#f4f4f4; height:3px;}
+
+.ModuleMemberSignUpMaterial .formTable td.input .box .helpBlock {margin-top:5px; line-height:1.6;}
+
+@media (max-width:767px) {
+	.ModuleMemberSignUpMaterial ul.stepbar li i.fa {display:block; margin-right:0px; height:20px; line-height:20px; margin-top:10px;}
+	.ModuleMemberSignUpMaterial ul.stepbar li span {display:block; height:30px; line-height:30px;}
+	.ModuleMemberSignUpMaterial .formTable td.label {width:80px; line-height:1.6;}
+	.ModuleMemberSignUpMaterial .formTable td.input .btn {display:block; margin-top:5px; width:100%;}
+}

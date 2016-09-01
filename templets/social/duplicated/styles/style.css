@@ -1,0 +1,8 @@
+.ModuleMemberSocialBox {margin:100px auto; width:95%; max-width:400px;}
+.ModuleMemberSocialBox h4 {display:block; text-align:center; font-size:16px; font-weight:200; margin-bottom:20px;}
+.ModuleMemberSocialBox .loginBox {display:block; background:#f7f7f7; padding:20px; box-shadow:0px 1px 2px rgba(0,0,0,0.3);}
+.ModuleMemberSocialBox .loginBox .photo {margin:20px auto; width:98px; height:98px; border-radius:50px; border:1px solid #ddd; overflow:hidden;}
+.ModuleMemberSocialBox .loginBox .photo img {width:98px; height:98px;}
+.ModuleMemberSocialBox .loginBox input {margin:5px 0px;}
+.ModuleMemberSocialBox .loginBox button {display:block; width:100%; margin-top:10px;}
+.ModuleMemberSocialBox .loginBox .description {font-size:12px; line-height:1.8; margin:20px 0px; color:#666; font-size:11px;}

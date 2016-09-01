@@ -1,0 +1,22 @@
+.ModuleMemberModifyDefault h4 {font-size:14px; font-weight:bold; display:block; padding:10px 0px; border-bottom:2px solid #373737; background:#fff;}
+.ModuleMemberModifyDefault .buttons {margin-top:10px; text-align:right; margin-bottom:15px;}
+
+.ModuleMemberModifyDefault .formTable {table-layout:fixed; width:100%; border-spacing:0px; border-collapse:collapse;}
+.ModuleMemberModifyDefault .formTable td.label {width:120px; background:#f4f4f4; font-size:12px; font-weight:bold; padding:0px 10px;}
+.ModuleMemberModifyDefault .formTable td.input {width:100%;}
+.ModuleMemberModifyDefault .formTable td.input .inputBlock {font-size:12px; line-height:1.6; background:#fff; padding:8px; border-left:1px dotted #ccc;}
+.ModuleMemberModifyDefault .formTable td.input .inputBlock input {max-width:100%;}
+.ModuleMemberModifyDefault .formTable tr.split {background:#e5e5e5; height:1px; font-size:0px;}
+.ModuleMemberModifyDefault .formTable tr.splitBottom {height:4px;}
+.ModuleMemberModifyDefault .formTable tr.splitBottom div {border-top:1px solid #ccc; background:#f4f4f4; height:3px;}
+
+.ModuleMemberModifyDefault .memberPhoto {border:1px solid #ccc; width:100px; height:100px; border-radius:3px; vertical-align:bottom;}
+
+.ModuleMemberModifyDefault .formTable td.input .box .helpBlock {margin-top:5px; line-height:1.6;}
+
+@media (max-width:767px) {
+	.ModuleMemberModifyDefault ul.stepbar li i.fa {display:block; margin-right:0px; height:20px; line-height:20px; margin-top:10px;}
+	.ModuleMemberModifyDefault ul.stepbar li span {display:block; height:30px; line-height:30px;}
+	.ModuleMemberModifyDefault .formTable td.label {width:80px; line-height:1.6;}
+	.ModuleMemberSignUpDefault .formTable td.input .btn {display:block; margin-top:5px; width:100%;}
+}

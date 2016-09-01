@@ -1,0 +1,313 @@
+{
+	"label":"회원라벨",
+	"label_none":"라벨없음",
+	"templet":"템플릿",
+	"contexts":{
+		"signup":"회원가입"
+	},
+	"account":{
+		"title":"계정관리",
+		"logout":[
+			{
+				"title":"계정관리",
+				"pages":{
+					"signup":"회원가입",
+					"help":"패스워드 재발급"
+				}
+			}
+		],
+		"logged":[
+			{
+				"title":"대시보드",
+				"page":"dashboard"
+			},{
+				"title":"개인정보관리",
+				"pages":{
+					"modify":"회원정보수정",
+					"password":"패스워드변경",
+					"point":"포인트 내역",
+					"push":"알림 메세지",
+					"leave":"회원탈퇴"
+				}
+			}
+		]
+	},
+	"info":{
+		"email":"이메일주소",
+		"password":"패스워드",
+		"password_confirm":"패스워드확인",
+		"password_verify":"패스워드인증",
+		"name":"실명",
+		"nickname":"닉네임",
+		"exp":"경험치",
+		"point":"포인트",
+		"photo":"프로필이미지"
+	},
+	"login":{
+		"title":"로그인",
+		"login":"로그인",
+		"logout":"로그아웃",
+		"auto":"자동로그인",
+		"login_loading":"로그인중...",
+		"logout_loading":"로그아웃중...",
+		"error":{
+			"email":"이메일주소를 확인할 수 없습니다.",
+			"password":"패스워드가 일치하지 않습니다.",
+			"login":"연속으로 5회이상 로그인에 실패하여 5분간 로그인을 할 수 없습니다."
+		}
+	},
+	"push":{
+		"title":"알림함"
+	},
+	"messagebox":{
+		"title":"쪽지함"
+	},
+	"find":{
+		"title":"정보찾기"
+	},
+	"signup":{
+		"title":"회원가입",
+		"loading":"처리중...",
+		"step":{
+			"agreement":"약관동의",
+			"cert":"본인인증",
+			"insert":"정보입력",
+			"verify":"가입인증",
+			"complete":"가입완료"
+		},
+		"help":{
+			"email":{
+				"default":"사용하고 계시는 이메일주소를 입력하여 주십시오. 로그인시 이메일주소를 이용합니다.",
+				"success":"이메일주소가 확인되었습니다.",
+				"error":"이메일주소가 형식에 맞지 않습니다.",
+				"duplicated":"이메일주소가 중복됩니다. 다른이메일주소로 시도하시거나, 회원가입여부를 확인하여 주십시오."
+			},
+			"name":{
+				"default":"실명을 입력하여 주십시오. 해당이름은 본인확인을 위해서만 사용되며 사이트에서 노출되지 않습니다.",
+				"success":"실명이 확인되었습니다.",
+				"error":"실명을 입력하여 주십시오."
+			},
+			"password":{
+				"default":"영문 및 숫자 그리고 특수문자를 조합하여 4자 이상으로 입력하여 주십시오.",
+				"error":"패스워드가 너무 짧습니다.",
+				"success":"패스워드가 확인되었습니다."
+			},
+			"password_confirm":{
+				"default":"위에서 입력한 패스워드와 동일하게 한번 더 입력하여 주십시오.",
+				"error":"패스워드와 패스워드확인이 일치하지 않습니다.",
+				"success":"패스워드와 패스워드확인이 일치합니다."
+			},
+			"nickname":{
+				"default":"사이트내에서 회원님을 나타낼 이름을 특수문자를 제외하고 2자이상 입력하여 주십시오.",
+				"error":"닉네임은 특수문자와 공백을 제외하고 2자이상 10자이내로 입력하여 주십시오.",
+				"success":"닉네임이 확인되었습니다.",
+				"duplicated":"닉네임이 중복됩니다. 다른 닉네임을 입력하여 주십시오."
+			},
+			"email_verify":"회원님의 이메일주소를 확인하기 위해, 확인 이메일을 전송하였습니다.<br>이메일에 포함된 인증코드 6자리를 입력하신 후 가입을 완료하시거나, 이메일에 포함된 링크를 클릭하여 회원가입을 완료할 수 있습니다.<br>이메일을 수신하지 못하였다면 스팸함을 확인해보시거나, 아래에 입력된 이메일주소를 다시 확인하신 후 이메일 재전송버튼을 클릭하여 주십시오.",
+			"email_verify_code":{
+				"default":"인증이메일에 포함된 인증코드 6자리를 입력하여 주십시오.<br>또는 이 과정을 생략하고, 이메일에 포함된 링크를 클릭하여 회원가입을 완료할 수 있습니다.",
+				"error":"이메일 인증코드를 입력하여 주십시오.",
+				"fail":"이메일 인증코드가 일치하지 않습니다."
+			}
+		},
+		"terms":"회원약관",
+		"cert":"본인인증",
+		"default":"기본정보입력",
+		"email_verify":"이메일주소 인증",
+		"email_verify_code":"인증코드",
+		"next":"다음단계",
+		"prev":"이전단계",
+		"cancel":"취소"
+	},
+	"verify":{
+		"title":"패스워드 확인",
+		"loading":"확인중",
+		"help":{
+			"password":{
+				"default":"개인정보보호를 위해 패스워드를 다시 입력하여 주시기 바랍니다.",
+				"error":"패스워드가 일치하지 않습니다."
+			}
+		}
+	},
+	"verifyEmail":{
+		"email_verify_code":"인증코드",
+		"help":{
+			"email":{
+				"notFound":"이메일인증메일을 발송한적이 없는 이메일주소입니다. 인증메일재발송을 하여 주십시오."
+			},
+			"email_verify_code":{
+				"error":"인증코드가 일치하지 않습니다."
+			}
+		},
+		"error":{
+			"target":"이메일주소 인증대상자가 아닙니다.",
+			"sending":"최근 5분내 이메일을 발송하였습니다. 잠시 후 다시 시도하여주십시오.",
+			"email":"이메일주소가 올바르지 않습니다. 이메일주소를 정확히 입력하여 주십시오."
+		},
+		"sending":"인증메일을 발송하였습니다. 최대 5분이내 인증메일을 받지 못하였을 경우 재발송버튼을 클릭하여 주시기 바랍니다."
+	},
+	"modify":{
+		"title":"정보수정",
+		"default":"기본정보수정",
+		"social":"소셜네트워크 연결",
+		"success":"성공적으로 수정하였습니다."
+	},
+	"password":{
+		"title":"패스워드변경",
+		"old_password":"기존패스워드",
+		"password":"변경할 패스워드",
+		"password_confirm":"패스워드 확인",
+		"success":"성공적으로 패스워드를 변경하였습니다. 다음부터 변경한 패스워드로 로그인이 가능합니다.",
+		"help":{
+			"old_password":{
+				"default":"기존 패스워드를 다시 입력하여 주시기 바랍니다.",
+				"success":"기존 패스워드가 확인되었습니다.",
+				"error":"기존 패스워드가 일치하지 않습니다."
+			}
+		}
+	},
+	"photoEdit":{
+		"title":"프로필이미지 수정",
+		"success":"프로필 이미지를 성공적으로 업로드하였습니다.",
+		"error":"이미지파일을 인식할 수 없습니다. 다른 이미지로 다시 시도하여 주십시오."
+	},
+	"modifyEmail":{
+		"title":"이메일주소 변경",
+		"email":"변경할 이메일주소",
+		"code":"인증코드",
+		"sending":"인증메일 전송중...",
+		"sendVerifyEmail":"인증메일 전송하기",
+		"success":"이메일주소가 성공적으로 변경되었습니다. 이후 변경한 이메일주소로 로그인할 수 있습니다.",
+		"help":{
+			"email":{
+				"default":"변경할 이메일주소를 입력하신 후 이메일인증버튼을 클릭하여 주십시오.",
+				"error":"이메일주소가 올바르지 않습니다. 이메일주소를 정확히 입력하여 주십시오.",
+				"duplicated":"이미 사용하고 있는 이메일주소입니다."
+			},
+			"code":{
+				"default":"인증 이메일에 포함된 코드 6자리를 입력하여 주십시오.",
+				"error":"인증코드가 일치하지 않습니다."
+			}
+		}
+	},
+	"point":{
+		"title":"포인트 내역",
+		"description":"회원님의 포인트 변동내역을 모두 확인할 수 있습니다.",
+		"content":"변동사유",
+		"point":"변동포인트",
+		"reg_date":"변경일"
+	},
+	"social":{
+		"facebook":{
+			"name":"페이스북",
+			"login":"페이스북으로 로그인",
+			"connect":"페이스북계정 연결",
+			"disconnect":"페이스북계정 연결해제"
+		},
+		"google":{
+			"name":"구글계정",
+			"login":"구글계정으로 로그인",
+			"connect":"구글계정 연결",
+			"disconnect":"구글계정 연결해제"
+		},
+		"github":{
+			"name":"깃허브",
+			"login":"깃허브 로그인",
+			"connect":"깃허브계정 연결",
+			"disconnect":"깃허브계정 연결해제"
+		}
+	},
+	"mypage":{
+		"title":"마이페이지"
+	},
+	"config":{
+		"title":"환경설정"
+	},
+	"error":{
+		"required":"필수항목입니다.",
+		"notFound":"해당 항목을 찾을 수 없습니다.",
+		"notLogged":"먼저 로그인을 하여주십시오.",
+		"invaildCode":"유효한 코드가 아닙니다."
+	},
+	"button":{
+		"confirm":"확인",
+		"cancel":"취소",
+		"modifyPhoto":"프로필이미지수정",
+		"modify_email":"이메일변경",
+		"email_verify_resend":"인증메일 재전송"
+	},
+	"admin":{
+		"grid_help":"더블클릭 : 상세정보 및 수정 / 마우스우클릭 : 상세메뉴",
+		"list":{
+			"title":"회원관리",
+			"addMember":"회원추가",
+			"status":{
+				"ACTIVE":"활성",
+				"DEACTIVE":"비활성",
+				"VERIFYING":"인증전",
+				"WAITING":"승인대기"
+			},
+			"columns":{
+				"status":"상태",
+				"email":"이메일주소",
+				"nickname":"닉네임",
+				"exp":"경험치",
+				"point":"포인트",
+				"reg_date":"가입일",
+				"last_login":"최종접속일"
+			}
+		},
+		"label":{
+			"title":"회원유형관리",
+			"labelTitle":"유형목록",
+			"addLabel":"유형추가",
+			"default":"기본유형",
+			"window":{
+				"add":"유형추가",
+				"modify":"유형수정"
+			},
+			"columns":{
+				"title":"유형명",
+				"membernum":"소속회원수"
+			},
+			"form":{
+				"title":"유형명",
+				"allow_signup":"가입허용여부",
+				"allow_signup_help":"해당 유형으로 회원가입을 허용합니다.",
+				"allow_signup_help_default":"(기본유형의 회원가입을 허용하지 않을 경우 회원가입이 불가능해집니다.)",
+				"auto_active":"자동승인여부",
+				"auto_active_help":"해당 유형으로 회원가입을 할 경우 자동으로 회원승인이 됩니다.",
+				"auto_active_help_default":"(기본유형의 자동승인여부를 비활성화하면 모든 회원은 회원가입 후 관리자의 승인이 필요합니다.)",
+				"auto_active":"자동승인여부",
+				"auto_active_help":"해당 유형으로 회원가입을 할 경우 자동으로 회원승인이 됩니다.",
+				"auto_active_help_default":"(기본유형의 자동승인여부를 비활성화하면 모든 회원은 회원가입 후 관리자의 승인이 필요합니다.)",
+				"is_change":"유형전환여부",
+				"is_change_help":"다른 유형으로 가입한 이후 정보수정에서 이 유형을 선택(또는 중복유형)할 수 있습니다.",
+				"is_change_help_default":"(기본유형은 해당 설정이 불가능합니다.)",
+				"is_unique":"단독유형여부",
+				"is_unique_help":"해당 유형으로 가입한 회원은 다른 유형을 추가로 선택할 수 없습니다.",
+				"is_unique_help_default":"(기본유형은 해당 설정이 불가능합니다.)"
+			}
+		},
+		"config":{
+			"signupStep":{
+				"agreement":"약관동의",
+				"label":"회원유형선택",
+				"cert":"실명인증",
+				"insert":"회원정보입력",
+				"verify":"이메일주소인증",
+				"complete":"가입완료"
+			},
+			"form":{
+				"signup":"회원가입페이지 설정",
+				"signupText":"회원가입메세지",
+				"signupStep":"회원가입절차",
+				"signupStepAvailable":"사용가능단계",
+				"signupStepUsed":"사용중인단계",
+				"addSignupStep":"선택단계사용",
+				"deleteSignupStep":"선택단계삭제",
+				"accountType":"페이지형식"
+			}
+		}
+	}
+}
