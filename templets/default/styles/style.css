@@ -1,0 +1,17 @@
+/**
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ *
+ * 회원모듈 기본템플릿 스타일정의
+ *
+ * @file /modules/member/templets/default/styles/style.css
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160922
+ */
+
+div[data-role=context][data-module=member] {}
+
+/**
+ * 회원가입 컨텍스트
+ */
+div[data-role=context][data-module=member] section.signup {}

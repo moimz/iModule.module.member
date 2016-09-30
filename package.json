@@ -1,6 +1,6 @@
 {
 	"id":"com.moimz.imodule.module.member",
-	"icon":"fa-user",
+	"icon":"mi-group",
 	"title":{
 		"ko":"회원"
 	},
@@ -25,37 +25,50 @@
 	"context":true,
 	"global":true,
 	"article":false,
+	"widget":true,
 	"attachments":[
 		"member"
 	],
 	"configs":{
-		"accountTemplet":{
+		"templet":{
 			"type":"string",
 			"value":"default"
 		},
-		"accountType":{
-			"type":"string",
-			"value":"standalone"
+		"allow_signup":{
+			"type":"boolean",
+			"value":true
 		},
-		"signupText":{
-			"type":"string",
-			"value":"Welcome to membership service"
+		"approve_signup":{
+			"type":"boolean",
+			"value":true
 		},
-		"signupStep":{
+		"label":{
+			"type":"int",
+			"value":0
+		},
+		"default_label_title":{
+			"type":"string",
+			"value":"LANGUAGE_SETTING"
+		},
+		"default_label_title_languages":{
+			"type":"object",
+			"value":{}
+		},
+		"point":{
+			"type":"int",
+			"value":1000
+		},
+		"exp":{
+			"type":"int",
+			"value":0
+		},
+		"universal_login":{
+			"type":"boolean",
+			"value":true
+		},
+		"signup_step":{
 			"type":"array",
 			"value":["agreement","insert","complete"]
-		},
-		"autoActive":{
-			"type":"boolean",
-			"value":true
-		},
-		"allowSignup":{
-			"type":"boolean",
-			"value":true
-		},
-		"signupPoint":{
-			"type":"int",
-			"value":2000
 		}
 	},
 	"databases":{
@@ -137,6 +150,10 @@
 					"type":"varchar",
 					"length":20
 				},
+				"languages":{
+					"type":"text",
+					"is_null":true
+				},
 				"membernum":{
 					"type":"int",
 					"length":11,
@@ -147,15 +164,31 @@
 					"length":"'TRUE','FALSE'",
 					"default":"TRUE"
 				},
-				"auto_active":{
+				"approve_signup":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"FALSE"
+				},
+				"is_change":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
 					"default":"TRUE"
+				},
+				"is_unique":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"FALSE"
+				},
+				"sort":{
+					"type":"int",
+					"length":11,
+					"default":0
 				}
 			},
 			"indexes":{
 				"idx":"primary_key"
-			}
+			},
+			"auto_increment":"idx"
 		},
 		"member_level_table":{
 			"columns":{
@@ -312,22 +345,34 @@
 					"type":"varchar",
 					"length":20
 				},
+				"input":{
+					"type":"varchar",
+					"length":20
+				},
 				"title":{
 					"type":"varchar",
 					"length":50
+				},
+				"title_languages":{
+					"type":"text",
+					"is_null":true
 				},
 				"help":{
 					"type":"varchar",
 					"length":255,
 					"is_null":true
 				},
+				"help_languages":{
+					"type":"text",
+					"is_null":true
+				},
 				"configs":{
 					"type":"longtext"
 				},
-				"allow_blank":{
+				"is_required":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"TRUE"
+					"default":"FALSE"
 				},
 				"sort":{
 					"type":"int",
@@ -339,9 +384,9 @@
 				"label,name":"primary_key"
 			},
 			"datas":[
-				{"label":0,"name":"email","type":"email","title":"","allow_blank":"FALSE","configs":"{}","sort":0},
-				{"label":0,"name":"password","type":"password","title":"","allow_blank":"FALSE","configs":"{}","sort":1},
-				{"label":0,"name":"nickname","type":"nickname","title":"","allow_blank":"FALSE","configs":"{}","sort":2}
+				{"label":0,"name":"email","type":"email","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":0},
+				{"label":0,"name":"password","type":"password","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":1},
+				{"label":0,"name":"nickname","input":"nickname","type":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":2}
 			]
 		},
 		"member_social_oauth_table":{

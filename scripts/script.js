@@ -1,8 +1,51 @@
+/**
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ *
+ * 회원모듈 기본템플릿 스타일정의
+ *
+ * @file /modules/member/templets/default/styles/style.css
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160922
+ */
+
 var Member = {
 	signup:{
 		init:function() {
-			$("#ModuleMemberSignUpForm").formInit(Member.signup.submit,Member.signup.check);
+			var $form = $("#ModuleMemberSignUpForm");
+			var step = $("input[name=step]",$form).val();
+			var next = $("input[name=next]",$form).val();
+			
+			if (step == "agreement") {
+				$("button[type=submit]",$form).prop("disabled",true);
+				$("input[type=checkbox]",$form).on("change",function() {
+					$("button[type=submit]",$form).prop("disabled",$("input[type=checkbox]",$form).length != $("input[type=checkbox]:checked",$form).length);
+				});
+				
+				$form.on("submit",function() {
+					$("input[name=agreement]",$form).prop("disabled",true);
+				});
+			}
+			
+			if (step == "insert") {
+				$form.inits(Member.signup.submit);
+			} else if (next) {
+				$form.attr("method","post");
+				$form.attr("action",ENV.getUrl(null,null,next,false));
+				$("input[name=step]",$form).prop("disabled",true);
+				$("input[name=prev]",$form).prop("disabled",true);
+				$("input[name=next]",$form).prop("disabled",true);
+				$("input[name=templet]",$form).prop("disabled",true);
+			} else {
+				$form.on("submit",function() {
+					location.href = ENV.getUrl(false);
+					return false;
+				});
+			}
 		},
+		submit:function($form) {
+			console.log($form);
+		}/*,
 		check:function($input) {
 			if ($input.attr("name") == "password" || $input.attr("name") == "password_confirm") {
 				if ($input.val().length < 4) {
@@ -120,7 +163,7 @@ var Member = {
 					}
 				}
 			});
-		}
+		}*/
 	},
 	modify:{
 		init:function() {

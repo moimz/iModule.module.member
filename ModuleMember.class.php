@@ -1,35 +1,74 @@
 <?php
 /**
- * This file is part of iModule - https://www.imodule.kr
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
  *
- * @file ModuleMember.class.php
- * @author Arzz
+ * 회원과 관련된 모든 기능을 제어한다.
+ * 
+ * @file /modules/member/ModuleMember.class.php
+ * @author Arzz (arzz@arzz.com)
  * @license MIT License
+ * @version 3.0.0.160910
  */
 class ModuleMember {
-	private $IM; // Linked iModule core
-	private $Module; // Linked Module core
-	
-	private $lang = null; // Store language strings
-	private $oLang = null; // Store original language(defined package.json) strings
-	private $table; // defined modules' database tables
-	
-	private $logged = null;
-	
-	// Stored loaded members, memberPages for low DB connection
-	private $members = array();
-	private $memberPages = array();
+	/**
+	 * iModule 및 Module 코어클래스
+	 */
+	private $IM;
+	private $Module;
 	
 	/**
-	 * construct
+	 * DB 관련 변수정의
 	 *
-	 * @param object $IM iModule core
-	 * @param object $Module Module.class
+	 * @private string[] $table DB 테이블 별칭 및 원 테이블명을 정의하기 위한 변수
+	 */
+	private $table;
+	
+	/**
+	 * 언어셋을 정의한다.
+	 * 
+	 * @private object $lang 현재 사이트주소에서 설정된 언어셋
+	 * @private object $oLang package.json 에 의해 정의된 기본 언어셋
+	 */
+	private $lang = null;
+	private $oLang = null;
+	
+	/**
+	 * DB접근을 줄이기 위해 DB에서 불러온 데이터를 저장할 변수를 정의한다.
+	 *
+	 * @private $members 회원정보
+	 * @private $labels 라벨정보
+	 * @private $memberPages 회원관련 컨텍스트를 사용하고 있는 사이트메뉴 정보
+	 * @private $logged 현재 로그인한 회원정보
+	 */
+	private $members = array();
+	private $labels = array();
+	private $memberPages = array();
+	private $logged = null;
+	
+	/**
+	 * 에러 발생여부
+	 */
+	private $isError = false;
+	
+	/**
+	 * class 선언
+	 *
+	 * @param iModule $IM iModule 코어클래스
+	 * @param Module $Module Module 코어클래스
+	 * @see /classes/iModule.class.php
+	 * @see /classes/Module.class.php
 	 */
 	function __construct($IM,$Module) {
+		/**
+		 * iModule 및 Module 코어 선언
+		 */
 		$this->IM = $IM;
 		$this->Module = $Module;
 		
+		/**
+		 * 모듈에서 사용하는 DB 테이블 별칭 정의
+		 * @see 모듈폴더의 package.json 의 databases 참고
+		 */
 		$this->table = new stdClass();
 		$this->table->member = 'member_table';
 		$this->table->email = 'member_email_table';
@@ -42,41 +81,67 @@ class ModuleMember {
 		$this->table->member_label = 'member_member_label_table';
 		$this->table->token = 'member_token_table';
 		$this->table->activity = 'member_activity_table';
-
-		$this->IM->addSiteHeader('style',$this->Module->getDir().'/styles/style.css');
-		$this->IM->addSiteHeader('script',$this->Module->getDir().'/scripts/member.js');
 		
+		/**
+		 * 회원메뉴를 제공하기 위한 자바스크립트 및 스타일시트를 로딩한다.
+		 * 회원모듈은 글로벌모듈이기 때문에 모듈클래스 선언부에서 선언해주어야 사이트 레이아웃에 반영된다.
+		 */
+		$this->IM->addHeadResource('style',$this->Module->getDir().'/styles/style.css');
+		$this->IM->addHeadResource('script',$this->Module->getDir().'/scripts/script.js');
+		
+		/**
+		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
+		 */
 		$this->logged = Request('MEMBER_LOGGED','session') != null && Decoder(Request('MEMBER_LOGGED','session')) != false ? json_decode(Decoder(Request('MEMBER_LOGGED','session'))) : false;
 	}
 	
 	/**
-	 * Get database for this Module
+	 * 모듈 코어 클래스를 반환한다.
+	 * 현재 모듈의 각종 설정값이나 모듈의 package.json 설정값을 모듈 코어 클래스를 통해 확인할 수 있다.
 	 *
-	 * @return object DB.class
+	 * @return Module $Module
+	 */
+	function getModule() {
+		return $this->Module;
+	}
+	
+	/**
+	 * 모듈 설치시 정의된 DB코드를 사용하여 모듈에서 사용할 전용 DB클래스를 반환한다.
+	 *
+	 * @return DB $DB
 	 */
 	function db() {
 		return $this->IM->db($this->Module->getInstalled()->database);
 	}
 	
 	/**
-	 * Get Database table from the others class (table is private value)
+	 * 모듈에서 사용중인 DB테이블 별칭을 이용하여 실제 DB테이블 명을 반환한다.
 	 *
-	 * @param string $table table code
-	 * @return string $tableName return real table name without prefix
+	 * @param string $table DB테이블 별칭
+	 * @return string $table 실제 DB테이블 명
 	 */
 	function getTable($table) {
 		return empty($this->table->$table) == true ? null : $this->table->$table;
 	}
 	
 	/**
-	 * Get API /$language/api/member/$api
+	 * [코어] 사이트 외부에서 현재 모듈의 API를 호출하였을 경우, API 요청을 처리하기 위한 함수로 API 실행결과를 반환한다.
+	 * 소스코드 관리를 편하게 하기 위해 각 요쳥별로 별도의 PHP 파일로 관리한다.
 	 *
-	 * @param string $api API code
-	 * @return object $data return data for API code
+	 * @param string $api API명
+	 * @return object $datas API처리후 반환 데이터 (해당 데이터는 /api/index.php 를 통해 API호출자에게 전달된다.)
+	 * @see /api/index.php
 	 */
 	function getApi($api) {
 		$data = new stdClass();
 		$values = new stdClass();
+		
+		/**
+		 * 모듈의 api 폴더에 $api 에 해당하는 파일이 있을 경우 불러온다.
+		 */
+		if (is_file($this->Module->getPath().'/api/'.$api.'.php') == true) {
+			INCLUDE $this->Module->getPath().'/api/'.$api.'.php';
+		}
 		
 		/**
 		 * SignUp
@@ -100,7 +165,7 @@ class ModuleMember {
 				$label = $this->db()->select($this->table->label)->where('idx',$label)->getOne();
 				if ($label == null) {
 					$autoActive = $allowSignup = false;
-					$errors['label'] = $this->getLanguage('error/notFound');
+					$errors['label'] = $this->getLanguage('error/not_found');
 					$label = 0;
 				} else {
 					$autoActive = $label->auto_active == 'TRUE';
@@ -300,7 +365,7 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get Push message
+	 * [코어] 푸시메세지를 구성한다.
 	 *
 	 * @param string $code Push Code
 	 * @param int $fromcode Push target idx
@@ -333,43 +398,78 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get Context list for Admin's sitemap panel
+	 * [사이트관리자] 모듈 설정패널을 구성한다.
+	 *
+	 * @return string $panel 설정패널 HTML
+	 */
+	function getConfigPanel() {
+		/**
+		 * 설정패널 PHP에서 iModule 코어클래스와 모듈코어클래스에 접근하기 위한 변수 선언
+		 */
+		$IM = $this->IM;
+		$Module = $this->Module;
+		
+		ob_start();
+		INCLUDE $this->Module->getPath().'/admin/configs.php';
+		$panel = ob_get_contents();
+		ob_end_clean();
+		
+		return $panel;
+	}
+	
+	/**
+	 * [사이트관리자] 모듈 관리자패널 구성한다.
+	 *
+	 * @return string $panel 관리자패널 HTML
+	 */
+	function getAdminPanel() {
+		/**
+		 * 설정패널 PHP에서 iModule 코어클래스와 모듈코어클래스에 접근하기 위한 변수 선언
+		 */
+		$IM = $this->IM;
+		$Module = $this->Module;
+		
+		ob_start();
+		INCLUDE $this->Module->getPath().'/admin/index.php';
+		$panel = ob_get_contents();
+		ob_end_clean();
+		
+		return $panel;
+	}
+	
+	/**
+	 * [사이트관리자] 모듈의 전체 컨텍스트 목록을 반환한다.
 	 *
 	 * @param object $site call by site data
 	 * @return object $contexts
 	 */
-	function getContextList($site) {
-		$contexts = $this->getLanguage('contexts');
+	function getContexts() {
+		$contexts = $this->getLanguage('admin/contexts');
 		$lists = array();
 		foreach ($contexts as $context=>$title) {
 			$lists[] = array('context'=>$context,'title'=>$title);
 		}
 		
-		$results = new stdClass();
-		$results->success = true;
-		$results->lists = $lists;
-		$results->count = count($lists);
-		
-		return $results;
+		return $lists;
 	}
 	
 	/**
-	 * Get Context configs for Admin's sitemap panel
+	 * [사이트관리자] 모듈의 컨텍스트 환경설정을 구성한다.
 	 *
-	 * @param object $site call by site data
-	 * @param string $context call by context value
-	 * @return object $contexts
+	 * @param object $site 설정대상 사이트
+	 * @param string $context 설정대상 컨텍스트명
+	 * @return object[] $configs 환경설정
 	 */
 	function getContextConfigs($site,$context) {
 		$configs = array();
 		
 		if ($context == 'signup') {
 			$label = new stdClass();
-			$label->title = $this->getLanguage('label');
+			$label->title = $this->getLanguage('text/label');
 			$label->name = 'label';
 			$label->type = 'select';
 			$label->data = array();
-			$label->data[] = array(0,$this->getLanguage('label_none'));
+			$label->data[] = array(0,$this->getLanguage('text/no_label'));
 			$labels = $this->db()->select($this->table->label,'idx,title')->get();
 			for ($i=0, $loop=count($labels);$i<$loop;$i++) {
 				$label->data[] = array($labels[$i]->idx,$labels[$i]->title);
@@ -379,40 +479,33 @@ class ModuleMember {
 		}
 		
 		$templet = new stdClass();
-		$templet->title = $this->getLanguage('templet');
+		$templet->title = $this->IM->getLanguage('text/templet');
 		$templet->name = 'templet';
 		$templet->type = 'select';
 		$templet->data = array();
 		
-		$templetsPath = @opendir($this->Module->getPath().'/templets/'.$context);
-		while ($templetName = @readdir($templetsPath)) {
-			if ($templetName != '.' && $templetName != '..' && is_dir($this->Module->getPath().'/templets/'.$context.'/'.$templetName) == true) {
-				$templet->data[] = array($templetName,__IM_DIR__.'/templets/'.$context.'/'.$templetName);
-			}
-		}
-		@closedir($templetsPath);
+		$templet->data[] = array('#',$this->getLanguage('admin/configs/form/default_setting'));
 		
-		$templetsPath = @opendir(__IM_PATH__.'/templets/'.$site->templet.'/templets/modules/member/templets/'.$context);
-		while ($templetName = @readdir($templetsPath)) {
-			if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/templets/'.$site->templet.'/templets/modules/member/templets/'.$context.'/'.$templetName) == true) {
-				$templet->data[] = array('@'.$templetName,__IM_DIR__.'/templets/'.$site->templet.'/templets/modules/member/templets/'.$context.'/'.$templetName);
-			}
+		$templets = $this->Module->getTemplets();
+		for ($i=0, $loop=count($templets);$i<$loop;$i++) {
+			$templet->data[] = array($templets[$i]->name,$templets[$i]->title.' ('.$templets[$i]->dir.')');
 		}
-		@closedir($templetsPath);
 		
-		$templet->value = 'default';
+		$templet->value = count($templet->data) > 0 ? $templet->data[0][0] : '#';
 		$configs[] = $templet;
 		
 		return $configs;
 	}
 	
 	/**
-	 * Get language string from language code
+	 * 언어셋파일에 정의된 코드를 이용하여 사이트에 설정된 언어별로 텍스트를 반환한다.
+	 * 코드에 해당하는 문자열이 없을 경우 1차적으로 package.json 에 정의된 기본언어셋의 텍스트를 반환하고, 기본언어셋 텍스트도 없을 경우에는 코드를 그대로 반환한다.
 	 *
-	 * @param string $code language code (json key)
-	 * @return string language string
+	 * @param string $code 언어코드
+	 * @param string $replacement 일치하는 언어코드가 없을 경우 반환될 메세지 (기본값 : null, $code 반환)
+	 * @return string $language 실제 언어셋 텍스트
 	 */
-	function getLanguage($code) {
+	function getLanguage($code,$replacement=null) {
 		if ($this->lang == null) {
 			if (file_exists($this->Module->getPath().'/languages/'.$this->IM->language.'.json') == true) {
 				$this->lang = json_decode(file_get_contents($this->Module->getPath().'/languages/'.$this->IM->language.'.json'));
@@ -425,36 +518,75 @@ class ModuleMember {
 			}
 		}
 		
+		$returnString = null;
 		$temp = explode('/',$code);
-		if (count($temp) == 1) {
-			return isset($this->lang->$code) == true ? $this->lang->$code : ($this->oLang != null && isset($this->oLang->$code) == true ? $this->oLang->$code : '');
-		} else {
-			$string = $this->lang;
-			for ($i=0, $loop=count($temp);$i<$loop;$i++) {
-				if (isset($string->{$temp[$i]}) == true) $string = $string->{$temp[$i]};
-				else $string = null;
+		
+		$string = $this->lang;
+		for ($i=0, $loop=count($temp);$i<$loop;$i++) {
+			if (isset($string->{$temp[$i]}) == true) {
+				$string = $string->{$temp[$i]};
+			} else {
+				$string = null;
+				break;
 			}
-			
+		}
+		
+		if ($string != null) {
+			$returnString = $string;
+		} elseif ($this->oLang != null) {
 			if ($string == null && $this->oLang != null) {
 				$string = $this->oLang;
 				for ($i=0, $loop=count($temp);$i<$loop;$i++) {
-					if (isset($string->{$temp[$i]}) == true) $string = $string->{$temp[$i]};
-					else $string = null;
+					if (isset($string->{$temp[$i]}) == true) {
+						$string = $string->{$temp[$i]};
+					} else {
+						$string = null;
+						break;
+					}
 				}
 			}
-			return $string == null ? '' : $string;
+			
+			if ($string != null) $returnString = $string;
 		}
+		
+		/**
+		 * 언어셋 텍스트가 없는경우 iModule 코어에서 불러온다.
+		 */
+		if ($returnString != null) return $returnString;
+		elseif (in_array(reset($temp),array('text','button','action')) == true) return $this->IM->getLanguage($code,$replacement);
+		else return $replacement == null ? $code : $replacement;
 	}
 	
 	/**
-	 * Get menu or page count information
+	 * 상황에 맞게 에러코드를 반환한다.
 	 *
-	 * @param string $context linked context code (point, activity, ... etc)
-	 * @return object $info ($info->count : item count, $info->last_time : reg_date of lastest item
-	 * @todo check count information
+	 * @param string $code 에러코드
+	 * @param object $value(옵션) 에러와 관련된 데이터
+	 * @param boolean $isRawData(옵션) RAW 데이터 반환여부
+	 * @return string $message 에러 메세지
 	 */
-	function getCountInfo($context,$config) {
-		return null;
+	function getErrorMessage($code,$value=null,$isRawData=false) {
+		$message = $this->getLanguage('error/'.$code,$code);
+		if ($message == $code) return $this->IM->getErrorMessage($code,$value,null,$isRawData);
+		
+		$description = null;
+		switch ($code) {
+			case 'NOT_ALLOWED_SIGNUP' :
+				if ($value != null && is_object($value) == true) {
+					$description = $value->title;
+				}
+				break;
+			
+			default :
+				if (is_object($value) == false && $value) $description = $value;
+		}
+		
+		$error = new stdClass();
+		$error->message = $message;
+		$error->description = $description;
+		
+		if ($isRawData === true) return $error;
+		else return $this->IM->getErrorMessage($error);
 	}
 	
 	/**
@@ -462,7 +594,7 @@ class ModuleMember {
 	 * If not exists container code in im_page_table, use account menu url @see iModule.class.php doLayout() method.
 	 * @param string $view container code (signup, modify, password ... etc)
 	 * @return object $page {menu:string $menu,page:string $page}, 1st and 2nd page code
-	 */
+	 *
 	function getMemberPage($view) {
 		if (isset($this->memberPages[$view]) == true) return $this->memberPages[$view];
 		
@@ -482,214 +614,490 @@ class ModuleMember {
 		if ($this->memberPages[$view] == null) return $this->getAccountPage($view == 'mypage' ? null : $view);
 		return $this->memberPages[$view];
 	}
+	*/
 	
 	/**
-	 * Get templet path
+	 * 특정 컨텍스트에 대한 제목을 반환한다.
 	 *
-	 * @param string $container context code
-	 * @param string $templet templet name
-	 * @return string $path templet path
+	 * @param string $context 컨텍스트명
+	 * @return string $title 컨텍스트 제목
 	 */
-	function getTempletPath($container,$templet) {
-		if (preg_match('/^@/',$templet) == true) { // use site templet
-			$path = __IM_PATH__.'/templets/'.$this->IM->getSite()->templet.'/templets/modules/member/templets/'.$container.'/'.preg_replace('/^@/','',$templet);
-		} else {
-			$path = $this->Module->getPath().'/templets/'.$container.'/'.$templet;
-		}
-		
-		if (is_dir($path) == false) $this->printError('NOT_FOUND_TEMPLET');
-		else return $path;
+	function getContextTitle($context) {
+		return $this->getLanguage('admin/contexts/'.$context);
 	}
 	
 	/**
-	 * Get templet dir
+	 * 사이트맵에 나타날 뱃지데이터를 생성한다.
 	 *
-	 * @param string $container context code
-	 * @param string $templet templet name
-	 * @return string $path templet dir
+	 * @param string $context 컨텍스트종류
+	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return object $badge 뱃지데이터 ($badge->count : 뱃지숫자, $badge->latest : 뱃지업데이트 시각(UNIXTIME), $badge->text : 뱃지텍스트)
+	 * @todo check count information
 	 */
-	function getTempletDir($container,$templet) {
-		if (preg_match('/^@/',$templet) == true) { // use site templet
-			$dir = __IM_DIR__.'/templets/'.$this->IM->getSite()->templet.'/templets/modules/member/templets/'.$container.'/'.preg_replace('/^@/','',$templet);
-		} else {
-			$dir = $this->Module->getDir().'/templets/'.$container.'/'.$templet;
-		}
-		
-		if (is_dir(preg_replace('/^'.__IM_DIR__.'/',__IM_PATH__,$dir)) == false) $this->printError('NOT_FOUND_TEMPLET');
-		else return $dir;
+	function getContextBadge($context,$config) {
+		/**
+		 * null 일 경우 뱃지를 표시하지 않는다.
+		 */
+		return null;
 	}
 	
 	/**
-	 * Get page context
+	 * 템플릿 정보를 가져온다.
 	 *
-	 * @param string $container linked context code (signup, account, modify, ... etc)
-	 * @return string $context context html code
+	 * @param string $templet 템플릿명
+	 * @return string $package 템플릿 정보
 	 */
-	function getContext($container,$config=null) {
-		$context = '';
-		$values = new stdClass();
+	function getTemplet($templet) {
+		/**
+		 * 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정일 경우
+		 */
+		if (is_object($templet) == true) {
+			$templet = $templet !== null && isset($templet->templet) == true ? $templet->templet : '#';
+		}
 		
-		switch ($container) {
-			case 'account' :
-				$context = $this->getAccountContext($config);
-				break;
-				
+		/**
+		 * 템플릿명이 # 이면 모듈 기본설정에 설정된 템플릿을 사용한다.
+		 */
+		$templet = $templet == '#' ? $this->Module->getConfig('templet') : $templet;
+		$package = $this->Module->getTempletPackage($templet);
+		
+		return $package == null ? $templet : $package;
+	}
+	
+	/**
+	 * 페이지 컨텍스트를 가져온다.
+	 *
+	 * @param string $context 컨테이너 종류
+	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return string $html 컨텍스트 HTML
+	 */
+	function getContext($context,$configs=null) {
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('beforeGetContext',$this->Module->getName(),$context,$configs,null);
+		
+		/**
+		 * 컨텍스트 컨테이너를 설정한다.
+		 */
+		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->Module->getName().'">'.PHP_EOL;
+		
+		/**
+		 * 컨텍스트 헤더
+		 */
+		$html.= $this->getHeader($context,$configs);
+		
+		/**
+		 * 컨테이너 종류에 따라 컨텍스트를 가져온다.
+		 */
+		switch ($context) {
 			case 'signup' :
-				$context = $this->getSignUpContext($config);
+				$html.= $this->getSignUpContext($configs);
 				break;
 				
 			case 'modify' :
-				$context = $this->getModifyContext($config);
+				$html.= $this->getModifyContext($configs);
 				break;
 				
 			case 'social' :
-				$context = $this->getSocialContext($config);
+				$html.= $this->getSocialContext($configs);
 				break;
 		}
 		
-		$this->IM->fireEvent('afterGetContext','member',$container,null,null,$context);
+		/**
+		 * 컨텍스트 푸터
+		 */
+		$html.= $this->getFooter($context,$configs);
 		
-		return $context;
+		/**
+		 * 컨텍스트 컨테이너를 설정한다.
+		 */
+		$html.= PHP_EOL.'</div>'.PHP_EOL.'<!--// MEMBER MODULE -->'.PHP_EOL;
+		
+		/**
+		 * 에러가 발생했다면, 에러메세지를 반환한다.
+		 */
+		if ($this->isError !== false) return $this->isError;
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('afterGetContext',$this->Module->getName(),$context,$configs,null,$html);
+		
+		return $html;
 	}
 	
 	/**
-	 * Get Error message
+	 * 컨텍스트 헤더를 가져온다.
 	 *
-	 * @param string $content error message body
-	 * @param string $title(optional) error message title (default is Error)
-	 * @return $content error message html
+	 * @param string $context 컨테이너 종류
+	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return string $html 컨텍스트 HTML
 	 */
-	function getError($content,$title='') {
-		return $content;
-	}
-	
-	/**
-	 * Print Error message
-	 *
-	 * @param string $content error message body
-	 * @param string $title(optional) error message title (default is Error)
-	 * @return $content error message html
-	 */
-	function printError($content,$title='') {
-		echo $this->getError($content,$title);
-		exit;
-	}
-	
-	/**
-	 * Get account context
-	 *
-	 * @param object $config context configs
-	 * @return string $context context html code
-	 * @todo change Korean pages menu to language pack code & fireEvent for addons and the others module
-	 */
-	function getAccountContext($config) {
-		ob_start();
-		if ($this->Module->getConfig('accountType') == 'standalone') $this->IM->removeTemplet();
+	function getHeader($context,$configs=null) {
+		/**
+		 * 에러가 발생했다면, 화면구성을 중단한다.
+		 */
+		if ($this->isError === true) return;
 		
-		$templetPath = $this->Module->getPath().'/templets/account/'.$this->Module->getConfig('accountTemplet');
-		$templetDir = $this->Module->getDir().'/templets/account/'.$this->Module->getConfig('accountTemplet');
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('beforeGetContext',$this->Module->getName(),'header',$configs,null);
 		
-		if (file_exists($templetPath.'/styles/style.css') == true) {
-			$this->IM->addSiteHeader('style',$templetDir.'/styles/style.css');
+		/**
+		 * 템플릿 정보를 가져온다.
+		 */
+		$templet = $this->getTemplet($configs);
+		if (is_object($templet) == false) return $this->printError('NOT_FOUND_TEMPLET',$templet);
+		$templetPath = $templet->path;
+		$templetDir = $templet->dir;
+		
+		/**
+		 * 템플릿에 style 파일이나, script 파일이 있을 경우 불러온다.
+		 */
+		if (is_file($templetPath.'/scripts/script.js') == true) {
+			$this->IM->addHeadResource('script',$templetDir.'/scripts/script.js');
 		}
 		
-		if (file_exists($templetPath.'/scripts/script.js') == true) {
-			$this->IM->addSiteHeader('script',$templetDir.'/scripts/script.js');
+		if (is_file($templetPath.'/styles/style.js') == true) {
+			$this->IM->addHeadResource('styles',$templetDir.'/styles/style.css');
 		}
 		
-		$values = new stdClass();
-		$values->title = $this->getLanguage('account/title');
-		$values->pages = array();
-		if ($this->isLogged() == true) {
-			if ($this->IM->page == null) $this->IM->page = 'dashboard';
-			$values->pages = $this->getLanguage('account/logged');
-		} else {
-			if ($this->IM->page == null) $this->IM->page = 'signup';
-			$values->pages = $this->getLanguage('account/logout');
-		}
+		$html = '';
 		
-		$values->groupTitle = '';
-		$values->pageTitle = '';
-		for ($i=0, $loop=count($values->pages);$i<$loop;$i++) {
-			if (isset($values->pages[$i]->page) == true && $this->IM->page == $values->pages[$i]->page) {
-				$values->pageTitle = $values->pages[$i]->title;
-				$values->groupTitle = '';
-				break;
-			} elseif (isset($values->pages[$i]->pages) == true) {
-				$values->groupTitle = $values->pages[$i]->title;
-				foreach ($values->pages[$i]->pages as $page=>$title) {
-					if ($this->IM->page == $page) {
-						$values->pageTitle = $title;
-						break;
-					}
-				}
-			}
-		}
-		
-		$pageContext = $this->getAccountViewContext();
-		
-		$IM = $this->IM;
-		$Module = $this;
-		
-		if (file_exists($templetPath.'/index.php') == true) {
-			INCLUDE $templetPath.'/index.php';
-		}
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
-	}
-	
-	/**
-	 * Get account view context, each page context from getAccountContext
-	 *
-	 * @return string $context context html code
-	 * @todo this function is just concept.
-	 */
-	function getAccountViewContext() {
-		$templetPath = $this->Module->getPath().'/templets/account/'.$this->Module->getConfig('accountTemplet');
-		$templetDir = $this->Module->getDir().'/templets/account/'.$this->Module->getConfig('accountTemplet');
-		
-		$context = '';
-		if (in_array($this->IM->page,array('signup','modify','password','leave','config','social','point','push')) == true) {
-			$config = new stdClass();
-			$config->templet = $templetPath.'/'.$this->IM->page.'.php';
-			if ($this->IM->page == 'signup') $context = $this->getSignUpContext($config);
-			if ($this->IM->page == 'modify') $context = $this->getModifyContext($config);
-			if ($this->IM->page == 'password') $context = $this->getPasswordContext($config);
-			if ($this->IM->page == 'point') $context = $this->getPointContext($config);
-			if ($this->IM->page == 'push') $context = $this->getPushContext($config);
-		} else {
+		/**
+		 * 템플릿에 헤더파일이 있을 경우 출력한다.
+		 */
+		if (is_file($templetPath.'/header.php') == true) {
 			ob_start();
-		
+			
+			/**
+			 * 템플릿파일에서 iModule 코어와, 현재 모듈에 접근하기 위한 변수설정
+			 */
 			$IM = $this->IM;
 			$Module = $this;
+			
+			INCLUDE $templetPath.'/header.php';
+			$html.= ob_get_contents();
+			ob_clean();
+		}
 		
-			if ($this->IM->view == null) {
-				if (file_exists($templetPath.'/'.$this->IM->page.'.php') == true) {
-					INCLUDE $templetPath.'/'.$this->IM->page.'.php';
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('afterGetContext',$this->Module->getName(),'header',null,null,$html);
+		
+		return $html;
+	}
+	
+	/**
+	 * 컨텍스트 푸터를 가져온다.
+	 *
+	 * @param string $context 컨테이너 종류
+	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return string $html 컨텍스트 HTML
+	 */
+	function getFooter($context,$configs=null) {
+		/**
+		 * 에러가 발생했다면, 화면구성을 중단한다.
+		 */
+		if ($this->isError === true) return;
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('beforeGetContext',$this->Module->getName(),'footer',$configs,null);
+		
+		/**
+		 * 템플릿 정보를 가져온다.
+		 */
+		$templet = $this->getTemplet($configs);
+		if (is_object($templet) == false) return $this->printError('NOT_FOUND_TEMPLET',$templet);
+		$templetPath = $templet->path;
+		$templetDir = $templet->dir;
+		
+		$html = '';
+		
+		/**
+		 * 템플릿에 푸터파일이 있을 경우 출력한다.
+		 */
+		if (is_file($templetPath.'/footer.php') == true) {
+			/**
+			 * 템플릿파일에서 iModule 코어와, 현재 모듈에 접근하기 위한 변수설정
+			 */
+			$IM = $this->IM;
+			$Module = $this;
+			
+			INCLUDE $templetPath.'/footer.php';
+			$html = ob_get_contents();
+			ob_clean();
+		}
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('afterGetContext',$this->Module->getName(),'footer',null,null,$html);
+		
+		return $html;
+	}
+	
+	/**
+	 * 에러메세지를 반환한다.
+	 *
+	 * @param string $code 에러코드 (에러코드는 iModule 코어에 의해 해석된다.)
+	 * @param object $value 에러코드에 따른 에러값
+	 * @return $html 에러메세지 HTML
+	 */
+	function getError($code,$value=null) {
+		/**
+		 * iModule 코어를 통해 에러메세지를 구성한다.
+		 */
+		$error = $this->getErrorMessage($code,$value,true);
+		return $this->IM->getError($error);
+	}
+	
+	/**
+	 * 에러메세지를 출력하고 컨텍스트 렌더링을 중단한다.
+	 *
+	 * @param string $code 에러코드 (에러코드는 iModule 코어에 의해 해석된다.)
+	 * @param object $value 에러코드에 따른 에러값
+	 * @return $html 에러메세지 HTML
+	 */
+	function printError($code,$value=null) {
+		/**
+		 * iModule 코어를 통해 에러메세지를 구성한다.
+		 */
+		$this->isError = $this->getError($code,$value,true);
+		return '';
+	}
+	
+	/**
+	 * 회원가입 컨텍스트를 가져온다.
+	 *
+	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return string $html 컨텍스트 HTML
+	 */
+	function getSignUpContext($configs) {
+		/**
+		 * 에러가 발생했다면, 화면구성을 중단한다.
+		 */
+		if ($this->isError === true) return;
+		
+		/**
+		 * 템플릿 정보를 가져온다.
+		 * 템플릿파일이 없으면 에러를 반환한다.
+		 */
+		$templet = $this->getTemplet($configs);
+		if (is_object($templet) == false) return $this->printError('NOT_FOUND_TEMPLET',$templet);
+		$templetPath = $templet->path;
+		$templetDir = $templet->dir;
+		if (is_file($templetPath.'/signup.php') == false) return $this->printError('NOT_FOUND_TEMPLET_FILE',$templetDir.'/signup.php');
+		
+		$label = isset($configs->label) == true ? $configs->label : null;
+		$label = $label == null ? Request('label') : $label;
+		$label = $label == null || is_numeric($label) == false ? 0 : $label;
+		
+		/**
+		 * 선택한 회원라벨의 회원가입이 가능한지 확인한다.
+		 */
+		if ($this->getLabel($label) == null || $this->getLabel($label)->allow_signup == false) return $this->printError('NOT_ALLOWED_SIGNUP',$this->getLabel($label));
+		
+		/**
+		 * 모듈설정에 정의된 회원가입절차를 가져온다.
+		 */
+		$steps = $this->Module->getConfig('signup_step');
+		
+		/**
+		 * iModule 코어의 view 값을 현재 가입단계로 사용한다.
+		 */
+		$step = $this->IM->view;
+		if ($step == null || in_array($step,$steps) == false) $step = $steps[0];
+		
+		$agreements = Request('agreements') == null ? '' : (is_array(Request('agreements')) == true ? implode(',',Request('agreements')) : Request('agreements'));
+		
+		while (count($steps) > 0) {
+			$position = array_search($step,$steps);
+			$prevStep = $position == 0 ? '' : $steps[$position-1];
+			$nextStep = $position == count($steps) - 1 ? '' : $steps[$position+1];
+		
+			/**
+			 * 약관동의
+			 */
+			if ($step == 'agreement') {
+				/**
+				 * 선택 회원라벨의 약관내용을 가져온다. 개인정보보호정책을 가져온다.
+				 */
+				$form = $this->db()->select($this->table->signup)->where('label',$label)->where('name','agreement')->getOne();
+				$form = $form == null && $label != 0 ? $this->db()->select($this->table->signup)->where('label',0)->where('name','agreement')->getOne() : $form;
+				
+				if ($form != null) {
+					$title_languages = json_decode($form->title_languages);
+					$help_languages = json_decode($form->help_languages);
+					$configs = json_decode($form->configs);
+					
+					$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
+					$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
+					
+					$agreement = new stdClass();
+					$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/agreement') : $title;
+					$agreement->content = $configs->content;
+					$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/agree') : $help;
+					$agreement->value = 'agreement-'.$form->label;
+				} else {
+					$agreement = null;
 				}
-			} else {
-				if (file_exists($templetPath.'/'.$this->IM->page.'.'.$this->IM->view.'.php') == true) {
-					INCLUDE $templetPath.'/'.$this->IM->page.'.'.$this->IM->view.'.php';
+				
+				/**
+				 * 선택 회원라벨의 개인정보보호정책을 가져온다.
+				 */
+				$form = $this->db()->select($this->table->signup)->where('label',$label)->where('name','privacy')->getOne();
+				$form = $form == null && $label != 0 ? $this->db()->select($this->table->signup)->where('label',0)->where('name','privacy')->getOne() : $form;
+				
+				if ($form != null) {
+					$title_languages = json_decode($form->title_languages);
+					$help_languages = json_decode($form->help_languages);
+					$configs = json_decode($form->configs);
+					
+					$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
+					$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
+					
+					$privacy = new stdClass();
+					$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/agreement') : $title;
+					$privacy->content = $configs->content;
+					$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/agree') : $help;
+					$privacy->value = 'privacy-'.$form->label;
+				} else {
+					$privacy = null;
+				}
+				
+				/**
+				 * 약관과 개인정보보호정책이 모두 없을 경우 약관동의 단계를 생략한다.
+				 */
+				if ($agreement == null && $privacy == null) {
+					array_splice($steps,$position,1);
+					$step = $nextStep;
+					continue;
 				}
 			}
 			
-			$context = ob_get_contents();
-			ob_end_clean();
+			/**
+			 * @todo 실명인증단계를 구현한다. 현재는 없기 때문에 실명인증 단계를 생략한다.
+			 */
+			if ($step == 'cert') {
+				if (true) {
+					array_splice($steps,$position,1);
+					$step = $nextStep;
+					continue;
+				}
+			}
+			
+			/**
+			 * 회원라벨 선택
+			 */
+			if ($step == 'label') {
+				$labels = $this->db()->select($this->table->label,'idx')->orderBy('sort','asc')->get();
+				for ($i=0, $loop=count($labels);$i<$loop;$i++) {
+					$labels[$i] = $this->getLabel($labels[$i]->idx);
+				}
+				
+				/**
+				 * 기본라벨 외에 회원라벨이 없으면 라벨선택 단계를 생략한다.
+				 */
+				if (count($labels) == 0) {
+					array_splice($steps,$position,1);
+					$step = $nextStep;
+					continue;
+				}
+				
+				array_unshift($labels,$this->getLabel(0));
+			}
+			
+			/**
+			 * 회원정보입력
+			 */
+			if ($step == 'insert') {
+				/**
+				 * 가입폼을 가져온다.
+				 * 회원약관이나, 개인정보보호정책 중 이미 동의한 항목은 생략한다.
+				 */
+				$is_agree = explode(',',$agreements);
+				$defaults = $extras = array();
+				$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->orderBy('sort','asc')->get();
+				for ($i=0, $loop=count($forms);$i<$loop;$i++) {
+					$field = $forms[$i];
+					if (in_array($field->name.'-'.$field->label,$is_agree) == true) continue;
+					
+					$title_languages = json_decode($field->title_languages);
+					$field->title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $field->title;
+					unset($field->title_languages);
+					
+					$help_languages = json_decode($field->help_languages);
+					$field->help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $field->help;
+					unset($field->help_languages);
+					
+					$configs = json_decode($field->configs);
+					unset($field->configs);
+					
+					if ($field->type == 'etc') {
+						$field->name = '@'.$field->name;
+					} else {
+						$field->title = $field->title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/'.$field->name) : $field->title;
+						$field->help = $field->help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/form/'.$field->name.'_help') : $field->help;
+					}
+					
+					if (in_array($field->input,array('select','radio','checkbox')) == true) {
+						$options = $configs->options;
+						$field->options = new stdClass();
+						foreach ($options as $option) {
+							$field->options->{$option->value} = isset($option->languages->{$this->IM->language}) == true ? $option->languages->{$this->IM->language} : $option->display;
+						}
+						
+						if ($field->input == 'checkbox') $field->max = $configs->max;
+					}
+					
+					$field->is_required = $field->is_required == 'TRUE';
+					
+					$field->inputHtml = $this->parseMemberInputField($field);
+					
+					if ($forms[$i]->label == 0) array_push($defaults,$field);
+					else array_push($extras,$field);
+				}
+				
+				echo '<pre>';
+				print_r($defaults);
+				print_r($extras);
+				echo '</pre>';
+			}
+			
+			break;
 		}
 		
-		return $context;
-	}
-	
-	/**
-	 * Get signup context
-	 *
-	 * @param object $config configs
-	 * @return string $context context html code
-	 */
-	function getSignUpContext($config) {
+		/**
+		 * 회원가입폼을 정의한다.
+		 */
+		$html = PHP_EOL.'<form id="ModuleMemberSignUpForm">'.PHP_EOL;
+		$html.= '<input type="text" name="step" value="'.$step.'">'.PHP_EOL;
+		$html.= '<input type="text" name="prev" value="'.$prevStep.'">'.PHP_EOL;
+		$html.= '<input type="text" name="next" value="'.$nextStep.'">'.PHP_EOL;
+		if ($step != 'label') $html.= '<input type="text" name="label" value="'.$label.'">'.PHP_EOL;
+		if ($step != 'agreement') $html.= '<input type="text" name="agreements" value="'.$agreements.'">'.PHP_EOL;
+		$html.= '<input type="text" name="templet" value="'.$templet->name.'">'.PHP_EOL;
+		 
+		
+		/**
+		 * 템플릿파일에서 iModule 코어와, 현재 모듈에 접근하기 위한 변수설정 및 템플릿파일을 불러온다.
+		 */
+		ob_start();
+		$IM = $this->IM;
+		$Module = $this;
+		
+		INCLUDE $templetPath.'/signup.php';
+		$html.= ob_get_contents();
+		ob_clean();
+		
+		$html.= PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
+		/*
 		ob_start();
 		
 		if (isset($config->label) == true || Request('label') != null) {
@@ -777,8 +1185,8 @@ class ModuleMember {
 		
 		$context = ob_get_contents();
 		ob_end_clean();
-		
-		return $context;
+		*/
+		return $html;
 	}
 	
 	/**
@@ -1121,13 +1529,23 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Check member login status
+	 * 현재 사용자가 로그인중인지 확인한다.
 	 *
 	 * @return boolean $isLogged
 	 */
 	function isLogged() {
 		if ($this->logged === false) return false;
 		else return true;
+	}
+	
+	/**
+	 * 현재 로그인한 사용자가 최고관리자인지 확인한다.
+	 *
+	 * @return boolean $isAdmin
+	 */
+	function isAdmin() {
+		if ($this->isLogged() == true && $this->getMember()->type == 'ADMINISTRATOR') return true;
+		return false;
 	}
 	
 	/**
@@ -1146,6 +1564,43 @@ class ModuleMember {
 		if ($check == null) return false;
 		$mHash = new Hash();
 		return $mHash->password_validate($password,$check->password) == true ? $check->idx : false;
+	}
+	
+	/**
+	 * 회원라벨 정보를 가져온다.
+	 *
+	 * @param int $idx 라벨고유값
+	 * @return object $label 라벨데이터
+	 */
+	function getLabel($idx) {
+		if (isset($this->labels[$idx]) == true) return $this->labels[$idx];
+		if ($idx == 0) {
+			$label = new stdClass();
+			
+			$languages = $this->Module->getConfig('default_label_title_languages');
+			$title = isset($languages->{$this->IM->language}) == true ? $languages->{$this->IM->language} : $this->Module->getConfig('default_label_title');
+			$label->idx = 0;
+			$label->title = $title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/default_label_title') : $title;
+			$label->allow_signup = $this->Module->getConfig('allow_signup') === true;
+			$label->approve_signup = $this->Module->getConfig('approve_signup') === true;
+			$label->is_change = true;
+			$label->is_unique = false;
+		} else {
+			$label = $this->db()->select($this->table->label)->where('idx',$idx)->getOne();
+			if ($label != null) {
+				$languages = json_decode($label->languages);
+				$label->title = isset($languages->{$this->IM->language}) == true ? $languages->{$this->IM->language} : $label->title;
+				$label->allow_signup = $label->allow_signup == 'TRUE';
+				$label->approve_signup = $label->approve_signup == 'TRUE';
+				$label->is_change = $label->is_change == 'TRUE';
+				$label->is_unique = $label->is_unique == 'TRUE';
+				
+				unset($label->languages,$label->membernum,$label->sort);
+			}
+		}
+		
+		$this->labels[$idx] = $label;
+		return $this->labels[$idx];
 	}
 	
 	/**
@@ -1583,9 +2038,108 @@ class ModuleMember {
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
 	}
 	
+	/**
+	 * 회원가입 / 회원수정 필드를 출력하기 위한 함수
+	 *
+	 * @param object $field 입력폼 데이터
+	 * @param boolean $isModify 정보수정 필드인지 여부
+	 * @param string $html
+	 */
+	function parseMemberInputField($field,$isModify=false) {
+		$html = array();
+		
+		if ($field->input == 'system') {
+			/**
+			 * 이메일
+			 */
+			if ($field->name == 'email') {
+				array_push($html,
+					'<div data-role="input" data-name="email" data-default="'.$field->help.'">',
+						'<input type="email" name="email">',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 패스워드
+			 */
+			if ($field->name == 'password') {
+				array_push($html,
+					'<div data-role="inputset" data-name="password" data-default="'.$field->help.'">',
+						'<div data-role="input">',
+							'<input type="password" name="password" placeholder="'.$this->getLanguage('signup/form/password').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="password" name="password_confirm" placeholder="'.$this->getLanguage('signup/form/password_confirm').'">',
+						'</div>',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 실명, 닉네임
+			 */
+			if ($field->name == 'name' || $field->name == 'nickname') {
+				array_push($html,
+					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<input type="text" name="'.$field->name.'">',
+					'</div>'
+				);
+			}
+		} else {
+			/**
+			 * 옵션박스
+			 */
+			if ($field->input == 'select') {
+				$html[] = '<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">';
+				$html[] = '<select name="'.$field->name.'">';
+				foreach ($field->options as $value=>$display) {
+					$html[] = '<option value="'.$value.'">'.$display.'</option>';
+				}
+				$html[] = '</select>';
+				$html[] = '</div>';
+			}
+			
+			
+			/**
+			 * 체크박스, 라디오버튼
+			 */
+			if ($field->input == 'checkbox' || $field->input == 'radio') {
+				$html[] = '<div data-role="inputset" data-name="'.$field->name.'" class="inline" data-default="'.$field->help.'">';
+				foreach ($field->options as $value=>$display) {
+					array_push($html,
+						'<div data-role="input">',
+							'<label><input type="'.$field->input.'" name="'.$field->name.'" value="'.$value.'">'.$display.'</label>',
+						'</div>'
+					);
+				}
+				$html[] = '</div>';
+			}
+			
+		}
+		
+		return implode(PHP_EOL,$html);
+	}
+	
+	/**
+	 * 현재 모듈에서 처리해야하는 요청이 들어왔을 경우 처리하여 결과를 반환한다.
+	 * 소스코드 관리를 편하게 하기 위해 각 요쳥별로 별도의 PHP 파일로 관리한다.
+	 * 작업코드가 '@' 로 시작할 경우 사이트관리자를 위한 작업으로 최고관리자 권한이 필요하다.
+	 *
+	 * @param string $action 작업코드
+	 * @return object $results 수행결과
+	 * @see /process/index.php
+	 */
 	function doProcess($action) {
 		$results = new stdClass();
 		$values = new stdClass();
+		
+		/**
+		 * 모듈의 process 폴더에 $action 에 해당하는 파일이 있을 경우 불러온다.
+		 */
+		if (is_file($this->Module->getPath().'/process/'.$action.'.php') == true) {
+			INCLUDE $this->Module->getPath().'/process/'.$action.'.php';
+		}
 		
 		if ($action == 'check') {
 			$name = Request('name');
@@ -1764,7 +2318,7 @@ class ModuleMember {
 				$label = $this->db()->select($this->table->label)->where('idx',$label)->getOne();
 				if ($label == null) {
 					$autoActive = $allowSignup = false;
-					$errors['label'] = $this->getLanguage('error/notFound');
+					$errors['label'] = $this->getLanguage('error/not_found');
 					$label = 0;
 				} else {
 					$autoActive = $label->auto_active == 'TRUE';
@@ -2199,61 +2753,6 @@ class ModuleMember {
 			$_refreshToken = $oauth->getRefreshToken() == null ? '' : $oauth->getRefreshToken();
 			
 			$this->socialLogin($action,$_client_id,$_id,$_name,$_email,$_photo,$_accessToken,$_refreshToken,$_scope);
-		}
-		
-		/**
-		 * For admin actions
-		 * Admin permission checking in /process/index.php
-		 * Admin action name started by '@'
-		 */
-		if ($action == '@getList') {
-			$start = Request('start') ? Request('start') : 0;
-			$limit = Request('limit') ? Request('limit') : 50;
-			$sort = Request('sort') ? Request('sort') : 'idx';
-			$dir = Request('dir') ? Request('dir') : 'DESC';
-			
-			$lists = $this->db()->select($this->table->member);
-			$total = $lists->copy()->count();
-			$lists = $lists->orderBy($sort,$dir)->limit($start,$limit)->get();
-			
-			$results->success = true;
-			$results->lists = $lists;
-			$results->total = $total;
-		}
-		
-		if ($action == '@getLabel') {
-			$idx = Request('idx');
-			
-			if ($idx !== null) {
-				if ($idx == 0) {
-					$data = new stdClass();
-					$data->title = $this->getLanguage('admin/label/default');
-					$data->allow_signup = $this->Module->getConfig('allowSignup') == 'TRUE';
-					$data->auto_active = $this->Module->getConfig('autoActive') == 'TRUE';
-					$data->is_change = false;
-					$data->is_unique = false;
-				}
-				
-				$results->success = true;
-				$results->data = $data;
-			} else {
-				$lists = array();
-				$lists[0] = new stdClass();
-				$lists[0]->idx = 0;
-				$lists[0]->title = '';
-				$lists[0]->membernum = $this->db()->select($this->table->member)->count();
-				
-				$sort = Request('sort') ? Request('sort') : 'title';
-				$dir = Request('dir') ? Request('dir') : 'ASC';
-				$labels = $this->db()->select($this->table->label)->orderBy($sort,$dir)->get();
-				for ($i=0, $loop=count($labels);$i<$loop;$i++) {
-					$lists[] = $labels[$i];
-				}
-				
-				$results->success = true;
-				$results->lists = $lists;
-				$results->total = count($lists);
-			}
 		}
 		
 		$this->IM->fireEvent('afterDoProcess','member',$action,$values,$results);
