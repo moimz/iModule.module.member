@@ -19,7 +19,7 @@ $idx = Request('idx');
 if ($idx === '0') {
 	$data = new stdClass();
 	$data->idx = '0';
-	$data->title = $this->Module->getConfig('allow_signup') == 'LANGUAGE_SETTING' ? $this->getLanguage('text/default_label_title') : $this->Module->getConfig('allow_signup');
+	$data->title = $this->Module->getConfig('allow_signup') == 'LANGUAGE_SETTING' ? $this->getText('text/default_label_title') : $this->Module->getConfig('allow_signup');
 	$data->allow_signup = $this->Module->getConfig('allow_signup');
 	$data->approve_signup = $this->Module->getConfig('approve_signup');
 	$data->is_change = true;
@@ -33,7 +33,7 @@ if ($idx === '0') {
 	$data = $this->db()->select($this->table->label)->where('idx',$idx)->getOne();
 	if ($data == null) {
 		$results->success = false;
-		$results->message = $this->getErrorMessage('NOT_FOUND');
+		$results->message = $this->getErrorText('NOT_FOUND');
 	} else {
 		$data->allow_signup = $data->allow_signup == 'TRUE';
 		$data->approve_signup = $data->approve_signup == 'TRUE';

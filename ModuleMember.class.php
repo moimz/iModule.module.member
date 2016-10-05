@@ -46,11 +46,6 @@ class ModuleMember {
 	private $logged = null;
 	
 	/**
-	 * 에러 발생여부
-	 */
-	private $isError = false;
-	
-	/**
 	 * class 선언
 	 *
 	 * @param iModule $IM iModule 코어클래스
@@ -86,13 +81,18 @@ class ModuleMember {
 		 * 회원메뉴를 제공하기 위한 자바스크립트 및 스타일시트를 로딩한다.
 		 * 회원모듈은 글로벌모듈이기 때문에 모듈클래스 선언부에서 선언해주어야 사이트 레이아웃에 반영된다.
 		 */
-		$this->IM->addHeadResource('style',$this->Module->getDir().'/styles/style.css');
-		$this->IM->addHeadResource('script',$this->Module->getDir().'/scripts/script.js');
+		$this->IM->addHeadResource('style',$this->getModule()->getDir().'/styles/style.css');
+		$this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/script.js');
 		
 		/**
 		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
 		 */
 		$this->logged = Request('MEMBER_LOGGED','session') != null && Decoder(Request('MEMBER_LOGGED','session')) != false ? json_decode(Decoder(Request('MEMBER_LOGGED','session'))) : false;
+		
+		/**
+		 * 통합로그인을 사용한다고 설정되어 있을 경우 통합로그인 세션처리를 위한 자바스크립트 파일을 로딩한다.
+		 */
+		if ($this->getModule()->getConfig('universal_login') == true) $this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/session.js');
 	}
 	
 	/**
@@ -111,7 +111,7 @@ class ModuleMember {
 	 * @return DB $DB
 	 */
 	function db() {
-		return $this->IM->db($this->Module->getInstalled()->database);
+		return $this->IM->db($this->getModule()->getInstalled()->database);
 	}
 	
 	/**
@@ -139,8 +139,8 @@ class ModuleMember {
 		/**
 		 * 모듈의 api 폴더에 $api 에 해당하는 파일이 있을 경우 불러온다.
 		 */
-		if (is_file($this->Module->getPath().'/api/'.$api.'.php') == true) {
-			INCLUDE $this->Module->getPath().'/api/'.$api.'.php';
+		if (is_file($this->getModule()->getPath().'/api/'.$api.'.php') == true) {
+			INCLUDE $this->getModule()->getPath().'/api/'.$api.'.php';
 		}
 		
 		/**
@@ -159,13 +159,13 @@ class ModuleMember {
 			$errors = array();
 			
 			if ($label == 0) {
-				$autoActive = $this->Module->getConfig('autoActive');
-				$allowSignup = $this->Module->getConfig('allowSignup');
+				$autoActive = $this->getModule()->getConfig('autoActive');
+				$allowSignup = $this->getModule()->getConfig('allowSignup');
 			} else {
 				$label = $this->db()->select($this->table->label)->where('idx',$label)->getOne();
 				if ($label == null) {
 					$autoActive = $allowSignup = false;
-					$errors['label'] = $this->getLanguage('error/not_found');
+					$errors['label'] = $this->getText('error/not_found');
 					$label = 0;
 				} else {
 					$autoActive = $label->auto_active == 'TRUE';
@@ -180,27 +180,27 @@ class ModuleMember {
 				
 				switch ($forms[$i]->type) {
 					case 'email' :
-						$insert['email'] = CheckEmail(Request('email')) == true ? Request('email') : $errors['email'] = $this->getLanguage('signup/help/email/error');
+						$insert['email'] = CheckEmail(Request('email')) == true ? Request('email') : $errors['email'] = $this->getText('signup/help/email/error');
 						if ($this->db()->select($this->table->member)->where('email',$insert['email'])->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('email',$insert['email'])->where('type','ADMINISTRATOR')->has() == true) {
-							$errors['email'] = $this->getLanguage('signup/help/email/duplicated');
+							$errors['email'] = $this->getText('signup/help/email/duplicated');
 						}
 						break;
 					
 					case 'password' :
-						$insert['password'] = strlen(Request('password')) >= 4 ? Request('password') : $errors['password'] = $this->getLanguage('signup/help/password/error');
+						$insert['password'] = strlen(Request('password')) >= 4 ? Request('password') : $errors['password'] = $this->getText('signup/help/password/error');
 						if (strlen(Request('password')) < 4 || Request('password') != Request('password_confirm')) {
-							$errors['password_confirm'] = $this->getLanguage('signup/help/password_confirm/error');
+							$errors['password_confirm'] = $this->getText('signup/help/password_confirm/error');
 						}
 						break;
 						
 					case 'name' :
-						$insert['name'] = CheckNickname(Request('name')) == true ? Request('name') : $errors['name'] = $this->getLanguage('signup/help/name/error');
+						$insert['name'] = CheckNickname(Request('name')) == true ? Request('name') : $errors['name'] = $this->getText('signup/help/name/error');
 						break;
 						
 					case 'nickname' :
-						$insert['nickname'] = CheckNickname(Request('nickname')) == true ? Request('nickname') : $errors['nickname'] = $this->getLanguage('signup/help/nickname/error');
+						$insert['nickname'] = CheckNickname(Request('nickname')) == true ? Request('nickname') : $errors['nickname'] = $this->getText('signup/help/nickname/error');
 						if ($this->db()->select($this->table->member)->where('nickname',$insert['nickname'])->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('nickname',$insert['nickname'])->where('type','ADMINISTRATOR')->has() == true) {
-							$errors['nickname'] = $this->getLanguage('signup/help/nickname/duplicated');
+							$errors['nickname'] = $this->getText('signup/help/nickname/duplicated');
 						}
 						break;
 						
@@ -217,11 +217,11 @@ class ModuleMember {
 							if ($insert['telephone'] && Request('telephone_country_code')) {
 								$insert['telephone'] = Request('telephone_country_code').preg_replace('/^0/','',$insert['telephone']);
 							} elseif (!Request('telephone_country_code')) {
-								$errors['telephone'] = $this->getLanguage('error/required');
+								$errors['telephone'] = $this->getText('error/required');
 							}
 						}
 						
-						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['telephone']) < 10) $errors['telephone'] = $this->getLanguage('error/required');
+						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['telephone']) < 10) $errors['telephone'] = $this->getText('error/required');
 						break;
 						
 					case 'cellphone' :
@@ -237,24 +237,24 @@ class ModuleMember {
 							if ($insert['cellphone'] && Request('cellphone_country_code')) {
 								$insert['cellphone'] = Request('cellphone_country_code').preg_replace('/^0/','',$insert['cellphone']);
 							} elseif (!Request('cellphone_country_code')) {
-								$errors['cellphone'] = $this->getLanguage('error/required');
+								$errors['cellphone'] = $this->getText('error/required');
 							}
 						}
 						
-						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['cellphone']) < 10) $errors['cellphone'] = $this->getLanguage('error/required');
+						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['cellphone']) < 10) $errors['cellphone'] = $this->getText('error/required');
 						break;
 						
 					case 'birthday' :
 						$birthday = Request('birthday') ? strtotime(Request('birthday')) : 0;
 						$insert['birthday'] = $birthday > 0 ? date('m-d-Y',$birthday) : '';
 						
-						if ($forms[$i]->allow_blank == 'FALSE' && !$insert['birthday']) $errors['birthday'] = $this->getLanguage('error/required');
+						if ($forms[$i]->allow_blank == 'FALSE' && !$insert['birthday']) $errors['birthday'] = $this->getText('error/required');
 						break;
 						
 					case 'gender' :
 						$insert['gender'] = in_array(Request('gender'),array('MALE','FEMALE')) == true ? Request('gender') : '';
 						
-						if ($forms[$i]->allow_blank == 'FALSE' && !$insert['gender']) $errors['gender'] = $this->getLanguage('error/required');
+						if ($forms[$i]->allow_blank == 'FALSE' && !$insert['gender']) $errors['gender'] = $this->getText('error/required');
 						break;
 				}
 			}
@@ -272,8 +272,8 @@ class ModuleMember {
 				
 				$insert['domain'] = $siteType == 'MERGE' ? '*' : $this->IM->domain;
 				$insert['password'] = $mHash->password_hash($insert['password']);
-				$insert['status'] = in_array('verify',$this->Module->getConfig('signupStep')) === true ? 'VERIFYING' : ($autoActive == true ? 'ACTIVE' : 'WAITING');
-				$insert['point'] = $this->Module->getConfig('signupPoint');
+				$insert['status'] = in_array('verify',$this->getModule()->getConfig('signupStep')) === true ? 'VERIFYING' : ($autoActive == true ? 'ACTIVE' : 'WAITING');
+				$insert['point'] = $this->getModule()->getConfig('signupPoint');
 				$insert['reg_date'] = time();
 				
 				$idx = $this->db()->insert($this->table->member,$insert)->execute();
@@ -285,7 +285,7 @@ class ModuleMember {
 				
 				if ($idx !== false) {
 					$data->success = true;
-					if (in_array('verify',$this->Module->getConfig('signupStep')) === true) $this->sendVerifyEmail($idx);
+					if (in_array('verify',$this->getModule()->getConfig('signupStep')) === true) $this->sendVerifyEmail($idx);
 					$data->idx = $idx;
 					$data->access_token = $this->makeAuthToken($client_id,$data->idx);
 				} else {
@@ -379,8 +379,8 @@ class ModuleMember {
 		$push = new stdClass();
 		$push->image = null;
 		$push->link = null;
-		if ($count > 0) $push->content = $this->getLanguage('push/'.$code.'s');
-		else $push->content = $this->getLanguage('push/'.$code);
+		if ($count > 0) $push->content = $this->getText('push/'.$code.'s');
+		else $push->content = $this->getText('push/'.$code);
 		/** example
 		if ($code == 'ment') {
 			$ment = $this->getMent($latest->idx);
@@ -407,10 +407,10 @@ class ModuleMember {
 		 * 설정패널 PHP에서 iModule 코어클래스와 모듈코어클래스에 접근하기 위한 변수 선언
 		 */
 		$IM = $this->IM;
-		$Module = $this->Module;
+		$Module = $this->getModule();
 		
 		ob_start();
-		INCLUDE $this->Module->getPath().'/admin/configs.php';
+		INCLUDE $this->getModule()->getPath().'/admin/configs.php';
 		$panel = ob_get_contents();
 		ob_end_clean();
 		
@@ -427,10 +427,10 @@ class ModuleMember {
 		 * 설정패널 PHP에서 iModule 코어클래스와 모듈코어클래스에 접근하기 위한 변수 선언
 		 */
 		$IM = $this->IM;
-		$Module = $this->Module;
+		$Module = $this;
 		
 		ob_start();
-		INCLUDE $this->Module->getPath().'/admin/index.php';
+		INCLUDE $this->getModule()->getPath().'/admin/index.php';
 		$panel = ob_get_contents();
 		ob_end_clean();
 		
@@ -444,7 +444,7 @@ class ModuleMember {
 	 * @return object $contexts
 	 */
 	function getContexts() {
-		$contexts = $this->getLanguage('admin/contexts');
+		$contexts = $this->getText('admin/contexts');
 		$lists = array();
 		foreach ($contexts as $context=>$title) {
 			$lists[] = array('context'=>$context,'title'=>$title);
@@ -465,11 +465,11 @@ class ModuleMember {
 		
 		if ($context == 'signup') {
 			$label = new stdClass();
-			$label->title = $this->getLanguage('text/label');
+			$label->title = $this->getText('text/label');
 			$label->name = 'label';
 			$label->type = 'select';
 			$label->data = array();
-			$label->data[] = array(0,$this->getLanguage('text/no_label'));
+			$label->data[] = array(0,$this->getText('text/no_label'));
 			$labels = $this->db()->select($this->table->label,'idx,title')->get();
 			for ($i=0, $loop=count($labels);$i<$loop;$i++) {
 				$label->data[] = array($labels[$i]->idx,$labels[$i]->title);
@@ -479,16 +479,16 @@ class ModuleMember {
 		}
 		
 		$templet = new stdClass();
-		$templet->title = $this->IM->getLanguage('text/templet');
+		$templet->title = $this->IM->getText('text/templet');
 		$templet->name = 'templet';
 		$templet->type = 'select';
 		$templet->data = array();
 		
-		$templet->data[] = array('#',$this->getLanguage('admin/configs/form/default_setting'));
+		$templet->data[] = array('#',$this->getText('admin/configs/form/default_setting'));
 		
-		$templets = $this->Module->getTemplets();
+		$templets = $this->getModule()->getTemplets();
 		for ($i=0, $loop=count($templets);$i<$loop;$i++) {
-			$templet->data[] = array($templets[$i]->name,$templets[$i]->title.' ('.$templets[$i]->dir.')');
+			$templet->data[] = array($templets[$i]->getName(),$templets[$i]->getTitle().' ('.$templets[$i]->getDir().')');
 		}
 		
 		$templet->value = count($templet->data) > 0 ? $templet->data[0][0] : '#';
@@ -505,15 +505,15 @@ class ModuleMember {
 	 * @param string $replacement 일치하는 언어코드가 없을 경우 반환될 메세지 (기본값 : null, $code 반환)
 	 * @return string $language 실제 언어셋 텍스트
 	 */
-	function getLanguage($code,$replacement=null) {
+	function getText($code,$replacement=null) {
 		if ($this->lang == null) {
-			if (file_exists($this->Module->getPath().'/languages/'.$this->IM->language.'.json') == true) {
-				$this->lang = json_decode(file_get_contents($this->Module->getPath().'/languages/'.$this->IM->language.'.json'));
-				if ($this->IM->language != $this->Module->getPackage()->language) {
-					$this->oLang = json_decode(file_get_contents($this->Module->getPath().'/languages/'.$this->Module->getPackage()->language.'.json'));
+			if (file_exists($this->getModule()->getPath().'/languages/'.$this->IM->language.'.json') == true) {
+				$this->lang = json_decode(file_get_contents($this->getModule()->getPath().'/languages/'.$this->IM->language.'.json'));
+				if ($this->IM->language != $this->getModule()->getPackage()->language) {
+					$this->oLang = json_decode(file_get_contents($this->getModule()->getPath().'/languages/'.$this->getModule()->getPackage()->language.'.json'));
 				}
 			} else {
-				$this->lang = json_decode(file_get_contents($this->Module->getPath().'/languages/'.$this->Module->getPackage()->language.'.json'));
+				$this->lang = json_decode(file_get_contents($this->getModule()->getPath().'/languages/'.$this->getModule()->getPackage()->language.'.json'));
 				$this->oLang = null;
 			}
 		}
@@ -553,7 +553,7 @@ class ModuleMember {
 		 * 언어셋 텍스트가 없는경우 iModule 코어에서 불러온다.
 		 */
 		if ($returnString != null) return $returnString;
-		elseif (in_array(reset($temp),array('text','button','action')) == true) return $this->IM->getLanguage($code,$replacement);
+		elseif (in_array(reset($temp),array('text','button','action')) == true) return $this->IM->getText($code,$replacement);
 		else return $replacement == null ? $code : $replacement;
 	}
 	
@@ -565,15 +565,21 @@ class ModuleMember {
 	 * @param boolean $isRawData(옵션) RAW 데이터 반환여부
 	 * @return string $message 에러 메세지
 	 */
-	function getErrorMessage($code,$value=null,$isRawData=false) {
-		$message = $this->getLanguage('error/'.$code,$code);
-		if ($message == $code) return $this->IM->getErrorMessage($code,$value,null,$isRawData);
+	function getErrorText($code,$value=null,$isRawData=false) {
+		$message = $this->getText('error/'.$code,$code);
+		if ($message == $code) return $this->IM->getErrorText($code,$value,null,$isRawData);
 		
 		$description = null;
 		switch ($code) {
 			case 'NOT_ALLOWED_SIGNUP' :
 				if ($value != null && is_object($value) == true) {
 					$description = $value->title;
+				}
+				break;
+				
+			case 'DISABLED_LOGIN' :
+				if ($value != null && is_numeric($value) == true) {
+					$description = str_replace('{SECOND}',$value,$this->getText('text/remain_time_second'));
 				}
 				break;
 			
@@ -586,7 +592,7 @@ class ModuleMember {
 		$error->description = $description;
 		
 		if ($isRawData === true) return $error;
-		else return $this->IM->getErrorMessage($error);
+		else return $this->IM->getErrorText($error);
 	}
 	
 	/**
@@ -623,7 +629,7 @@ class ModuleMember {
 	 * @return string $title 컨텍스트 제목
 	 */
 	function getContextTitle($context) {
-		return $this->getLanguage('admin/contexts/'.$context);
+		return $this->getText('admin/contexts/'.$context);
 	}
 	
 	/**
@@ -644,7 +650,7 @@ class ModuleMember {
 	/**
 	 * 템플릿 정보를 가져온다.
 	 *
-	 * @param string $templet 템플릿명
+	 * @param string $this->getTemplet($configs) 템플릿명
 	 * @return string $package 템플릿 정보
 	 */
 	function getTemplet($templet) {
@@ -658,10 +664,8 @@ class ModuleMember {
 		/**
 		 * 템플릿명이 # 이면 모듈 기본설정에 설정된 템플릿을 사용한다.
 		 */
-		$templet = $templet == '#' ? $this->Module->getConfig('templet') : $templet;
-		$package = $this->Module->getTempletPackage($templet);
-		
-		return $package == null ? $templet : $package;
+		$templet = $templet == '#' ? $this->getModule()->getConfig('templet') : $templet;
+		return $this->getModule()->getTemplet($templet);
 	}
 	
 	/**
@@ -673,14 +677,9 @@ class ModuleMember {
 	 */
 	function getContext($context,$configs=null) {
 		/**
-		 * 이벤트를 발생시킨다.
-		 */
-		$this->IM->fireEvent('beforeGetContext',$this->Module->getName(),$context,$configs,null);
-		
-		/**
 		 * 컨텍스트 컨테이너를 설정한다.
 		 */
-		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->Module->getName().'">'.PHP_EOL;
+		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->getModule()->getName().'">'.PHP_EOL;
 		
 		/**
 		 * 컨텍스트 헤더
@@ -714,16 +713,6 @@ class ModuleMember {
 		 */
 		$html.= PHP_EOL.'</div>'.PHP_EOL.'<!--// MEMBER MODULE -->'.PHP_EOL;
 		
-		/**
-		 * 에러가 발생했다면, 에러메세지를 반환한다.
-		 */
-		if ($this->isError !== false) return $this->isError;
-		
-		/**
-		 * 이벤트를 발생시킨다.
-		 */
-		$this->IM->fireEvent('afterGetContext',$this->Module->getName(),$context,$configs,null,$html);
-		
 		return $html;
 	}
 	
@@ -736,59 +725,9 @@ class ModuleMember {
 	 */
 	function getHeader($context,$configs=null) {
 		/**
-		 * 에러가 발생했다면, 화면구성을 중단한다.
+		 * 템플릿파일을 호출한다.
 		 */
-		if ($this->isError === true) return;
-		
-		/**
-		 * 이벤트를 발생시킨다.
-		 */
-		$this->IM->fireEvent('beforeGetContext',$this->Module->getName(),'header',$configs,null);
-		
-		/**
-		 * 템플릿 정보를 가져온다.
-		 */
-		$templet = $this->getTemplet($configs);
-		if (is_object($templet) == false) return $this->printError('NOT_FOUND_TEMPLET',$templet);
-		$templetPath = $templet->path;
-		$templetDir = $templet->dir;
-		
-		/**
-		 * 템플릿에 style 파일이나, script 파일이 있을 경우 불러온다.
-		 */
-		if (is_file($templetPath.'/scripts/script.js') == true) {
-			$this->IM->addHeadResource('script',$templetDir.'/scripts/script.js');
-		}
-		
-		if (is_file($templetPath.'/styles/style.js') == true) {
-			$this->IM->addHeadResource('styles',$templetDir.'/styles/style.css');
-		}
-		
-		$html = '';
-		
-		/**
-		 * 템플릿에 헤더파일이 있을 경우 출력한다.
-		 */
-		if (is_file($templetPath.'/header.php') == true) {
-			ob_start();
-			
-			/**
-			 * 템플릿파일에서 iModule 코어와, 현재 모듈에 접근하기 위한 변수설정
-			 */
-			$IM = $this->IM;
-			$Module = $this;
-			
-			INCLUDE $templetPath.'/header.php';
-			$html.= ob_get_contents();
-			ob_clean();
-		}
-		
-		/**
-		 * 이벤트를 발생시킨다.
-		 */
-		$this->IM->fireEvent('afterGetContext',$this->Module->getName(),'header',null,null,$html);
-		
-		return $html;
+		return $this->getTemplet($configs)->getHeader(get_defined_vars());
 	}
 	
 	/**
@@ -800,46 +739,9 @@ class ModuleMember {
 	 */
 	function getFooter($context,$configs=null) {
 		/**
-		 * 에러가 발생했다면, 화면구성을 중단한다.
+		 * 템플릿파일을 호출한다.
 		 */
-		if ($this->isError === true) return;
-		
-		/**
-		 * 이벤트를 발생시킨다.
-		 */
-		$this->IM->fireEvent('beforeGetContext',$this->Module->getName(),'footer',$configs,null);
-		
-		/**
-		 * 템플릿 정보를 가져온다.
-		 */
-		$templet = $this->getTemplet($configs);
-		if (is_object($templet) == false) return $this->printError('NOT_FOUND_TEMPLET',$templet);
-		$templetPath = $templet->path;
-		$templetDir = $templet->dir;
-		
-		$html = '';
-		
-		/**
-		 * 템플릿에 푸터파일이 있을 경우 출력한다.
-		 */
-		if (is_file($templetPath.'/footer.php') == true) {
-			/**
-			 * 템플릿파일에서 iModule 코어와, 현재 모듈에 접근하기 위한 변수설정
-			 */
-			$IM = $this->IM;
-			$Module = $this;
-			
-			INCLUDE $templetPath.'/footer.php';
-			$html = ob_get_contents();
-			ob_clean();
-		}
-		
-		/**
-		 * 이벤트를 발생시킨다.
-		 */
-		$this->IM->fireEvent('afterGetContext',$this->Module->getName(),'footer',null,null,$html);
-		
-		return $html;
+		return $this->getTemplet($configs)->getFooter(get_defined_vars());
 	}
 	
 	/**
@@ -853,23 +755,8 @@ class ModuleMember {
 		/**
 		 * iModule 코어를 통해 에러메세지를 구성한다.
 		 */
-		$error = $this->getErrorMessage($code,$value,true);
+		$error = $this->getErrorText($code,$value,true);
 		return $this->IM->getError($error);
-	}
-	
-	/**
-	 * 에러메세지를 출력하고 컨텍스트 렌더링을 중단한다.
-	 *
-	 * @param string $code 에러코드 (에러코드는 iModule 코어에 의해 해석된다.)
-	 * @param object $value 에러코드에 따른 에러값
-	 * @return $html 에러메세지 HTML
-	 */
-	function printError($code,$value=null) {
-		/**
-		 * iModule 코어를 통해 에러메세지를 구성한다.
-		 */
-		$this->isError = $this->getError($code,$value,true);
-		return '';
 	}
 	
 	/**
@@ -879,21 +766,6 @@ class ModuleMember {
 	 * @return string $html 컨텍스트 HTML
 	 */
 	function getSignUpContext($configs) {
-		/**
-		 * 에러가 발생했다면, 화면구성을 중단한다.
-		 */
-		if ($this->isError === true) return;
-		
-		/**
-		 * 템플릿 정보를 가져온다.
-		 * 템플릿파일이 없으면 에러를 반환한다.
-		 */
-		$templet = $this->getTemplet($configs);
-		if (is_object($templet) == false) return $this->printError('NOT_FOUND_TEMPLET',$templet);
-		$templetPath = $templet->path;
-		$templetDir = $templet->dir;
-		if (is_file($templetPath.'/signup.php') == false) return $this->printError('NOT_FOUND_TEMPLET_FILE',$templetDir.'/signup.php');
-		
 		$label = isset($configs->label) == true ? $configs->label : null;
 		$label = $label == null ? Request('label') : $label;
 		$label = $label == null || is_numeric($label) == false ? 0 : $label;
@@ -901,12 +773,12 @@ class ModuleMember {
 		/**
 		 * 선택한 회원라벨의 회원가입이 가능한지 확인한다.
 		 */
-		if ($this->getLabel($label) == null || $this->getLabel($label)->allow_signup == false) return $this->printError('NOT_ALLOWED_SIGNUP',$this->getLabel($label));
+		if ($this->getLabel($label) == null || $this->getLabel($label)->allow_signup == false) return $this->getTemplet($configs)->getError('NOT_ALLOWED_SIGNUP',$this->getLabel($label));
 		
 		/**
 		 * 모듈설정에 정의된 회원가입절차를 가져온다.
 		 */
-		$steps = $this->Module->getConfig('signup_step');
+		$steps = $this->getModule()->getConfig('signup_step');
 		
 		/**
 		 * iModule 코어의 view 값을 현재 가입단계로 사용한다.
@@ -928,8 +800,7 @@ class ModuleMember {
 				/**
 				 * 선택 회원라벨의 약관내용을 가져온다. 개인정보보호정책을 가져온다.
 				 */
-				$form = $this->db()->select($this->table->signup)->where('label',$label)->where('name','agreement')->getOne();
-				$form = $form == null && $label != 0 ? $this->db()->select($this->table->signup)->where('label',0)->where('name','agreement')->getOne() : $form;
+				$form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','agreement')->orderBy('label','desc')->getOne();
 				
 				if ($form != null) {
 					$title_languages = json_decode($form->title_languages);
@@ -940,9 +811,9 @@ class ModuleMember {
 					$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
 					
 					$agreement = new stdClass();
-					$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/agreement') : $title;
+					$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
 					$agreement->content = $configs->content;
-					$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/agree') : $help;
+					$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
 					$agreement->value = 'agreement-'.$form->label;
 				} else {
 					$agreement = null;
@@ -951,8 +822,7 @@ class ModuleMember {
 				/**
 				 * 선택 회원라벨의 개인정보보호정책을 가져온다.
 				 */
-				$form = $this->db()->select($this->table->signup)->where('label',$label)->where('name','privacy')->getOne();
-				$form = $form == null && $label != 0 ? $this->db()->select($this->table->signup)->where('label',0)->where('name','privacy')->getOne() : $form;
+				$form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','privacy')->orderBy('label','desc')->getOne();
 				
 				if ($form != null) {
 					$title_languages = json_decode($form->title_languages);
@@ -963,9 +833,9 @@ class ModuleMember {
 					$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
 					
 					$privacy = new stdClass();
-					$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/agreement') : $title;
+					$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
 					$privacy->content = $configs->content;
-					$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/agree') : $help;
+					$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
 					$privacy->value = 'privacy-'.$form->label;
 				} else {
 					$privacy = null;
@@ -1021,511 +891,144 @@ class ModuleMember {
 				 * 가입폼을 가져온다.
 				 * 회원약관이나, 개인정보보호정책 중 이미 동의한 항목은 생략한다.
 				 */
-				$is_agree = explode(',',$agreements);
+				$agreement = null;
+				$privacy = null;
+				
+				$agreements = explode(',',$agreements);
 				$defaults = $extras = array();
 				$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->orderBy('sort','asc')->get();
 				for ($i=0, $loop=count($forms);$i<$loop;$i++) {
-					$field = $forms[$i];
-					if (in_array($field->name.'-'.$field->label,$is_agree) == true) continue;
+					if (in_array($forms[$i]->name.'-'.$forms[$i]->label,$agreements) == true) continue;
 					
-					$title_languages = json_decode($field->title_languages);
-					$field->title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $field->title;
-					unset($field->title_languages);
-					
-					$help_languages = json_decode($field->help_languages);
-					$field->help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $field->help;
-					unset($field->help_languages);
-					
-					$configs = json_decode($field->configs);
-					unset($field->configs);
-					
-					if ($field->type == 'etc') {
-						$field->name = '@'.$field->name;
-					} else {
-						$field->title = $field->title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/'.$field->name) : $field->title;
-						$field->help = $field->help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/form/'.$field->name.'_help') : $field->help;
-					}
-					
-					if (in_array($field->input,array('select','radio','checkbox')) == true) {
-						$options = $configs->options;
-						$field->options = new stdClass();
-						foreach ($options as $option) {
-							$field->options->{$option->value} = isset($option->languages->{$this->IM->language}) == true ? $option->languages->{$this->IM->language} : $option->display;
-						}
+					if ($forms[$i]->name == 'agreement') {
+						$title_languages = json_decode($forms[$i]->title_languages);
+						$help_languages = json_decode($forms[$i]->help_languages);
+						$configs = json_decode($forms[$i]->configs);
 						
-						if ($field->input == 'checkbox') $field->max = $configs->max;
+						$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $forms[$i]->title;
+						$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $forms[$i]->help;
+						
+						$agreement = new stdClass();
+						$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
+						$agreement->content = $configs->content;
+						$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
+						$agreement->value = 'agreement-'.$forms[$i]->label;
+						
+						continue;
 					}
 					
-					$field->is_required = $field->is_required == 'TRUE';
+					if ($forms[$i]->name == 'privacy') {
+						$title_languages = json_decode($forms[$i]->title_languages);
+						$help_languages = json_decode($forms[$i]->help_languages);
+						$configs = json_decode($forms[$i]->configs);
+						
+						$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $forms[$i]->title;
+						$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $forms[$i]->help;
+						
+						$privacy = new stdClass();
+						$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
+						$privacy->content = $configs->content;
+						$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
+						$privacy->value = 'privacy-'.$forms[$i]->label;
+						
+						continue;
+					}
 					
-					$field->inputHtml = $this->parseMemberInputField($field);
+					$field = $this->parseInputField($forms[$i]);
+					$field->inputHtml = $this->getInputFieldHtml($field,'signup');
 					
 					if ($forms[$i]->label == 0) array_push($defaults,$field);
 					else array_push($extras,$field);
 				}
+			}
+			
+			/**
+			 * 이메일주소 인증
+			 */
+			if ($step == 'verify') {
+				$fields = array();
 				
-				echo '<pre>';
-				print_r($defaults);
-				print_r($extras);
-				echo '</pre>';
+				$field = new stdClass();
+				$field->name = 'email_verification_email';
+				$field->title = $this->getText('signup/form/email_verification_email');
+				$field->help = $this->getText('signup/form/email_verification_email_help');
+				$field->input = 'system';
+				$field->is_required = true;
+				$field->inputHtml = $this->getInputFieldHtml($field,'signup');
+				
+				$fields[] = $field;
+				
+				$field = new stdClass();
+				$field->name = 'email_verification_code';
+				$field->title = $this->getText('signup/form/email_verification_code');
+				$field->help = $this->getText('signup/form/email_verification_code_help');
+				$field->input = 'system';
+				$field->is_required = true;
+				$field->inputHtml = $this->getInputFieldHtml($field,'signup');
+				
+				$fields[] = $field;
 			}
 			
 			break;
 		}
 		
+		$values = get_defined_vars();
+		
+		/**
+		 * 이메일 인증단계나 가입완료단계에서 로그인중이 아니라면, 에러메세지를 출력한다.
+		 * 나머지 단계에서 로그인중이라면 에러 메세지를 출력한다.
+		 */
+		if (in_array($step,array('agreement','label','cert','insert')) == true) {
+			if ($this->isLogged() == true) return $this->getTemplet($configs)->getError('ALREADY_LOGGED');
+		} else {
+			if ($this->isLogged() == false) return $this->getTemplet($configs)->getError('REQUIRED_LOGIN');
+		}
+		
 		/**
 		 * 회원가입폼을 정의한다.
 		 */
-		$html = PHP_EOL.'<form id="ModuleMemberSignUpForm">'.PHP_EOL;
-		$html.= '<input type="text" name="step" value="'.$step.'">'.PHP_EOL;
-		$html.= '<input type="text" name="prev" value="'.$prevStep.'">'.PHP_EOL;
-		$html.= '<input type="text" name="next" value="'.$nextStep.'">'.PHP_EOL;
-		if ($step != 'label') $html.= '<input type="text" name="label" value="'.$label.'">'.PHP_EOL;
-		if ($step != 'agreement') $html.= '<input type="text" name="agreements" value="'.$agreements.'">'.PHP_EOL;
-		$html.= '<input type="text" name="templet" value="'.$templet->name.'">'.PHP_EOL;
-		 
+		$header = PHP_EOL.'<form id="ModuleMemberSignUpForm">'.PHP_EOL;
+		$header.= '<input type="text" name="step" value="'.$step.'">'.PHP_EOL;
+		$header.= '<input type="text" name="prev" value="'.$prevStep.'">'.PHP_EOL;
+		$header.= '<input type="text" name="next" value="'.$nextStep.'">'.PHP_EOL;
+		if ($step != 'label') $header.= '<input type="text" name="label" value="'.$label.'">'.PHP_EOL;
+		if ($step != 'agreement' && $step != 'insert') $header.= '<input type="text" name="agreements" value="'.$agreements.'">'.PHP_EOL;
+		if ($step == 'insert') {
+			foreach ($agreements as $agree) $header.= '<input type="text" name="agreements[]" value="'.$agree.'">'.PHP_EOL;
+		}
+		$header.= '<input type="text" name="templet" value="'.$this->getTemplet($configs)->getName().'">'.PHP_EOL;
+		
+		$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
 		
 		/**
-		 * 템플릿파일에서 iModule 코어와, 현재 모듈에 접근하기 위한 변수설정 및 템플릿파일을 불러온다.
+		 * 템플릿파일을 호출한다.
 		 */
-		ob_start();
-		$IM = $this->IM;
-		$Module = $this;
-		
-		INCLUDE $templetPath.'/signup.php';
-		$html.= ob_get_contents();
-		ob_clean();
-		
-		$html.= PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
-		/*
-		ob_start();
-		
-		if (isset($config->label) == true || Request('label') != null) {
-			$label = Request('label') != null ? Request('label') : $config->label;
-			$form = $this->db()->select($this->table->signup)->where('label',$label)->orderBy('sort','asc')->get();
-		} else {
-			$form = $this->db()->select($this->table->signup)->where('label',0)->orderBy('sort','asc')->get();
-		}
-		
-		$step = $this->Module->getConfig('signupStep');
-		$view = $this->IM->view == '' ? 'agreement' : $this->IM->view;
-		
-		$currentStep = array_search($view,$step);
-		$nextStep = $currentStep !== null && isset($step[$currentStep+1]) == true ? $step[$currentStep+1] : '';
-		
-		if ($view == 'verify') {
-			if (in_array('verify',$step) == false) header("location: ".$this->IM->getUrl($this->IM->menu,$this->IM->page,'complete',false));
-			if (Request('code') != null) {
-				$code = Decoder(Request('code'));
-				if ($code === false) header("location: ".$this->IM->getUrl($this->IM->menu,$this->IM->page,'verify',false));
-				else $code = json_decode($code);
-				
-				$check = $this->db()->select($this->table->email)->where('midx',$code->midx)->where('email',$code->email)->getOne();
-				if ($check != null && $check->code == $code->code) {
-					$this->db()->update($this->table->email,array('status'=>'VERIFIED'))->where('midx',$code->midx)->where('email',$code->email)->execute();
-					$this->db()->update($this->table->member,array('status'=>'ACTIVE'))->where('idx',$code->midx)->execute();
-					header("location: ".$this->IM->getUrl($this->IM->menu,$this->IM->page,'complete',false));
-				} else {
-					header("location: ".$this->IM->getUrl($this->IM->menu,$this->IM->page,'verify',false));
-				}
-			}
-			
-			$registerIDX = Request('MEMBER_REGISTER_IDX','session') != null ? Decoder(Request('MEMBER_REGISTER_IDX','session')) : false;
-			if ($registerIDX == false) return $this->getError('ERROR!');
-			$registerInfo = $this->db()->select($this->table->member)->where('idx',$registerIDX)->getOne();
-			if ($registerInfo == null) return $this->getError('ERROR!');
-			
-			$status = $this->sendVerifyEmail($registerIDX);
-			if ($registerInfo->status != 'VERIFYING') {
-				header("location: ".$this->IM->getUrl($this->IM->menu,$this->IM->page,'complete',false));
-				exit;
-			} elseif ($status == 'VERIFIED') {
-				$this->db()->update($this->table->member,array('status'=>'ACTIVE'))->where('idx',$registerIDX)->execute();
-				header("location: ".$this->IM->getUrl($this->IM->menu,$this->IM->page,'complete',false));
-				exit;
-			}
-		}
-
-		echo '<form id="ModuleMemberSignUpForm" method="post">'.PHP_EOL;
-		foreach ($_POST as $key=>$value) {
-			if ($key == 'step' || $key == 'next') continue;
-			echo '<input type="hidden" name="'.$key.'" value="'.$value.'">'.PHP_EOL;
-		}
-		echo '<input type="hidden" name="step" value="'.$view.'">'.PHP_EOL;
-		echo '<input type="hidden" name="next" value="'.($nextStep != '' ? $this->IM->getUrl(null,null,$nextStep) : '').'">'.PHP_EOL;
-		if ($view == 'verify') echo '<input type="hidden" name="registerIDX" value="'.$registerIDX.'">'.PHP_EOL;
-		
-		if (preg_match('/\.php$/',$config->templet) == true) {
-			$temp = explode('/',$config->templet);
-			$templetFile = array_pop($temp);
-			$templetPath = implode('/',$temp);
-			$templetDir = str_replace(__IM_PATH__,__IM_DIR__,$templetPath);
-		} else {
-			$templetPath = $this->getTempletPath('signup',$config->templet);
-			$templetDir = $this->getTempletDir('signup',$config->templet);
-			
-			if (file_exists($templetPath.'/styles/style.css') == true) {
-				$this->IM->addSiteHeader('style',$templetDir.'/styles/style.css');
-			}
-			
-			$templetFile = 'templet.php';
-		}
-		
-		$IM = $this->IM;
-		$Module = $this;
-		$Module->templetPath = $templetPath;
-		$Module->templetDir = $templetDir;
-		
-		if (file_exists($templetPath.'/'.$templetFile) == true) {
-			INCLUDE $templetPath.'/'.$templetFile;
-		}
-		
-		echo '</form>'.PHP_EOL;
-		echo '<script>$(document).ready(function() { Member.signup.init(); });</script>'.PHP_EOL;
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		*/
-		return $html;
+		return $this->getTemplet($configs)->getContext('signup',$values,$header,$footer);
 	}
 	
 	/**
-	 * Get modify context
+	 * 회원로그인 세션을 만든다.
+	 * 탈퇴회원이나, 비활성화 계정의 경우 세션을 만들지 않는다.
 	 *
-	 * @param object $config configs
-	 * @return string $context context html code
+	 * @param int $midx 회원 고유번호
+	 * @param boolean $isLogged 로그인여부
 	 */
-	function getModifyContext($config) {
-		ob_start();
+	function login($midx) {
+		$member = $this->getMember($midx);
+		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVE')) == true) return false;
 		
-		if ($this->isLogged() == false) {
-			return $this->getError($this->getLanguage('error/notLogged'));
-		}
-
-		$member = $this->getMember();
-		if (strlen($this->getMember()->password) == 0) {
-			if (preg_match('/\.php$/',$config->templet) == true) {
-				$temp = explode('/',$config->templet);
-				$templetFile = array_pop($temp);
-				$templetPath = implode('/',$temp);
-				$templetDir = str_replace(__IM_PATH__,__IM_DIR__,$templetPath);
-				
-				$config->templet = $templetPath.'/password.php';
-				return $this->getPasswordContext($config,true);
-			} else {
-				return $this->getPasswordContext($config,true);
-			}
-		} elseif (Request('MEMBER_MODIFY_PASSWORD','session') !== true && Request('password') == null) {
-			$step = 'verify';
-		} else {
-			$this->IM->addSiteHeader('script',__IM_DIR__.'/scripts/jquery.cropit.min.js');
-			
-			$mHash = new Hash();
-			$password = Decoder(Request('password'));
-			
-			if (Request('MEMBER_MODIFY_PASSWORD','session') !== true && ($password == false || $mHash->password_validate($password,$member->password) == false)) {
-				return $this->getError($this->getLanguage('verify/help/password/error'));
-			}
-			
-			$step = 'modify';
-		}
+		$logged = new stdClass();
+		$logged->idx = $midx;
+		$logged->time = time();
+		$logged->ip = $_SERVER['REMOTE_ADDR'];
 		
-		unset($_SESSION['MEMBER_MODIFY_PASSWORD']);
+		$_SESSION['MEMBER_LOGGED'] = Encoder(json_encode($logged));
+		$this->logged = $logged;
 		
-		echo '<form id="ModuleMemberModifyForm" method="post">'.PHP_EOL;
-		echo '<input type="hidden" name="templet" value="'.$config->templet.'">'.PHP_EOL;
-		echo '<input type="hidden" name="step" value="'.$step.'">'.PHP_EOL;
-		
-		if (preg_match('/\.php$/',$config->templet) == true) {
-			$temp = explode('/',$config->templet);
-			$templetFile = array_pop($temp);
-			$templetPath = implode('/',$temp);
-			$templetDir = str_replace(__IM_PATH__,__IM_DIR__,$templetPath);
-		} else {
-			$templetPath = $this->getTempletPath('modify',$config->templet);
-			$templetDir = $this->getTempletDir('modify',$config->templet);
-		
-			if (file_exists($templetPath.'/styles/style.css') == true) {
-				$this->IM->addSiteHeader('style',$templetDir.'/styles/style.css');
-			}
-			
-			$templetFile = 'templet.php';
-		}
-		
-		$IM = $this->IM;
-		$Module = $this;
-		$Module->templetPath = $templetPath;
-		$Module->templetDir = $templetDir;
-		
-		if (file_exists($templetPath.'/'.$templetFile) == true) {
-			INCLUDE $templetPath.'/'.$templetFile;
-		}
-		
-		echo '</form>'.PHP_EOL;
-		echo '<script>$(document).ready(function() { Member.modify.init(); });</script>'.PHP_EOL;
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
-	}
-	
-	/**
-	 * Get confirm member's password (using social login or enter modify form or password modify modal)
-	 *
-	 * @param object $config configs
-	 * @param boolean $isModify call by password modify modal
-	 * @return string $context context html code
-	 * @todo maybe this function sometimes not working...
-	 */
-	function getPasswordContext($config,$isModify=false) {
-		ob_start();
-		
-		if ($this->isLogged() == false) {
-			return $this->getError($this->getLanguage('error/notLogged'));
-		}
-		
-		$member = $this->getMember();
-		
-		if (strlen($this->getMember()->password) == 0) {
-			$type = 'social';
-		} else {
-			$type = 'default';
-		}
-		
-		unset($_SESSION['MEMBER_MODIFY_PASSWORD']);
-		
-		echo '<form id="ModuleMemberPasswordForm">'.PHP_EOL;
-		echo '<input type="hidden" name="type" value="'.($isModify == true ? 'modify' : 'confirm').'">'.PHP_EOL;
-		
-		if (preg_match('/\.php$/',$config->templet) == true) {
-			$temp = explode('/',$config->templet);
-			$templetFile = array_pop($temp);
-			$templetPath = implode('/',$temp);
-			$templetDir = str_replace(__IM_PATH__,__IM_DIR__,$templetPath);
-		} else {
-			$templetPath = $this->getTempletPath('password',$config->templet);
-			$templetDir = $this->getTempletDir('password',$config->templet);
-		
-			if (file_exists($templetPath.'/styles/style.css') == true) {
-				$this->IM->addSiteHeader('style',$templetDir.'/styles/style.css');
-			}
-			
-			$templetFile = 'templet.php';
-		}
-		
-		$IM = $this->IM;
-		$Module = $this;
-		$Module->templetPath = $templetPath;
-		$Module->templetDir = $templetDir;
-		
-		if (file_exists($templetPath.'/'.$templetFile) == true) {
-			INCLUDE $templetPath.'/'.$templetFile;
-		}
-		
-		echo '</form>'.PHP_EOL;
-		echo '<script>$(document).ready(function() { Member.password.init(); });</script>'.PHP_EOL;
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
-	}
-	
-	/**
-	 * Get point context (member's point changed list context)
-	 *
-	 * @param object $config configs
-	 * @return string $context context html code
-	 */
-	function getPointContext($config) {
-		ob_start();
-		
-		if ($this->isLogged() == false) {
-			return $this->getError($this->getLanguage('error/notLogged'));
-		}
-		
-		$member = $this->getMember();
-		
-		if (preg_match('/\.php$/',$config->templet) == true) {
-			$temp = explode('/',$config->templet);
-			$templetFile = array_pop($temp);
-			$templetPath = implode('/',$temp);
-			$templetDir = str_replace(__IM_PATH__,__IM_DIR__,$templetPath);
-		} else {
-			if (preg_match('/^@/',$config->templet) == true) {
-				$templetPath = $this->IM->getTempletPath().'/templets/modules/member/templets/point/'.preg_replace('/^@/','',$config->templet);
-				$templetDir = $this->IM->getTempletDir().'/templets/modules/member/templets/point/'.preg_replace('/^@/','',$config->templet);
-			} else {
-				$templetPath = $this->Module->getPath().'/templets/point/'.$config->templet;
-				$templetDir = $this->Module->getDir().'/templets/point/'.$config->templet;
-			}
-		
-			if (file_exists($templetPath.'/styles/style.css') == true) {
-				$this->IM->addSiteHeader('style',$templetDir.'/styles/style.css');
-			}
-			
-			$templetFile = 'templet.php';
-		}
-		
-		$page = Request('p') ? Request('p') : 1;
-		$start = ($page - 1) * 20;
-		$lists = $this->db()->select($this->table->point)->where('midx',$this->getLogged());
-		$total = $lists->copy()->count();
-		$lists = $lists->limit($start,20)->orderBy('reg_date','desc')->get();
-		for ($i=0, $loop=count($lists);$i<$loop;$i++) {
-			if ($this->IM->Module->isInstalled($lists[$i]->module) == true) {
-				$mModule = $this->IM->getModule($lists[$i]->module);
-				if (method_exists($mModule,'getPoint') == true) {
-					$lists[$i]->content = $mModule->getPoint($lists[$i]->code,$lists[$i]->content ? json_decode($lists[$i]->content) : null);
-				} else {
-					$lists[$i]->content = $lists[$i]->module.'@'.$lists[$i]->code.'@'.$lists[$i]->content;
-				}
-			} else {
-				$lists[$i]->content = $lists[$i]->module.'@'.$lists[$i]->code.'@'.$lists[$i]->content;
-			}
-		}
-		
-		$pagination = GetPagination($page,ceil($total/20),7,'LEFT',$this->IM->getUrl(null,null,false));
-		
-		$IM = $this->IM;
-		$Module = $this;
-		$Module->templetPath = $templetPath;
-		$Module->templetDir = $templetDir;
-		
-		if (file_exists($templetPath.'/'.$templetFile) == true) {
-			INCLUDE $templetPath.'/'.$templetFile;
-		}
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
-	}
-	
-	/**
-	 * Get push context (member's point changed list context)
-	 *
-	 * @param object $config configs
-	 * @return string $context context html code
-	 */
-	function getPushContext($config) {
-		return $this->IM->getModule('push')->getContext('list',$config);
-	}
-	
-	/**
-	 * Get social login context, if someone logged via social account and not linked iModule's account, showing this context
-	 * someone can be linked iModule's account, or select iModule's account
-	 *
-	 * @param object $config configs
-	 * @return string $context context html code
-	 */
-	function getSocialContext($config) {
-		ob_start();
-		
-		$formName = 'ModuleMemberSocialForm';
-		echo '<input type="hidden" name="type" value="'.$config->type.'">'.PHP_EOL;
-		if ($config->type == 'duplicated') {
-			echo '<form name="'.$formName.'" method="post" onsubmit="return Member.login(this);">'.PHP_EOL;
-			echo '<input type="hidden" name="idx" value="'.$config->member->idx.'">'.PHP_EOL;
-			
-			$member = $config->member;
-		} else {
-			echo '<form>'.PHP_EOL;
-			$photo = $config->photo;
-			$redirectUrl = $config->redirectUrl;
-			$accounts = array();
-			for ($i=0, $loop=count($config->account);$i<$loop;$i++) {
-				$accounts[$i] = $this->getMember($config->account[$i]->midx);
-			}
-		}
-		
-		if (file_exists($this->IM->getTempletPath().'/templets/modules/member/templets/social/'.$config->type) == true) {
-			$templetPath = $this->IM->getTempletPath().'/templets/modules/member/templets/social/'.$config->type;
-			$templetDir = $this->IM->getTempletDir().'/templets/modules/member/templets/social/'.$config->type;
-		} else {
-			$templetPath = $this->Module->getPath().'/templets/social/'.$config->type;
-			$templetDir = $this->Module->getDir().'/templets/social/'.$config->type;
-		}
-		
-		if (file_exists($templetPath.'/styles/style.css') == true) {
-			$this->IM->addSiteHeader('style',$templetDir.'/styles/style.css');
-		}
-		
-		$IM = $this->IM;
-		$Module = $this;
-		$Module->templetPath = $templetPath;
-		$Module->templetDir = $templetDir;
-		
-		if (file_exists($templetPath.'/templet.php') == true) {
-			INCLUDE $templetPath.'/templet.php';
-		}
-		
-		echo '</form>'.PHP_EOL;
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
-	}
-	
-	/**
-	 * Make logged session data, logged session is encrypt by remove ip, member idx and current time
-	 * iModule always check session data for security.
-	 *
-	 * @param int $midx im_member_table idx
-	 */
-	function login($idx) {
-		$_SESSION['MEMBER_LOGGED'] = Encoder(json_encode(array('idx'=>$idx,'time'=>time(),'ip'=>$_SERVER['REMOTE_ADDR'])));
-		$this->logged = Request('MEMBER_LOGGED','session') != null && Decoder(Request('MEMBER_LOGGED','session')) != false ? json_decode(Decoder(Request('MEMBER_LOGGED','session'))) : false;
-	}
-	
-	/**
-	 * Login by oauth2.0 protocol(BEARER), check token in HTTP request header
-	 *
-	 * @param string $token
-	 */
-	function loginByToken($token) {
-		$token = explode(' ',$token);
-		if (count($token) != 2 || strtoupper($token[0]) != 'BEARER' || Decoder($token[1]) === false) {
-			header("HTTP/1.1 401 Unauthorized");
-			header("Content-type: text/json; charset=utf-8",true);
-			
-			$results = new stdClass();
-			$results->success = false;
-			$results->message = 'Access token Error : Unauthorized';
-	
-			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
-		} else {
-			$data = json_decode(Decoder($token[1]));
-			$midx = array_pop($data);
-			$client_id = array_pop($data);
-			$this->login($midx);
-		}
+		$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
+		$activity = $this->addActivity($midx,0,'member','login',array('ip'=>$logged->ip,'browser'=>$_SERVER['HTTP_USER_AGENT']));
 		
 		return true;
-	}
-	
-	/**
-	 * Make access_token by oauth2.0 protocol(BEARER)
-	 *
-	 * @param string $client_id app id
-	 * @param int $midx im_member_table idx
-	 * @return string $token oauth2.0 access_token, not used expired time
-	 * @todo check app id (is app id registed or not)
-	 */
-	function makeAuthToken($client_id,$midx) {
-		return Encoder(json_encode(array($client_id,$midx)));
-	}
-	
-	/**
-	 * Check login token for tokenLogin API
-	 *
-	 * @param int $midx member idx
-	 * @return string $loginToken
-	 */
-	function makeLoginToken($midx) {
-		return urlencode(Encoder(json_encode(array('idx'=>$midx,'ip'=>$_SERVER['REMOTE_ADDR'],'time'=>time()))));
 	}
 	
 	/**
@@ -1577,12 +1080,12 @@ class ModuleMember {
 		if ($idx == 0) {
 			$label = new stdClass();
 			
-			$languages = $this->Module->getConfig('default_label_title_languages');
-			$title = isset($languages->{$this->IM->language}) == true ? $languages->{$this->IM->language} : $this->Module->getConfig('default_label_title');
+			$languages = $this->getModule()->getConfig('default_label_title_languages');
+			$title = isset($languages->{$this->IM->language}) == true ? $languages->{$this->IM->language} : $this->getModule()->getConfig('default_label_title');
 			$label->idx = 0;
-			$label->title = $title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/default_label_title') : $title;
-			$label->allow_signup = $this->Module->getConfig('allow_signup') === true;
-			$label->approve_signup = $this->Module->getConfig('approve_signup') === true;
+			$label->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/default_label_title') : $title;
+			$label->allow_signup = $this->getModule()->getConfig('allow_signup') === true;
+			$label->approve_signup = $this->getModule()->getConfig('approve_signup') === true;
 			$label->is_change = true;
 			$label->is_unique = false;
 		} else {
@@ -1628,11 +1131,11 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get Member Information (parsed member data)
+	 * 회원정보를 가져온다.
 	 *
-	 * @param int $midx(optional) im_member_table idx, if not exists this param, used logged member idx
-	 * @param boolean $forceReload(optional) this function used cache, if this value is true, not use cache data and get data from database
-	 * @return object $memberInfo
+	 * @param int $midx(옵션) 회원 고유번호
+	 * @param boolean $forceReload(optional) 캐싱되어 있는 회원정보가 아닌, 최신의 회원정보를 요청
+	 * @return object $member 회원정보
 	 */
 	function getMember($midx=null,$forceReload=false) {
 		$midx = $midx !== null ? $midx : $this->getLogged();
@@ -1645,14 +1148,14 @@ class ModuleMember {
 				$member->code = '';
 				$member->type = 'GUEST';
 				$member->name = $member->nickname = 'Unknown';
-				$member->photo = $this->Module->getDir().'/images/nophoto.png';
+				$member->photo = $this->getModule()->getDir().'/images/nophoto.png';
 				$member->nickcon = null;
 				$member->level = $this->getLevel(0);
 				$member->label = array();
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
-				$member->photo = file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.jpg' : $this->Module->getDir().'/images/nophoto.png';
+				$member->photo = file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.jpg' : $this->getModule()->getDir().'/images/nophoto.png';
 				$member->nickcon = file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.gif' : null;
 				$member->level = $this->getLevel($member->exp);
 				$temp = explode('-',$member->birthday);
@@ -1716,7 +1219,7 @@ class ModuleMember {
 	 * @return string $photo member's photo img tag
 	 */
 	function getMemberPhoto($midx=null,$width=null,$height=null) {
-		if ($midx === null && $this->isLogged() == false) return '<img src="'.$this->Module->getDir().'/images/nophoto.png" alt="unknown">';
+		if ($midx === null && $this->isLogged() == false) return '<img src="'.$this->getModule()->getDir().'/images/nophoto.png" alt="unknown">';
 		
 		$member = $this->getMember($midx);
 		
@@ -1763,7 +1266,7 @@ class ModuleMember {
 		$page->language = $this->IM->language;
 		$page->menu = 'account';
 		$page->page = $view == null ? 'dashboard' : $view;
-		$page->title = $this->getLanguage('account/title');
+		$page->title = $this->getText('account/title');
 		$page->type = 'MODULE';
 		$page->layout = 'empty';
 		$page->context = new stdClass();
@@ -1775,67 +1278,14 @@ class ModuleMember {
 		
 		return $page;
 	}
-	
-	/**
-	 * send verify email when user signup or modify email address
-	 *
-	 * @param int $midx im_member_table idx
-	 * @param string $email(optional) if not exist email, send email to member's email address
-	 * @return string SENDING or VERIFIED
-	 * @todo email context configure via database (email subject and email body)
-	 */
-	function sendVerifyEmail($midx,$email=null) {
-		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
-		if ($member == null) return null;
-		
-		$email = $email == null ? $member->email : $email;
-		$check = $this->db()->select($this->table->email)->where('midx',$midx)->where('email',$email)->getOne();
-		
-		$code = GetRandomString(6);
-		$isSendEmail = false;
-		if ($check == null) {
-			$this->db()->insert($this->table->email,array('midx'=>$midx,'email'=>$email,'code'=>$code,'reg_date'=>time(),'status'=>'SENDING'))->execute();
-			$isSendEmail = true;
-		} elseif ($check->status == 'CANCELED') {
-			$this->db()->update($this->table->email,array('code'=>$code,'reg_date'=>time(),'status'=>'SENDING'))->where('midx',$midx)->where('email',$email)->execute();
-			$isSendEmail = true;
-		} elseif ($check->status == 'VERIFIED') {
-			return 'VERIFIED';
-		}
-		
-		if ($isSendEmail == true) {
-			$subject = '['.$this->IM->getSiteTitle().'] 이메일주소 확인메일';
-			$content = '회원님이 입력하신 이메일주소가 유효한 이메일주소인지 확인하기 위한 이메일입니다.<br>회원가입하신적이 없거나, 최근에 이메일주소변경신청을 하신적이 없다면 본 메일은 무시하셔도 됩니다.';
-			if ($member->status == 'VERIFYING') {
-				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하시거나, 인증링크를 클릭하여 회원가입을 완료할 수 있습니다.';
-			} else {
-				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하여 이메일주소변경을 완료할 수 있습니다.';
-			}
-			$content.= '<br><br>인증코드 : <b>'.$code.'</b>';
-			if ($member->status == 'VERIFYING') {
-				$signupPage = $this->getMemberPage('signup');
-				$link = $this->IM->getUrl($signupPage->menu,$signupPage->page,'verify',false,true).'?code='.urlencode(Encoder(json_encode(array('midx'=>$midx,'email'=>$email,'code'=>$code))));
-				$content.= '<br>인증주소 : <a href="'.$link.'" target="_blank">'.$link.'</a>';
-			}
-			$content.= '<br><br>본 메일은 발신전용메일로 회신되지 않습니다.<br>감사합니다.';
-			
-			$this->IM->getModule('email')->addTo($email,$member->name)->setSubject($subject)->setContent($content)->send();
-		}
-		
-		if ($member->status == 'VERIFYING' && $member->email != $email) {
-			$this->db()->update($this->table->member,array('email'=>$email))->where('idx',$member->idx)->execute();
-		}
-		
-		return 'SENDING';
-	}
-	
-	function getPhotoEditModal($templet) {
+	/*
+	function getPhotoEditModal($this->getTemplet($configs)) {
 		ob_start();
 		
-		$templetPath = $this->getTempletPath('modify',$templet);
-		$templetDir = $this->getTempletDir('modify',$templet);
+		$this->getTemplet($configs)->getPath() = $this->getTempletPath('modify',$this->getTemplet($configs));
+		$this->getTemplet($configs)->getDir() = $this->getTempletDir('modify',$this->getTemplet($configs));
 		
-		$title = $this->getLanguage('photoEdit/title');
+		$title = $this->getText('photoEdit/title');
 		echo '<form id="ModuleMemberPhotoEditForm">'.PHP_EOL;
 
 		$content = '<style>'.PHP_EOL;
@@ -1881,10 +1331,10 @@ class ModuleMember {
 		$IM = $this->IM;
 		$Module = $this;
 		
-		if (file_exists($templetPath.'/modal.php') == true) {
-			INCLUDE $templetPath.'/modal.php';
+		if (file_exists($this->getTemplet($configs)->getPath().'/modal.php') == true) {
+			INCLUDE $this->getTemplet($configs)->getPath().'/modal.php';
 		} else {
-			INCLUDE $this->Module->getPath().'/templets/modal.php';
+			INCLUDE $this->getModule()->getPath().'/templets/modal.php';
 		}
 		
 		echo '</form>'.PHP_EOL.'<script>Member.photoEdit.init();</script>';
@@ -1895,33 +1345,34 @@ class ModuleMember {
 		return $context;
 	}
 	
-	function getModifyEmail($templet) {
+	
+	function getModifyEmail($this->getTemplet($configs)) {
 		ob_start();
 		
-		if (preg_match('/^@/',$templet) == true) {
-			$templetPath = $this->IM->getTempletPath().'/templets/modules/member/templets/modify/'.preg_replace('/^@/','',$templet);
-			$templetDir = $this->IM->getTempletDir().'/templets/modules/member/templets/modify/'.preg_replace('/^@/','',$templet);
+		if (preg_match('/^@/',$this->getTemplet($configs)) == true) {
+			$this->getTemplet($configs)->getPath() = $this->IM->getTempletPath().'/templets/modules/member/templets/modify/'.preg_replace('/^@/','',$this->getTemplet($configs));
+			$this->getTemplet($configs)->getDir() = $this->IM->getTempletDir().'/templets/modules/member/templets/modify/'.preg_replace('/^@/','',$this->getTemplet($configs));
 		} else {
-			$templetPath = $this->Module->getPath().'/templets/modify/'.$templet;
-			$templetDir = $this->Module->getDir().'/templets/modify/'.$templet;
+			$this->getTemplet($configs)->getPath() = $this->getModule()->getPath().'/templets/modify/'.$this->getTemplet($configs);
+			$this->getTemplet($configs)->getDir() = $this->getModule()->getDir().'/templets/modify/'.$this->getTemplet($configs);
 		}
 		
-		$title = $this->getLanguage('modifyEmail/title');
+		$title = $this->getText('modifyEmail/title');
 		echo '<form name="ModuleMemberModifyEmailForm" onsubmit="return Member.modify.modifyEmail(this);">'.PHP_EOL;
 		echo '<input type="hidden" name="confirm" value="TRUE">'.PHP_EOL;
 		
-		$content = '<div class="message">'.$this->getLanguage('modifyEmail/email').'</div>'.PHP_EOL;
+		$content = '<div class="message">'.$this->getText('modifyEmail/email').'</div>'.PHP_EOL;
 		$content.= '<div class="inputBlock">'.PHP_EOL;
 		$content.= '	<input type="text" name="email" class="inputControl" required>'.PHP_EOL;
-		$content.= '	<div class="helpBlock" data-default="'.$this->getLanguage('modifyEmail/help/email/default').'"></div>'.PHP_EOL;
+		$content.= '	<div class="helpBlock" data-default="'.$this->getText('modifyEmail/help/email/default').'"></div>'.PHP_EOL;
 		$content.= '</div>'.PHP_EOL;
 		
-		$content.= '<button type="button" class="btn btnRed" style="margin:5px 0px; width:100%;" data-loading="'.$this->getLanguage('modifyEmail/sending').'" onclick="Member.modify.sendVerifyEmail(this);"><i class="fa fa-check"></i> '.$this->getLanguage('modifyEmail/sendVerifyEmail').'</button>'.PHP_EOL;
+		$content.= '<button type="button" class="btn btnRed" style="margin:5px 0px; width:100%;" data-loading="'.$this->getText('modifyEmail/sending').'" onclick="Member.modify.sendVerifyEmail(this);"><i class="fa fa-check"></i> '.$this->getText('modifyEmail/sendVerifyEmail').'</button>'.PHP_EOL;
 		
-		$content.= '<div class="message">'.$this->getLanguage('modifyEmail/code').'</div>'.PHP_EOL;
+		$content.= '<div class="message">'.$this->getText('modifyEmail/code').'</div>'.PHP_EOL;
 		$content.= '<div class="inputBlock">'.PHP_EOL;
 		$content.= '	<input type="text" name="code" class="inputControl" required>'.PHP_EOL;
-		$content.= '	<div class="helpBlock" data-default="'.$this->getLanguage('modifyEmail/help/code/default').'"></div>'.PHP_EOL;
+		$content.= '	<div class="helpBlock" data-default="'.$this->getText('modifyEmail/help/code/default').'"></div>'.PHP_EOL;
 		$content.= '</div>'.PHP_EOL;
 		
 //		$actionButton = '<button type="button" class="danger" onclick="$(\'input.cropit-image-input\').click();">사진선택</button>';
@@ -1929,10 +1380,10 @@ class ModuleMember {
 		$IM = $this->IM;
 		$Module = $this;
 		
-		if (file_exists($templetPath.'/modal.php') == true) {
-			INCLUDE $templetPath.'/modal.php';
+		if (file_exists($this->getTemplet($configs)->getPath().'/modal.php') == true) {
+			INCLUDE $this->getTemplet($configs)->getPath().'/modal.php';
 		} else {
-			INCLUDE $this->Module->getPath().'/templets/modal.php';
+			INCLUDE $this->getModule()->getPath().'/templets/modal.php';
 		}
 		
 		echo '</form>'.PHP_EOL;
@@ -1942,7 +1393,7 @@ class ModuleMember {
 		
 		return $context;
 	}
-	
+	*/
 	/**
 	 * Check social oauth token and scope
 	 *
@@ -2010,6 +1461,63 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 이메일 인증과정이 있을 경우 이메일 인증메일을 발송한다.
+	 *
+	 * @param int $midx 회원고유번호
+	 * @param string $email(옵션) 이메일주소, 없을 경우 회원정보의 이메일주소로 발송한다.
+	 * @return string 이메일 발송코드 (VERIFIED : 이미 인증됨, SENDING : 인증메일을 발송함, WAITING : 이메일을 발송하고 대기중, FAIL : 이메일 발송실패)
+	 */
+	function sendVerificationEmail($midx,$email=null) {
+		$member = $this->getMember($midx);
+		if ($member->idx == 0) return 'FAIL';
+		
+		$email = $email == null ? $member->email : $email;
+		$check = $this->db()->select($this->table->email)->where('midx',$midx)->where('email',$email)->getOne();
+		
+		$code = GetRandomString(6);
+		$isSendEmail = false;
+		if ($check == null) {
+			$this->db()->insert($this->table->email,array('midx'=>$midx,'email'=>$email,'code'=>$code,'reg_date'=>time(),'status'=>'SENDING'))->execute();
+			$isSendEmail = true;
+		} elseif ($check->status == 'CANCELED' || ($check->status == 'SENDING' && $check->reg_date < time() - 300)) {
+			$this->db()->update($this->table->email,array('code'=>$code,'reg_date'=>time(),'status'=>'SENDING'))->where('midx',$midx)->where('email',$email)->execute();
+			$isSendEmail = true;
+		} elseif ($check->status == 'VERIFIED') {
+			return 'VERIFIED';
+		} else {
+			return 'WAITING';
+		}
+		
+		if ($isSendEmail == true) {
+			/**
+			 * @todo 메일발송부분 언어팩 설정
+			 */
+			$subject = '['.$this->IM->getSiteTitle().'] 이메일주소 확인메일';
+			$content = '회원님이 입력하신 이메일주소가 유효한 이메일주소인지 확인하기 위한 이메일입니다.<br>회원가입하신적이 없거나, 최근에 이메일주소변경신청을 하신적이 없다면 본 메일은 무시하셔도 됩니다.';
+			if ($member->status == 'VERIFYING') {
+				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하시거나, 인증링크를 클릭하여 회원가입을 완료할 수 있습니다.';
+			} else {
+				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하여 이메일주소변경을 완료할 수 있습니다.';
+			}
+			$content.= '<br><br>인증코드 : <b>'.$code.'</b>';
+			
+			if ($member->verified == 'FALSE') {
+				$link = $this->IM->getModuleUrl('member','verification',urlencode(Encoder(json_encode(array('midx'=>$midx,'email'=>$email,'code'=>$code)))),true);
+				$content.= '<br>인증주소 : <a href="'.$link.'" target="_blank">'.$link.'</a>';
+			}
+			$content.= '<br><br>본 메일은 발신전용메일로 회신되지 않습니다.<br>감사합니다.';
+			
+			$this->IM->getModule('email')->addTo($email,$member->name)->setSubject($subject)->setContent($content)->send();
+		}
+		
+		if ($member->verified != 'TRUE' && $member->email != $email) {
+			$this->db()->update($this->table->member,array('email'=>$email))->where('idx',$member->idx)->execute();
+		}
+		
+		return 'SENDING';
+	}
+	
+	/**
 	 * Add member label
 	 *
 	 * @param int $midx member idx
@@ -2030,12 +1538,68 @@ class ModuleMember {
 		}
 	}
 	
+	/**
+	 * 회원활동기록을 추가한다.
+	 *
+	 * @param int $midx 회원 고유번호
+	 * @param int $exp 활동에 따른 경험치
+	 * @param string $module 활동이 발생한 모듈명
+	 * @param string $code 활동코드
+	 * @param object[] $content 활동에 따른 정보
+	 * @return int $activity 활동 고유번호
+	 */
 	function addActivity($midx,$exp,$module,$code,$content=array()) {
 		$member = $this->getMember($midx);
-		if ($member == null) return;
+		if ($member->idx == 0) return false;
 		
-		$this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>time()))->execute();
+		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>time()))->execute();
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
+		
+		return $idx;
+	}
+	
+	/**
+	 * 회원가입 / 회원수정 필드데이터를 가공한다.
+	 *
+	 * @param object $rawData $this->table->signup 테이블의 RAW 데이터
+	 * @return object $field
+	 */
+	function parseInputField($rawData) {
+		$field = $rawData;
+		
+		$title_languages = json_decode($field->title_languages);
+		$field->title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $field->title;
+		unset($field->title_languages);
+		
+		$help_languages = json_decode($field->help_languages);
+		$field->help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $field->help;
+		unset($field->help_languages);
+		
+		$configs = json_decode($field->configs);
+		unset($field->configs);
+		
+		if ($field->type == 'etc') {
+			$field->name = $field->name;
+			$field->is_extra = true;
+		} else {
+			$field->title = $field->title == 'LANGUAGE_SETTING' ? $this->getText('text/'.$field->name) : $field->title;
+			$field->help = $field->help == 'LANGUAGE_SETTING' ? $this->getText('signup/form/'.$field->name.'_help') : $field->help;
+			$field->is_extra = false;
+		}
+		
+		if (in_array($field->input,array('select','radio','checkbox')) == true) {
+			$options = $configs->options;
+			$field->options = new stdClass();
+			foreach ($options as $option) {
+				$field->options->{$option->value} = isset($option->languages->{$this->IM->language}) == true ? $option->languages->{$this->IM->language} : $option->display;
+			}
+			
+			if ($field->input == 'checkbox') $field->max = $configs->max;
+		}
+		
+		$field->is_required = $field->is_required == 'TRUE';
+		
+		return $field;
 	}
 	
 	/**
@@ -2045,17 +1609,22 @@ class ModuleMember {
 	 * @param boolean $isModify 정보수정 필드인지 여부
 	 * @param string $html
 	 */
-	function parseMemberInputField($field,$isModify=false) {
+	function getInputFieldHtml($field,$mode) {
 		$html = array();
+		
+		$isSignUp = $mode == 'signup';
+		
+		if ($this->isLogged() == false) $value = null;
+		else $value = $this->getMember();
 		
 		if ($field->input == 'system') {
 			/**
 			 * 이메일
 			 */
-			if ($field->name == 'email') {
+			if ($field->name == 'email' || $field->name == 'email_verification_email') {
 				array_push($html,
-					'<div data-role="input" data-name="email" data-default="'.$field->help.'">',
-						'<input type="email" name="email">',
+					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<input type="email" name="'.$field->name.'"'.($value !== null && isset($value->email) == true ? ' value="'.GetString($value->email,'input').'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -2067,10 +1636,10 @@ class ModuleMember {
 				array_push($html,
 					'<div data-role="inputset" data-name="password" data-default="'.$field->help.'">',
 						'<div data-role="input">',
-							'<input type="password" name="password" placeholder="'.$this->getLanguage('signup/form/password').'">',
+							'<input type="password" name="password" placeholder="'.$this->getText('signup/form/password').'">',
 						'</div>',
 						'<div data-role="input">',
-							'<input type="password" name="password_confirm" placeholder="'.$this->getLanguage('signup/form/password_confirm').'">',
+							'<input type="password" name="password_confirm" placeholder="'.$this->getText('signup/form/password_confirm').'" data-error="'.$this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM').'">',
 						'</div>',
 					'</div>'
 				);
@@ -2083,6 +1652,96 @@ class ModuleMember {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
 						'<input type="text" name="'.$field->name.'">',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 생일
+			 */
+			if ($field->name == 'birthday') {
+				array_push($html,
+					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<input type="date" name="'.$field->name.'">',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 전화번호 및 휴대전화번호
+			 */
+			if ($field->name == 'telephone' || $field->name == 'cellphone') {
+				array_push($html,
+					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<input type="tel" name="'.$field->name.'">',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 홈페이지
+			 */
+			if ($field->name == 'homepage') {
+				array_push($html,
+					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<input type="url" name="'.$field->name.'">',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 성별
+			 */
+			if ($field->name == 'gender') {
+				array_push($html,
+					'<div data-role="inputset" class="inline" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<div data-role="input">',
+							'<label><input type="radio" name="'.$field->name.'" value="MALE">'.$this->getText('text/male').'</label>',
+						'</div>',
+						'<div data-role="input">',
+							'<label><input type="radio" name="'.$field->name.'" value="FEMALE">'.$this->getText('text/female').'</label>',
+						'</div>',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 주소
+			 */
+			if ($field->name == 'address') {
+				array_push($html,
+					'<div data-role="inputset" class="block" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_zipcode" placeholder="'.$this->getText('text/zipcode').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_address1" placeholder="'.$this->getText('text/address1').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_address2" placeholder="'.$this->getText('text/address2').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_city" placeholder="'.$this->getText('text/city').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_state" placeholder="'.$this->getText('text/state').'">',
+						'</div>',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 이메일주소 인증 코드
+			 */
+			if ($field->name == 'email_verification_code') {
+				array_push($html,
+					'<div data-role="inputset" class="flex" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<div data-role="input" class="flex">',
+							'<input type="url" name="'.$field->name.'">',
+						'</div>',
+						'<div data-role="input">',
+							'<button type="button" data-action="resend">'.$this->getText('button/resend_email_verification_code').'</button>',
+						'</div>',
 					'</div>'
 				);
 			}
@@ -2102,23 +1761,448 @@ class ModuleMember {
 			
 			
 			/**
-			 * 체크박스, 라디오버튼
+			 * 체크박스
 			 */
-			if ($field->input == 'checkbox' || $field->input == 'radio') {
+			if ($field->input == 'checkbox') {
 				$html[] = '<div data-role="inputset" data-name="'.$field->name.'" class="inline" data-default="'.$field->help.'">';
 				foreach ($field->options as $value=>$display) {
 					array_push($html,
 						'<div data-role="input">',
-							'<label><input type="'.$field->input.'" name="'.$field->name.'" value="'.$value.'">'.$display.'</label>',
+							'<label><input type="checkbox" name="'.$field->name.'[]" value="'.$value.'">'.$display.'</label>',
 						'</div>'
 					);
 				}
 				$html[] = '</div>';
 			}
 			
+			/**
+			 * 라디오버튼
+			 */
+			if ($field->input == 'radio') {
+				$html[] = '<div data-role="inputset" data-name="'.$field->name.'" class="inline" data-default="'.$field->help.'">';
+				foreach ($field->options as $value=>$display) {
+					array_push($html,
+						'<div data-role="input">',
+							'<label><input type="radio" name="'.$field->name.'" value="'.$value.'">'.$display.'</label>',
+						'</div>'
+					);
+				}
+				$html[] = '</div>';
+			}
+			
+			/**
+			 * 텍스트 / 패스워드 / 이메일 / URL / 전화번호 / 날짜필드
+			 */
+			if (in_array($field->input,array('text','password','email','date','tel')) == true) {
+				array_push($html,
+					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<input type="'.$field->input.'" name="'.$field->name.'">',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 주소
+			 */
+			if ($field->input == 'address') {
+				array_push($html,
+					'<div data-role="inputset" class="block" data-name="'.$field->name.'" data-default="'.$field->help.'">',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_zipcode" placeholder="'.$this->getText('text/zipcode').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_address1" placeholder="'.$this->getText('text/address1').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_address2" placeholder="'.$this->getText('text/address2').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_city" placeholder="'.$this->getText('text/city').'">',
+						'</div>',
+						'<div data-role="input">',
+							'<input type="text" name="'.$field->name.'_state" placeholder="'.$this->getText('text/state').'">',
+						'</div>',
+					'</div>'
+				);
+			}
+			
+			/**
+			 * 긴글 텍스트
+			 */
+			if ($field->input == 'textarea') {
+				array_push($html,
+					'<div data-role="input" data-default="'.$field->help.'">',
+						'<textarea name="'.$field->name.'"></textarea>',
+					'</div>'
+				);
+			}
 		}
 		
 		return implode(PHP_EOL,$html);
+	}
+	
+	/**
+	 * 회원가입 / 정보수정의 데이터가 유효한지 파악하여, DB처리를 위한 배열 및 에러처리를 위한 배열을 만든다.
+	 *
+	 * @param string $mode 회원가입(signup) 또는 정보수정(modify)
+	 * @param object/array $data 사용자가 입력한 데이터
+	 * @param &array $insert(옵션) DB처리를 위한 배열 포인터
+	 * @param &array $errors(옵션) 에러처리를 위한 배열 포인터
+	 * @param boolean $isValid 유효한지 여부
+	 */
+	function isValidInsertData($mode,$data,&$insert=null,&$errors=null) {
+		if (is_array($data) == true) $data = (object)$data;
+		
+		$isSignUp = $mode == 'signup';
+		$siteType = $this->IM->getSite()->member;
+		$label = isset($data->label) == true ? $data->label : 0;
+		
+		if ($insert != null) $insert['extras'] = array();
+		
+		$success = true;
+		$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->get();
+		for ($i=0, $loop=count($forms);$i<$loop;$i++) {
+			if ($forms[$i]->name == 'agreement' || $forms[$i]->name == 'privacy') continue;
+			$field = $this->parseInputField($forms[$i]);
+			
+			$field->value = null;
+			$field->error = null;
+			
+			if ($field->input == 'system') {
+				switch ($field->name) {
+					case 'email' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (CheckEmail($field->value) == true) {
+								$check = $this->db()->select($this->table->member)->where('email',$field->value);
+								if ($isSignUp == false && $this->isLogged() == true) $check->where('idx',$this->getLogged(),'!=');
+								
+								$checkAdmin = $check->copy();
+								
+								if ($siteType == 'UNIVERSAL') $check->where('domain','*');
+								else $check->where('domain',$this->IM->domain);
+								
+								$checkAdmin->where('type','ADMINISTRATOR');
+								
+								if ($check->has() == true || $checkAdmin->has() == true) {
+									$field->error = $this->getErrorText('DUPLICATED');
+								}
+							} else {
+								$field->error = $this->getErrorText('INVALID_EMAIL');
+							}
+						}
+						
+						break;
+						
+					case 'name' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (CheckName($field->value) == false) {
+								$field->error = $this->getErrorText('INVALID_USERNAME');
+							}
+						}
+						
+						break;
+					
+					case 'nickname' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (CheckNickname($field->value) == true) {
+								$check = $this->db()->select($this->table->member)->where('nickname',$field->value);
+								if ($isSignUp == false && $this->isLogged() == true) $check->where('idx',$this->getLogged(),'!=');
+								
+								$checkAdmin = $check->copy();
+								
+								if ($siteType == 'UNIVERSAL') $check->where('domain','*');
+								else $check->where('domain',$this->IM->domain);
+								
+								$checkAdmin->where('type','ADMINISTRATOR');
+								
+								if ($check->has() == true || $checkAdmin->has() == true) {
+									$field->error = $this->getErrorText('DUPLICATED');
+								}
+							} else {
+								$field->error = $this->getErrorText('INVALID_NICKNAME');
+							}
+						}
+						
+						break;
+						
+					case 'password' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (strlen($field->value) < 6) {
+								$field->error = $this->getErrorText('TOO_SHORT_PASSWORD');
+							} elseif (isset($data->password_confirm) == true && $field->value != $data->password_confirm) {
+								$field->error = $this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM');
+							} else {
+								$mHash = new Hash();
+								$field->value = $mHash->password_hash($field->value);
+							}
+						}
+						
+						break;
+						
+					case 'birthday' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$field->value) == true) {
+								$field->value = date('m-d-Y',strtotime($field->value));
+							} else {
+								$field->error = $this->getErrorText('INVALID_DATE');
+							}
+						}
+						
+						break;
+						
+					case 'address' :
+						if (isset($data->{$field->name.'_zipcode'}) == true && $data->{$field->name.'_zipcode'} && isset($data->{$field->name.'_address1'}) == true && $data->{$field->name.'_address1'} && isset($data->{$field->name.'_address2'}) == true && $data->{$field->name.'_address2'}) {
+							if (is_string($data->{$field->name.'_zipcode'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (is_string($data->{$field->name.'_address1'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (is_string($data->{$field->name.'_address2'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (isset($data->{$field->name.'_state'}) == true && is_string($data->{$field->name.'_state'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (isset($data->{$field->name.'_city'}) == true && is_string($data->{$field->name.'_city'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							$field->value = json_encode(
+								array(
+									'zipcode'=>$data->{$field->name.'_zipcode'},
+									'address1'=>$data->{$field->name.'_address1'},
+									'address2'=>$data->{$field->name.'_address2'},
+									'state'=>isset($data->{$field->name.'_state'}) == true ? $data->{$field->name.'_state'} : '',
+									'city'=>isset($data->{$field->name.'_city'}) == true ? $data->{$field->name.'_city'} : ''
+								),
+								JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK
+							);
+						} else {
+							$field->value = null;
+						}
+						
+						break;
+						
+					case 'gender' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (in_array($field->value,array('MALE','FEMALE')) == false) {
+								$field->error = $this->getErrorText('INVALID_GENDER');
+							}
+						}
+						
+						break;
+						
+					case 'homepage' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (preg_match('/^(http|https):\/\//',$field->value) == false) {
+								$field->value = 'http://'.$field->value;
+							}
+						}
+						
+						break;
+						
+					default :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+						}
+						
+						break;
+				}
+				
+				if ($field->error == null) {
+					if ($field->value !== null && strlen($field->value) > 0) {
+						if (is_array($insert) == true) $insert[$field->name] = $field->value;
+					} elseif ($field->is_required == true) {
+						$success = false;
+						if (is_array($errors) == true) $errors[$field->name] = $this->getErrorText('REQUIRED');
+					}
+				} else {
+					$success = false;
+					if (is_array($errors) == true) $errors[$field->name] = $field->error;
+				}
+			} else {
+				switch ($field->input) {
+					case 'checkbox' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null && ((is_array($field->value) == true && count($field->value) > 0) || (is_string($field->value) == true && strlen($field->value) > 0))) {
+							if (is_array($field->value) == false) $field->value = array($field->value);
+							
+							foreach ($field->value as $selected) {
+								if (isset($field->options->$selected) == false) {
+									$field->error = $this->getErrorText('INVALID_SELECT_OPTION');
+								}
+							}
+						} else {
+							$field->value = null;
+						}
+						
+						break;
+						
+					case 'select' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (isset($field->options->{$field->value}) == false) {
+								$field->error = $this->getErrorText('INVALID_SELECT_OPTION');
+							}
+						}
+						
+						break;
+						
+					case 'radio' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (isset($field->options->{$field->value}) == false) {
+								$field->error = $this->getErrorText('INVALID_SELECT_OPTION');
+							}
+						}
+						
+						break;
+						
+					case 'date' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/',$field->value) == true) {
+								$field->value = date('m-d-Y',strtotime($field->value));
+							} else {
+								$field->error = $this->getErrorText('INVALID_DATE');
+							}
+						}
+						
+						break;
+						
+					case 'url' :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (preg_match('/^(http|https):\/\//',$field->value) == false) {
+								$field->value = 'http://'.$field->value;
+							}
+						}
+						
+						break;
+						
+					default :
+						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
+						
+						if ($field->value !== null) {
+							if (is_string($field->value) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+						}
+						
+						break;
+				}
+				
+				if ($field->error == null) {
+					if ($field->value !== null) {
+						if (is_array($insert) == true) $insert['extras'][$field->name] = $field->value;
+					} elseif ($field->is_required == true) {
+						$success = false;
+						if (is_array($errors) == true) $errors[$field->name] = $this->getErrorText('REQUIRED');
+					}
+				} else {
+					$success = false;
+					if (is_array($errors) == true) $errors[$field->name] = $field->error;
+				}
+			}
+		}
+		
+		if ($insert !== null) {
+			if (isset($insert['name']) == false && isset($insert['nickname']) == true) $insert['name'] = $insert['nickname'];
+			if (isset($insert['nickname']) == false && isset($insert['name']) == true) $insert['nickname'] = $insert['name'];
+			$insert['extras'] = count($insert['extras']) > 0 ? json_encode($insert['extras'],JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
+		}
+		
+		return $success;
 	}
 	
 	/**
@@ -2132,748 +2216,18 @@ class ModuleMember {
 	 */
 	function doProcess($action) {
 		$results = new stdClass();
-		$values = new stdClass();
 		
 		/**
 		 * 모듈의 process 폴더에 $action 에 해당하는 파일이 있을 경우 불러온다.
 		 */
-		if (is_file($this->Module->getPath().'/process/'.$action.'.php') == true) {
-			INCLUDE $this->Module->getPath().'/process/'.$action.'.php';
+		if (is_file($this->getModule()->getPath().'/process/'.$action.'.php') == true) {
+			INCLUDE $this->getModule()->getPath().'/process/'.$action.'.php';
 		}
 		
-		if ($action == 'check') {
-			$name = Request('name');
-			$value = Request('value');
-			
-			if ($name == 'email') {
-				$siteType = $this->IM->getSite()->member;
-				
-				if (CheckEmail($value) == true) {
-					if ($this->db()->select($this->table->member)->where('email',$value)->where('idx',$this->getLogged(),'!=')->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('email',$value)->where('idx',$this->getLogged(),'!=')->where('type','ADMINISTRATOR')->has() == true) {
-						$results->success = false;
-						$results->message = $this->getLanguage('signup/help/email/duplicated');
-					} else {
-						$results->success = true;
-					}
-				} else {
-					$results->success = false;
-					$results->message = $this->getLanguage('signup/help/email/error');
-				}
-			}
-			
-			if ($name == 'name') {
-				if (strlen($value) > 0) {
-					$results->success = true;
-				} else {
-					$results->success = false;
-					$results->message = $this->getLanguage('signup/help/name/error');
-				}
-			}
-			
-			if ($name == 'nickname') {
-				$siteType = $this->IM->getSite()->member;
-				
-				if (CheckNickname($value) == true) {
-					if ($this->db()->select($this->table->member)->where('nickname',$value)->where('idx',$this->getLogged(),'!=')->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('nickname',$value)->where('idx',$this->getLogged(),'!=')->where('type','ADMINISTRATOR')->has() == true) {
-						$results->success = false;
-						$results->message =  $this->getLanguage('signup/help/nickname/duplicated');
-					} else {
-						$results->success = true;
-					}
-				} else {
-					$results->success = false;
-					$results->message = $this->getLanguage('signup/help/nickname/error');
-				}
-			}
-			
-			if ($name == 'old_password') {
-				if ($this->isLogged() == false) {
-					$results->success = false;
-					$results->message = $this->getLanguage('error/notLogged');
-				} else {
-					$mHash = new Hash();
-					if ($mHash->password_validate($value,$this->getMember()->password) == true) {
-						$results->success = true;
-						$results->message = $this->getLanguage('password/help/old_password/success');
-					} else {
-						$results->success = false;
-						$results->message = $this->getLanguage('password/help/old_password/error');
-					}
-				}
-			}
-		}
-		
-		if ($action == 'forceLogin') {
-			$code = Decoder(Request('code'));
-			
-			if ($code === false) {
-				$results->success = false;
-				$results->message = $this->getLanguage('error/invalidCode');
-			} else {
-				$data = json_decode($code);
-				if ($data != null && $data->ip == $_SERVER['REMOTE_ADDR']) {
-					$this->login($data->idx);
-					$results->success = true;
-				} else {
-					$results->success = false;
-					$results->message = $this->getLanguage('error/invalidCode');
-				}
-			}
-		}
-		
-		if ($action == 'login') {
-			$mHash = new Hash();
-			$email = Request('email');
-			$password = Request('password');
-			
-			$results->errors = array();
-			
-			$loginFail = Request('loginFail','session') != null && is_array(Request('loginFail','session')) == true ? Request('loginFail','session') : array('count'=>0,'time'=>0);
-			if ($loginFail['time'] > time()) {
-				$results->success = false;
-				$results->message = $this->getLanguage('login/error/login');
-			} else {
-				$siteType = $this->IM->getSite()->member;
-				
-				if ($siteType == 'MERGE') {
-					$check = $this->db()->select($this->table->member)->where('email',$email)->where('domain','*')->getOne();
-				} else {
-					$check = $this->db()->select($this->table->member)->where('email',$email)->where('domain',$this->IM->domain)->getOne();
-				}
-				
-				// not found member, search ADMINISTRATOR
-				if ($check == null) {
-					$check = $this->db()->select($this->table->member)->where('email',$email)->where('type','ADMINISTRATOR')->getOne();
-				}
-				
-				if ($check == null || $check->status == 'LEAVE') {
-					$results->success = false;
-					$results->errors['email'] = $this->getLanguage('login/error/email');
-					$loginFail['count']++;
-					if ($loginFail['count'] == 5) {
-						$loginFail['count'] = 0;
-						$loginFail['time'] = time() + 60 * 5;
-					}
-					
-					$values->email = $email;
-					$values->password = $password;
-				} elseif ($mHash->password_validate($password,$check->password) == false) {
-					$results->success = false;
-					$results->errors['password'] = $this->getLanguage('login/error/password');
-					$loginFail['count']++;
-					if ($loginFail['count'] == 5) {
-						$loginFail['count'] = 0;
-						$loginFail['time'] = time() + 60 * 5;
-					}
-					
-					$values->email = $email;
-					$values->password = $password;
-				} else {
-					$loginFail = array('count'=>0,'time'=>0);
-					
-					if ($check->status == 'ACTIVE') {
-						$this->db()->update($this->table->member,array('last_login'=>time()))->where('idx',$check->idx)->execute();
-						$this->login($check->idx);
-						$results->success = true;
-					} elseif ($check->status == 'VERIFYING') {
-						$_SESSION['MEMBER_REGISTER_IDX'] = Encoder($check->idx);
-						$page = $this->getMemberPage('signup');
-						$results->success = false;
-						$results->redirect = $this->IM->getUrl($page->menu,$page->page,'verify');
-					} else {
-						$results->success = false;
-						$results->message = $this->getLanguage('error/'.$check->status);
-					}
-				}
-			}
-			$_SESSION['loginFail'] = $loginFail;
-		}
-		
-		if ($action == 'logout') {
-			$redirect = Request('redirect');
-			unset($_SESSION['MEMBER_LOGGED']);
-			$results->success = true;
-			
-			if ($redirect != null && $redirect) {
-				header("location:".urldecode($redirect));
-				exit;
-			}
-		}
-		
-		if ($action == 'cert') {
-			$results->success = true;
-		}
-		
-		if ($action == 'signup') {
-			$label = Request('label') ? Request('label') : 0;
-			$siteType = $this->IM->getSite()->member;
-			
-			$insert = array();
-			$errors = array();
-			
-			if ($label == 0) {
-				$autoActive = $this->Module->getConfig('autoActive');
-				$allowSignup = $this->Module->getConfig('allowSignup');
-			} else {
-				$label = $this->db()->select($this->table->label)->where('idx',$label)->getOne();
-				if ($label == null) {
-					$autoActive = $allowSignup = false;
-					$errors['label'] = $this->getLanguage('error/not_found');
-					$label = 0;
-				} else {
-					$autoActive = $label->auto_active == 'TRUE';
-					$allowSignup = $label->allow_signup == 'TRUE';
-					$label = $label->idx;
-				}
-			}
-			
-			$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->get();
-			for ($i=0, $loop=count($forms);$i<$loop;$i++) {
-				$configs = json_decode($forms[$i]->configs);
-				
-				switch ($forms[$i]->type) {
-					case 'email' :
-						$insert['email'] = CheckEmail(Request('email')) == true ? Request('email') : $errors['email'] = $this->getLanguage('signup/help/email/error');
-						if ($this->db()->select($this->table->member)->where('email',$insert['email'])->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('email',$insert['email'])->where('type','ADMINISTRATOR')->has() == true) {
-							$errors['email'] = $this->getLanguage('signup/help/email/duplicated');
-						}
-						break;
-					
-					case 'password' :
-						$insert['password'] = strlen(Request('password')) >= 4 ? Request('password') : $errors['password'] = $this->getLanguage('signup/help/password/error');
-						if (strlen(Request('password')) < 4 || Request('password') != Request('password_confirm')) {
-							$errors['password_confirm'] = $this->getLanguage('signup/help/password_confirm/error');
-						}
-						break;
-						
-					case 'name' :
-						$insert['name'] = CheckNickname(Request('name')) == true ? Request('name') : $errors['name'] = $this->getLanguage('signup/help/name/error');
-						break;
-						
-					case 'nickname' :
-						$insert['nickname'] = CheckNickname(Request('nickname')) == true ? Request('nickname') : $errors['nickname'] = $this->getLanguage('signup/help/nickname/error');
-						if ($this->db()->select($this->table->member)->where('nickname',$insert['nickname'])->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('nickname',$insert['nickname'])->where('type','ADMINISTRATOR')->has() == true) {
-							$errors['nickname'] = $this->getLanguage('signup/help/nickname/duplicated');
-						}
-						break;
-						
-					case 'telephone' :
-						if (Request('telephone1') != null && Request('telephone2') != null && Request('telephone3') != null) {
-							$insert['telephone'] = Request('telephone1').Request('telephone2').Request('telephone3');
-						} elseif (Request('telephone') != null) {
-							$insert['telephone'] = Request('telephone');
-						} else {
-							$insert['telephone'] = '';
-						}
-						
-						if ($configs->useCountryCode == true) {
-							if ($insert['telephone'] && Request('telephone_country_code')) {
-								$insert['telephone'] = Request('telephone_country_code').preg_replace('/^0/','',$insert['telephone']);
-							} elseif (!Request('telephone_country_code')) {
-								$errors['telephone'] = $this->getLanguage('error/required');
-							}
-						}
-						
-						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['telephone']) < 10) $errors['telephone'] = $this->getLanguage('error/required');
-						break;
-						
-					case 'cellphone' :
-						if (Request('cellphone1') != null && Request('cellphone2') != null && Request('cellphone3') != null) {
-							$insert['cellphone'] = Request('cellphone1').Request('cellphone2').Request('cellphone3');
-						} elseif (Request('cellphone') != null) {
-							$insert['cellphone'] = Request('cellphone');
-						} else {
-							$insert['cellphone'] = '';
-						}
-						
-						if ($configs->useCountryCode == true) {
-							if ($insert['cellphone'] && Request('cellphone_country_code')) {
-								$insert['cellphone'] = Request('cellphone_country_code').preg_replace('/^0/','',$insert['cellphone']);
-							} elseif (!Request('cellphone_country_code')) {
-								$errors['cellphone'] = $this->getLanguage('error/required');
-							}
-						}
-						
-						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['cellphone']) < 10) $errors['cellphone'] = $this->getLanguage('error/required');
-						break;
-				}
-			}
-			
-			$values = new stdClass();
-			$values->insert = $insert;
-			$values->errors = $errors;
-			$this->IM->fireEvent('beforeDoProcess','member',$action,$values);
-			$insert = $values->insert;
-			$errors = $values->errors;
-			
-			$values = new stdClass();
-			if (empty($errors) == true) {
-				$mHash = new Hash();
-				
-				$insert['domain'] = $siteType == 'MERGE' ? '*' : $this->IM->domain;
-				$insert['password'] = $mHash->password_hash($insert['password']);
-				$insert['status'] = in_array('verify',$this->Module->getConfig('signupStep')) === true ? 'VERIFYING' : ($autoActive == true ? 'ACTIVE' : 'WAITING');
-				$insert['point'] = $this->Module->getConfig('signupPoint');
-				$insert['reg_date'] = time();
-				
-				$idx = $this->db()->insert($this->table->member,$insert)->execute();
-				if ($label != 0) {
-					$this->db()->insert($this->table->member_label,array('idx'=>$idx,'label'=>$label,'reg_date'=>$insert['reg_date']))->execute();
-					$membernum = $this->db()->select($this->table->member_label)->where('label',$label)->count();
-					$this->db()->update($this->table->label,array('membernum'=>$membernum))->where('idx',$label)->execute();
-				}
-				
-				if ($idx !== false) {
-					$results->success = true;
-					$_SESSION['MEMBER_REGISTER_IDX'] = Encoder($idx);
-					if (in_array('verify',$this->Module->getConfig('signupStep')) === true) $this->sendVerifyEmail($idx);
-					$values->idx = $idx;
-				} else {
-					$results->success = false;
-				}
-			} else {
-				$results->success = false;
-				$results->errors = $errors;
-			}
-		}
-		
-		if ($action == 'verifyEmail') {
-			$registerIDX = Request('registerIDX');
-			
-			if ($registerIDX == null) {
-				$results->success = false;
-			} else {
-				$email = Request('email');
-				$email_verify_code = Request('email_verify_code');
-				$check = $this->db()->select($this->table->email)->where('midx',$registerIDX)->where('email',$email)->getOne();
-				
-				if ($check == null) {
-					$results->success = false;
-					$results->errors = array('email'=>$this->getLanguage('verifyEmail/help/email/notFound'));
-				} elseif ($check->code == $email_verify_code) {
-					$this->db()->update($this->table->email,array('status'=>'VERIFIED'))->where('midx',$registerIDX)->where('email',$email)->execute();
-					$this->db()->update($this->table->member,array('status'=>'ACTIVE'))->where('idx',$registerIDX)->execute();
-					$results->success = true;
-				} else {
-					$results->success = false;
-					$results->errors = array('email_verify_code'=>$this->getLanguage('verifyEmail/help/email_verify_code/error'));
-				}
-			}
-		}
-		
-		if ($action == 'sendVerifyEmail') {
-			$registerIDX = Request('registerIDX');
-			$email = Request('email');
-			
-			if ($this->isLogged() == true) {
-				if (CheckEmail($email) == false) {
-					$results->success = false;
-					$results->errors = array('email'=>$this->getLanguage('modifyEmail/help/email/error'));
-				} elseif ($this->db()->select($this->table->member)->where('email',$email)->count() == 1) {
-					$results->success = false;
-					$results->errors = array('email'=>$this->getLanguage('modifyEmail/help/email/duplicated'));
-				} else {
-					$check = $this->db()->select($this->table->email)->where('midx',$this->getLogged())->where('email',$email)->getOne();
-					if ($check == null || $check->status != 'SENDING' || ($check->status == 'SENDING' && $check->reg_date + 300 < time())) {
-						$this->db()->delete($this->table->email)->where('midx',$this->getLogged())->where('email',$email)->execute();
-						$status = $this->sendVerifyEmail($this->getLogged(),$email);
-						$results->success = true;
-						$results->message = $this->getLanguage('verifyEmail/sending');
-					} else {
-						$results->success = false;
-						$results->message = $this->getLanguage('verifyEmail/error/sending');
-					}
-				}
-			} elseif ($registerIDX != null) {
-				$member = $this->db()->select($this->table->member)->where('idx',$registerIDX)->getOne();
-				if ($member == null || $member->status != 'VERIFYING') {
-					$results->success = false;
-					$results->message = $this->getLanguage('verifyEmail/error/target');
-				} else {
-					if (CheckEmail($email) == false) {
-						$results->success = false;
-						$results->message = $this->getLanguage('verifyEmail/error/email');
-					} else {
-						$check = $this->db()->select($this->table->email)->where('midx',$registerIDX)->where('email',$email)->getOne();
-						if ($check->status == 'VERIFIED') {
-							$signupPage = $this->getMemberPage('signup');
-							$results->success = true;
-							$this->db()->update($this->table->member,array('status'=>'ACTIVE'))->where('idx',$registerIDX)->execute();
-							$results->redirect = $this->IM->getUrl($signupPage->menu,$signupPage->page,'complete');
-						} elseif ($check == null || $check->status == 'CANCELED' || ($check->status == 'SENDING' && $check->reg_date + 300 < time())) {
-							$this->db()->delete($this->table->email)->where('midx',$registerIDX)->where('email',$email)->execute();
-							$status = $this->sendVerifyEmail($registerIDX,$email);
-							$results->success = true;
-							$results->message = $this->getLanguage('verifyEmail/sending');
-						} else {
-							$results->success = false;
-							$results->message = $this->getLanguage('verifyEmail/error/sending');
-						}
-					}
-				}
-			} else {
-				$results->success = false;
-				$results->message = $this->getLanguage('error/notLogged');
-			}
-		}
-		
-		if ($action == 'photoEdit') {
-			$templet = Request('templet');
-			if ($this->isLogged() == true) {
-				$results->success = true;
-				$results->modalHtml = $this->getPhotoEditModal($templet);
-				$results->photo = $this->getMember()->photo;
-			} else {
-				$results->success = false;
-				$results->message = $this->getLanguage('error/notLogged');
-			}
-		}
-		
-		if ($action == 'photoUpload') {
-			$photo = Request('photo');
-			if ($this->isLogged() == false) {
-				$results->success = false;
-				$results->message = $this->getLanguage('error/notLogged');
-			} else {
-				if (preg_match('/^data:image\/(.*?);base64,(.*?)$/',$photo,$match) == true) {
-					$bytes = base64_decode($match[2]);
-					file_put_contents($this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg',$bytes);
-					$this->IM->getModule('attachment')->createThumbnail($this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg',$this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg',250,250,false,'jpg');
-					
-					$results->success = true;
-					$results->message = $this->getLanguage('photoEdit/success');
-				} else {
-					$results->success = false;
-					$results->message = $this->getLanguage('photoEdit/error');
-				}
-			}
-		}
-		
-		if ($action == 'modifyEmail') {
-			$confirm = Request('confirm');
-			
-			if ($confirm == 'TRUE') {
-				$email = Request('email');
-				$code = Request('code');
-				$check = $this->db()->select($this->table->email)->where('midx',$this->getLogged())->where('email',$email)->getOne();
-				
-				if ($check == null || $check->code != $code) {
-					$results->success = false;
-					$results->errors = array('code'=>$this->getLanguage('modifyEmail/help/code/error'));
-				} else {
-					$this->db()->update($this->table->email,array('status'=>'VERIFIED'))->where('midx',$this->getLogged())->where('email',$email)->execute();
-					$this->db()->update($this->table->member,array('email'=>$email))->where('idx',$this->getLogged())->execute();
-					$results->success = true;
-					$results->message = $this->getLanguage('modifyEmail/success');
-				}
-			} else {
-				$templet = Request('templet');
-				if ($this->isLogged() == true) {
-					$results->success = true;
-					$results->modalHtml = $this->getModifyEmail($templet);
-				} else {
-					$results->success = false;
-					$results->message = $this->getLanguage('error/notLogged');
-				}
-			}
-		}
-		
-		if ($action == 'modify') {
-			$step = Request('step');
-			
-			if ($step == 'verify') {
-				$member = $this->getMember();
-				$password = Request('password');
-				
-				$mHash = new Hash();
-				
-				if ($mHash->password_validate($password,$member->password) == true) {
-					$results->success = true;
-					$results->password = Encoder($password);
-				} else {
-					$results->success = false;
-					$results->errors = array('password'=>$this->getLanguage('verify/help/password/error'));
-				}
-			}
-			
-			if ($step == 'modify') {
-				$errors = array();
-				$values->name = Request('name') ? Request('name') : $errors['name'] = $this->getLanguage('signup/help/name/error');
-				$values->nickname = Request('nickname') ? Request('nickname') : $errors['nickname'] = $this->getLanguage('signup/help/nickname/error');
-				
-				if ($this->isLogged() == false) {
-					$results->success = false;
-					$results->message = $this->getLangauge('error/notLogged');
-				} elseif (count($errors) == 0) {
-					$insert = array();
-					$insert['name'] = $values->name;
-					$insert['nickname'] = $values->nickname;
-					
-					$this->db()->update($this->table->member,$insert)->where('idx',$this->getLogged())->execute();
-					$results->success = true;
-					$results->message = $this->getLanguage('modify/success');
-				} else {
-					$results->success = false;
-					$results->errors = $errors;
-				}
-			}
-		}
-		
-		if ($action == 'password') {
-			$errors = array();
-			$password = strlen(Request('password')) >= 4 ? Request('password') : $errors['password'] = $this->getLanguage('signup/help/password/error');
-			if (strlen(Request('password')) < 4 || Request('password') != Request('password_confirm')) {
-				$errors['password_confirm'] = $this->getLanguage('signup/help/password_confirm/error');
-			}
-			
-			if ($this->isLogged() == false) {
-				$results->success = false;
-				$results->message = $this->getLangauge('error/notLogged');
-			} else {
-				$mHash = new Hash();
-				
-				if (strlen($this->getMember()->password) == 65) {
-					$old_password = Request('old_password');
-					if ($old_password == '' || $mHash->password_validate($old_password,$this->getMember()->password) == false) {
-						$errors['old_password'] = $this->getLanguage('password/help/old_password/error');
-					}
-				}
-				
-				if (count($errors) == 0) {
-					$password = $mHash->password_hash($password);
-					$this->db()->update($this->table->member,array('password'=>$password))->where('idx',$this->getLogged())->execute();
-					$results->success = true;
-					$results->message = $this->getLanguage('password/success');
-				} else {
-					$results->success = false;
-					$results->errors = $errors;
-				}
-			}
-		}
-		
-		if ($action == 'facebook' || $action == 'google' || $action == 'github') {
-			$_oauth = $this->db()->select($this->table->social_oauth)->where('domain',$this->IM->domain)->where('code',$action)->getOne();
-			if ($_oauth == null) $this->IM->printError('OAUTH_DOMAIN_ERROR');
-			$_client_id = $_oauth->client_id;
-			$_client_secret = $_oauth->client_secret;
-			$_scope = array();
-			$_store_scope = array();
-			
-			$_is_refresh_token = false;
-			if ($this->isLogged() == true) {
-				$check = $this->db()->select($this->table->social_token)->where('midx',$this->getLogged())->where('code',$action)->getOne();
-				if ($check !== null) {
-					$_store_scope = $check->scope ? explode(',',$check->scope) : array();
-					$_request_scope = $check->request_scope ? explode(',',$check->request_scope) : array();
-					$_scope = array_merge($_store_scope,$_request_scope);
-					$_is_refresh_token = strlen($check->refresh_token) == 0;
-				}
-			}
-			
-			if ($action == 'facebook') {
-				$_auth_url = 'https://graph.facebook.com/oauth/authorize';
-				$_token_url = 'https://graph.facebook.com/oauth/access_token';
-				$_scope = array_unique(array_merge($_scope,array('public_profile','email')));
-			} elseif ($action == 'google') {
-				$_auth_url = 'https://accounts.google.com/o/oauth2/auth';
-				$_token_url = 'https://accounts.google.com/o/oauth2/token';
-				$_scope = array_unique(array_merge($_scope,array('https://www.googleapis.com/auth/plus.me','https://www.googleapis.com/auth/userinfo.email')));
-			} elseif ($action == 'github') {
-				$_auth_url = 'https://github.com/login/oauth/authorize';
-				$_token_url = 'https://github.com/login/oauth/access_token';
-				$_scope = array_unique(array_merge($_scope,array('user')));
-			}
-			
-			if ($_is_refresh_token == true || (count($_store_scope) > 0 && count(array_diff($_scope,$_store_scope)) > 0)) {
-				$_approval_prompt = 'force';
-			} else {
-				$_approval_prompt = 'auto';
-			}
-			
-			if (Request('SOCIAL_REDIRECT_URL','session') == null) {
-				$_SESSION['SOCIAL_REDIRECT_URL'] = isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : __IM_DIR__.'/';
-			}
-			
-			$oauth = new OAuthClient();
-			$oauth->setClientId($_client_id)->setClientSecret($_client_secret)->setScope($action == 'google' ? implode(' ',$_scope) : implode(',',$_scope))->setAccessType('offline')->setAuthUrl($_auth_url)->setTokenUrl($_token_url)->setApprovalPrompt($_approval_prompt);
-
-			if (isset($_GET['code']) == true) {
-				if ($oauth->authenticate($_GET['code']) == true) {
-					$redirectUrl = $oauth->getRedirectUrl();
-					header('location:'.$redirectUrl);
-				}
-				exit;
-			} elseif ($oauth->getAccessToken() == null) {
-				$authUrl = $oauth->getAuthenticationUrl();
-				header('location:'.$authUrl);
-				exit;
-			}
-			
-			$_id = $_name = $_email = $_photo = null;
-			
-			if ($action == 'facebook') {
-				$data = $oauth->get('https://graph.facebook.com/me',array('fields'=>'id,email,name'));
-				if ($data === false || empty($data->email) == true) $this->IM->printError('OAUTH_API_ERROR');
-				
-				$_id = $data->id;
-				$_name = $data->name;
-				$_email = $data->email;
-				$_photo = 'https://graph.facebook.com/'.$data->id.'/picture?width=250&height=250';
-			}
-			
-			if ($action == 'google') {
-				$data = $oauth->get('https://www.googleapis.com/plus/v1/people/me');
-				if ($data === false || empty($data->emails) == true) $this->IM->printError('OAUTH_API_ERROR');
-				for ($i=0, $loop=count($data->emails);$i<$loop;$i++) {
-					if ($data->emails[$i]->type == 'account') {
-						$data->email = $data->emails[$i]->value;
-						break;
-					}
-				}
-				
-				$_id = $data->id;
-				$_name = $data->displayName;
-				$_email = $data->email;
-				$_photo = str_replace('sz=50','sz=250',$data->image->url);
-			}
-			
-			if ($action == 'github') {
-				$data = $oauth->get('https://api.github.com/user');
-				if ($data === false || empty($data->email) == true) $this->IM->printError('OAUTH_API_ERROR');
-				
-				$_id = $data->id;
-				$_name = $data->name;
-				$_email = $data->email;
-				$_photo = $data->avatar_url;
-			}
-			
-			if ($_id == null || $_name == null || $_email == null || $_photo == null) $this->IM->printError('OAUTH_API_ERROR');
-			
-			$_accessToken = $oauth->getAccessToken();
-			$_refreshToken = $oauth->getRefreshToken() == null ? '' : $oauth->getRefreshToken();
-			
-			$this->socialLogin($action,$_client_id,$_id,$_name,$_email,$_photo,$_accessToken,$_refreshToken,$_scope);
-		}
-		
+		$values = (object)get_defined_vars();
 		$this->IM->fireEvent('afterDoProcess','member',$action,$values,$results);
 		
 		return $results;
-	}
-
-	/**
-	 * login from social account
-	 *
-	 * @param string $code via social (facebook, google, github)
-	 * @param string $user_id social account id
-	 * @param string $name social account name
-	 * @param string $email social account email
-	 * @param string $photo social account photo url path
-	 * @param string $accessToken social oauth access_token
-	 * @param string $refreshToken social oauth refresh_token
-	 * @return null if run this function, just redirect url directly
-	 */
-	function socialLogin($code,$client_id,$user_id,$name,$email,$photo,$accessToken,$refreshToken,$scope) {
-		$siteType = $this->IM->getSite()->member;
-		
-		$_oauth = $this->db()->select($this->table->social_oauth)->where('domain',$this->IM->domain)->where('code',$code)->getOne();
-		if ($_oauth == null || $_oauth->client_id != $client_id) $this->IM->printError('OAUTH_DOMAIN_ERROR');
-		
-		if ($this->isLogged() == true) {
-			$check = $this->db()->select($this->table->social_token)->where('midx',$this->getLogged())->where('code',$code)->where('client_id',$client_id)->getOne();
-			if ($check == null) {
-				$this->db()->insert($this->table->social_token,array('midx'=>$this->getLogged(),'code'=>$code,'client_id'=>$client_id,'user_id'=>$user_id,'email'=>$email,'access_token'=>$accessToken,'refresh_token'=>$refreshToken,'scope'=>implode(',',$scope)))->execute();
-			} else {
-				$refreshToken = $refreshToken ? $refreshToken : $check->refresh_token;
-				$this->db()->update($this->table->social_token,array('user_id'=>$user_id,'email'=>$email,'access_token'=>$accessToken,'refresh_token'=>$refreshToken,'scope'=>implode(',',$scope),'request_scope'=>''))->where('midx',$this->getLogged())->where('code',$code)->where('client_id',$client_id)->execute();
-			}
-			
-			// if not exists user's photo, get social photo
-			if (file_exists($this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg') == false) {
-				if (SaveFileFromUrl($photo,$this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg','image') == true) {
-					$this->IM->getModule('attachment')->createThumbnail($this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg',$this->IM->getAttachmentPath().'/member/'.$this->getLogged().'.jpg',250,250,false,'jpg');
-				}
-			}
-		} else {
-			$check = $this->db()->select($this->table->social_token)->where('code',$code)->where('client_id',$client_id)->where('user_id',$user_id)->get();
-			
-			if (count($check) == 0) { // not connected member idx and social token.
-				$checkEmail = $this->db()->select($this->table->member)->where('email',$email)->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->getOne();
-				// cannot find social member's email address on im_member_table, search administator
-				if ($checkEmail == null) $checkEmail = $this->db()->select($this->table->member)->where('email',$email)->where('type','ADMINISTRATOR')->getOne();
-				
-				if ($checkEmail == null) { // not found social member's email, new member register
-					$insert = array();
-					$insert['type'] = 'MEMBER';
-					$insert['domain'] = $siteType == 'MERGE' ? '*' : $this->IM->domain;
-					$insert['email'] = $email;
-					$insert['password'] = '';
-					$insert['name'] = $insert['nickname'] = $name;
-					$insert['reg_date'] = $insert['last_login'] = time();
-					$insert['status'] = 'ACTIVE';
-					
-					$idx = $this->db()->insert($this->table->member,$insert)->execute();
-					$this->login($idx);
-					
-					header('location:'.$this->IM->getProcessUrl('member',$code));
-					exit;
-				} elseif (strlen($checkEmail->password) == 65) { // found member and exists password, check account password
-					$config = new stdClass();
-					$config->type = 'duplicated';
-					$config->member = $this->getMember($checkEmail->idx);
-					
-					$this->IM->addSiteHeader('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->IM->language);
-					
-					$context = $this->getContext('social',$config);
-					$header = $this->IM->printHeader();
-					$footer = $this->IM->printFooter();
-					
-					echo $header;
-					echo $context;
-					echo $footer;
-					
-					exit;
-				} else { // found member and not exists password(someone used social login only), login directly.
-					$this->login($checkEmail->idx);
-					header('location:'.$this->IM->getProcessUrl('member',$code));
-					exit;
-				}
-			} elseif (count($check) == 1) { // only one account connected via social login, login directly.
-				$this->login($check[0]->midx);
-				$refresh_token = $refresh_token ? $refresh_token : $check[0]->refresh_token;
-				$this->db()->update($this->table->social_token,array('user_id'=>$user_id,'email'=>$email,'access_token'=>$accessToken,'refresh_token'=>$refreshToken,'scope'=>implode(',',$scope),'request_scope'=>''))->where('midx',$check[0]->midx)->where('code',$code)->where('client_id',$client_id)->execute();
-			} else { // multiple account connected via social login, select account.
-				$config = new stdClass();
-				$config->type = 'select';
-				$config->account = $check;
-				$config->redirectUrl = Request('SOCIAL_REDIRECT_URL','session') != null ? Request('SOCIAL_REDIRECT_URL','session') : '/';
-				$config->photo = $photo;
-				
-				$this->IM->addSiteHeader('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->IM->language);
-				
-				$context = $this->getContext('social',$config);
-				$header = $this->IM->printHeader();
-				$footer = $this->IM->printFooter();
-				
-				echo $header;
-				echo $context;
-				echo $footer;
-				
-				unset($_SESSION['OAUTH_ACCESS_TOKEN']);
-				unset($_SESSION['OAUTH_REFRESH_TOKEN']);
-				unset($_SESSION['SOCIAL_REDIRECT_URL']);
-				
-				exit;
-			}
-		}
-		
-		unset($_SESSION['OAUTH_ACCESS_TOKEN']);
-		unset($_SESSION['OAUTH_REFRESH_TOKEN']);
-		
-		$redirectUrl = Request('SOCIAL_REDIRECT_URL','session') != null && preg_match('/\/member\/'.$code.'/',Request('SOCIAL_REDIRECT_URL','session')) == false ? Request('SOCIAL_REDIRECT_URL','session') : __IM_DIR__.'/';
-		
-		unset($_SESSION['SOCIAL_REDIRECT_URL']);
-		
-		header('location:'.$redirectUrl);
 	}
 }
 ?>

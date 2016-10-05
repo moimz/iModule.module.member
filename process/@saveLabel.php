@@ -21,7 +21,7 @@ if (defined('__IM__') == false) exit;
 $errors = array();
 
 $idx = Request('idx');
-$title = $idx === '0' && Request('is_default_language_setting') == 'on' ? 'LANGUAGE_SETTING' : (Request('title') ? Request('title') : $errors['title'] = $this->getErrorMessage('REQUIRED'));
+$title = $idx === '0' && Request('is_default_language_setting') == 'on' ? 'LANGUAGE_SETTING' : (Request('title') ? Request('title') : $errors['title'] = $this->getErrorText('REQUIRED'));
 $allow_signup = Request('allow_signup') == 'on' ? 'TRUE' : 'FALSE';
 $approve_signup = Request('approve_signup') == 'on' ? 'TRUE' : 'FALSE';
 $is_change = Request('is_change') == 'on' ? 'TRUE' : 'FALSE';
@@ -37,18 +37,18 @@ for ($i=0, $loop=count($codes);$i<$loop;$i++) {
 }
 
 if ($idx !== '0') {
-	if ($this->Module->getConfig('default_label_title') == $title || ($this->Module->getConfig('default_label_title') == 'LANGUAGE_SETTING' && $this->getLanguage('admin/label/default_label_title') == $title)) {
-		$errors['title'] = $this->getErrorMessage('DUPLICATED');
+	if ($this->Module->getConfig('default_label_title') == $title || ($this->Module->getConfig('default_label_title') == 'LANGUAGE_SETTING' && $this->getText('admin/label/default_label_title') == $title)) {
+		$errors['title'] = $this->getErrorText('DUPLICATED');
 	}
 }
 
 if ($idx == null) {
 	if ($this->db()->select($this->table->label)->where('title',$title)->has() == true) {
-		$errors['title'] = $this->getErrorMessage('DUPLICATED');
+		$errors['title'] = $this->getErrorText('DUPLICATED');
 	}
 } else {
 	if ($this->db()->select($this->table->label)->where('title',$title)->where('idx',$idx,'!=')->has() == true) {
-		$errors['title'] = $this->getErrorMessage('DUPLICATED');
+		$errors['title'] = $this->getErrorText('DUPLICATED');
 	}
 }
 

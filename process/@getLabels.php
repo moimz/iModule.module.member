@@ -21,7 +21,7 @@ $lists = array();
 if ($type == 'title') {
 	$lists[] = array(
 		'idx'=>'0',
-		'title'=>$this->Module->getConfig('default_label_title') == 'LANGUAGE_SETTING' ? $this->getLanguage('text/default_label_title') : $this->Module->getConfig('default_label_title'),
+		'title'=>$this->Module->getConfig('default_label_title') == 'LANGUAGE_SETTING' ? $this->getText('text/default_label_title') : $this->Module->getConfig('default_label_title'),
 		'membernum'=>$this->db()->select($this->table->member)->count(),
 		'allow_signup'=>$this->Module->getConfig('allow_signup'),
 		'approve_signup'=>$this->Module->getConfig('approve_signup'),
@@ -30,7 +30,7 @@ if ($type == 'title') {
 		'sort'=>-1
 	);
 } elseif ($type) {
-	$lists[] = array('idx'=>'0','title'=>$this->getLanguage('text/'.$type),'sort'=>-1);
+	$lists[] = array('idx'=>'0','title'=>$this->getText('text/'.$type),'sort'=>-1);
 }
 
 for ($i=0, $loop=count($labels);$i<$loop;$i++) {

@@ -20,7 +20,7 @@ $name = Request('name');
 $data = $this->db()->select($this->table->signup)->where('label',$label)->where('name',$name)->getOne();
 if ($data == null) {
 	$results->success = false;
-	$results->message = $this->getErrorMessage('NOT_FOUND');
+	$results->message = $this->getErrorText('NOT_FOUND');
 } else {
 	if ($data->type == 'etc') {
 		$data->name_etc = $data->name;

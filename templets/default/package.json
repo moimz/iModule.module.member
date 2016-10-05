@@ -2,6 +2,26 @@
 	"title":{
 		"ko":"기본템플릿"
 	},
+	"version":"3.0.0",
+	"author":{
+		"name":"Arzz",
+		"email":"arzz@arzz.com"
+	},
+	"homepage":"https://www.imodule.kr",
 	"language":"ko",
-	"version":"3.0.0"
+	"styles":[
+		"/styles/style.css"
+	],
+	"configs":{
+		"signup_help":{
+			"title":{
+				"ko":"안내문구"
+			},
+			"help":{
+				"ko":"회원가입 페이지 상단에 나타날 안내문구를 입력하여 주십시오."
+			},
+			"type":"textarea",
+			"default":""
+		}
+	}
 }

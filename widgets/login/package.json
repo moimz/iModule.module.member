@@ -2,5 +2,31 @@
 	"title":{
 		"ko":"외부로그인"
 	},
-	"languages":["ko"]
+	"version":"3.0.0",
+	"description":{
+		"ko":"페이지에 로그인박스를 출력합니다."
+	},
+	"author":{
+		"name":"Arzz",
+		"email":"arzz@arzz.com"
+	},
+	"homepage":"https://www.imodule.kr",
+	"dependencies":{
+		"core":"3.0.0",
+		"member":"3.0.0"
+	},
+	"language":"ko",
+	"configs":{
+		"force_login":{
+			"title":{
+				"ko":"강제로그인"
+			},
+			"help":{
+				"ko":"로그인여부와 관계없이 무조건 로그인을 할 수 있는 상태로 설정한다."
+			},
+			"type":"boolean",
+			"value":false,
+			"is_required":false
+		}
+	}
 }

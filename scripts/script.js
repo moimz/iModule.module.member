@@ -10,7 +10,46 @@
  */
 
 var Member = {
+	/**
+	 * 회원로그인
+	 *
+	 * @param object $form 로그인폼
+	 */
+	login:function($form) {
+		$form.send(ENV.getProcessUrl("member","login"),function(result) {
+			if (result.success == true) {
+				location.href = location.href;
+			}
+		});
+	},
+	logout:function(button) {
+		iModule.buttonStatus($(button),"loading");
+		
+		$.ajax({
+			type:"POST",
+			url:ENV.getProcessUrl("member","logout"),
+			dataType:"json",
+			success:function(result) {
+				if (result.success == true) {
+					location.href = location.href.split("#").shift();
+				} else {
+					if (result.message) iModule.alertMessage.show("error",result.message,5);
+					
+					iModule.buttonStatus($(button),"reset");
+				}
+			},
+			error:function() {
+				iModule.alertMessage.show("Server Connect Error!");
+			}
+		});
+	},
+	/**
+	 * 회원가입
+	 */
 	signup:{
+		/**
+		 * 회원가입폼을 초기화한다.
+		 */
 		init:function() {
 			var $form = $("#ModuleMemberSignUpForm");
 			var step = $("input[name=step]",$form).val();
@@ -27,8 +66,24 @@ var Member = {
 				});
 			}
 			
-			if (step == "insert") {
+			if (step == "insert" || step == "cert" || step == "verify") {
 				$form.inits(Member.signup.submit);
+				
+				if (step == "insert") {
+					Member.signup.check();
+					
+					if ($("input[type=checkbox][name='agreements[]']",$form).length > 0) {
+						$("button[type=submit]",$form).prop("disabled",true);
+					}
+					
+					$("input[type=checkbox][name='agreements[]']",$form).on("change",function() {
+						$("button[type=submit]",$form).prop("disabled",$("input[type=checkbox][name='agreements[]']",$form).length != $("input[type=checkbox][name='agreements[]']:checked",$form).length);
+					});
+				}
+				
+				if (step == "verify") {
+					Member.signup.check();
+				}
 			} else if (next) {
 				$form.attr("method","post");
 				$form.attr("action",ENV.getUrl(null,null,next,false));
@@ -43,8 +98,65 @@ var Member = {
 				});
 			}
 		},
+		/**
+		 * 회원가입폼 입력데이터를 확인한다.
+		 */
+		check:function() {
+			var $form = $("#ModuleMemberSignUpForm");
+			
+			$("input[name=email], input[name=name], input[name=nickname], input[name=email_verification_email]",$form).on("blur",function() {
+				var $field = $(this);
+				if ($field.val().length > 0 && $field.data("lastValue") != $field.val()) {
+					$.send(ENV.getProcessUrl("member","liveCheckValue"),{name:$field.attr("name"),value:$field.val(),mode:"signup"},function(result) {
+						$field.status(result.success == true ? "success" : "error",result.message ? result.message : "");
+						$field.data("submitValue",$field.val());
+					});
+				}
+			});
+			
+			$("input[name=password], input[name=password_confirm]",$form).on("blur",function() {
+				var $password = $("input[name=password]",$form);
+				var $password_confirm = $("input[name=password_confirm]",$form);
+				
+				if ($password.val().length < 6) {
+					$(this).status("error");
+				} else if (($(this).attr("name") == "password_confirm" || $password_confirm.val().length > 0) && $password.val() != $password_confirm.val()) {
+					$(this).status("error",$password_confirm.attr("data-error"));
+				} else if ($password.val() == $password_confirm.val()) {
+					$(this).status("success");
+				}
+				
+				$password.data("submitValue",$password.val());
+				$password_confirm.data("submitValue",$password_confirm.val());
+			});
+		},
 		submit:function($form) {
-			console.log($form);
+			var step = $("input[name=step]",$form).val();
+			var next = $("input[name=next]",$form).val();
+			
+			if (step == "insert") {
+				$form.send(ENV.getProcessUrl("member","signup"),function(result) {
+					if (result.success == true) {
+						$form.status("success");
+						location.href = ENV.getUrl(null,null,next,false);
+					} else {
+						$form.status("error",result.errors);
+						if (result.message) iModule.alert.show("error",result.message);
+					}
+				});
+			}
+			
+			if (step == "verify") {
+				$form.send(ENV.getProcessUrl("member","verifyEmail"),function(result) {
+					if (result.success == true) {
+						$form.status("success");
+						location.href = ENV.getUrl(null,null,next,false);
+					} else {
+						$form.status("error",result.errors);
+						if (result.message) iModule.alert.show("error",result.message);
+					}
+				});
+			}
 		}/*,
 		check:function($input) {
 			if ($input.attr("name") == "password" || $input.attr("name") == "password_confirm") {
@@ -452,61 +564,6 @@ var Member = {
 					location.href = redirectUrl ? redirectUrl : location.href.split("#").shift();
 				} else {
 					iModule.alertMessage.show("error",result.message,5);
-				}
-			},
-			error:function() {
-				iModule.alertMessage.show("Server Connect Error!");
-			}
-		});
-	},
-	login:function(form) {
-		var form = $(form);
-		iModule.buttonStatus(form,"loading");
-		iModule.inputStatus(form,"default");
-		
-		$.ajax({
-			type:"POST",
-			url:ENV.getProcessUrl("member","login"),
-			data:form.serialize(),
-			dataType:"json",
-			success:function(result) {
-				if (result.success == true) {
-					location.href = location.href.split("#").shift();
-				} else {
-					if (result.redirect) {
-						location.href = result.redirect;
-					} else {
-						for (var field in result.errors) {
-							iModule.inputStatus(form.find("input[name="+field+"]"),"error",result.errors[field]);
-						}
-						
-						if (result.message) iModule.alertMessage.show("error",result.message,5);
-						
-						iModule.buttonStatus(form,"reset");
-					}
-				}
-			},
-			error:function() {
-				iModule.alertMessage.show("Server Connect Error!");
-			}
-		});
-		
-		return false;
-	},
-	logout:function(button) {
-		iModule.buttonStatus($(button),"loading");
-		
-		$.ajax({
-			type:"POST",
-			url:ENV.getProcessUrl("member","logout"),
-			dataType:"json",
-			success:function(result) {
-				if (result.success == true) {
-					location.href = location.href.split("#").shift();
-				} else {
-					if (result.message) iModule.alertMessage.show("error",result.message,5);
-					
-					iModule.buttonStatus($(button),"reset");
 				}
 			},
 			error:function() {

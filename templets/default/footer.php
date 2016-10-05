@@ -9,6 +9,7 @@
  * @license MIT License
  * @version 3.0.0.160922
  */
-?>
 
+if (defined('__IM__') == false) exit;
+?>
 </section>

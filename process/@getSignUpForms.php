@@ -16,14 +16,26 @@ if (defined('__IM__') == false) exit;
 
 $label = Request('label');
 $lists = $this->db()->select($this->table->signup)->where('label',$label)->orderBy('sort','asc')->get();
+$agreements = $this->db()->select($this->table->signup)->where('label',$label)->where('name',array('agreement','privacy'),'IN')->count();
+
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
-	$lists[$i]->title = $lists[$i]->title == 'LANGUAGE_SETTING' ? $this->getLanguage('text/'.$lists[$i]->type) : $lists[$i]->title;
-	$lists[$i]->help = $lists[$i]->help == 'LANGUAGE_SETTING' ? $this->getLanguage('signup/form/'.$lists[$i]->type.'_help') : $lists[$i]->help;
+	$lists[$i]->title = $lists[$i]->title == 'LANGUAGE_SETTING' ? $this->getText('text/'.$lists[$i]->type) : $lists[$i]->title;
+	$lists[$i]->help = $lists[$i]->help == 'LANGUAGE_SETTING' ? $this->getText('signup/form/'.$lists[$i]->type.'_help') : $lists[$i]->help;
 	$lists[$i]->is_required = $lists[$i]->is_required == 'TRUE';
 	
-	if ($lists[$i]->sort != $i) {
-		$this->db()->update($this->table->signup,array('sort'=>$i))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
-		$lists[$i]->sort = $i;
+	if ($lists[$i]->name == 'agreement' && $lists[$i]->sort != -2) {
+		$this->db()->update($this->table->signup,array('sort'=>-2))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		$lists[$i]->sort = -2;
+	}
+	
+	if ($lists[$i]->name == 'privacy' && $lists[$i]->sort != -1) {
+		$this->db()->update($this->table->signup,array('sort'=>-1))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		$lists[$i]->sort = -1;
+	}
+	
+	if (in_array($lists[$i]->name,array('agreement','privacy')) == false && ($lists[$i]->sort < 0 || $lists[$i]->sort != $i - $agreements)) {
+		$this->db()->update($this->table->signup,array('sort'=>max(0,$i - $agreements)))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		$lists[$i]->sort = max(0,$i - $agreements);
 	}
 }
 

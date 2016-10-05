@@ -16,7 +16,7 @@ if (defined('__IM__') == false) exit;
 $templets = $this->Module->getTemplets();
 $lists = array();
 for ($i=0, $loop=count($templets);$i<$loop;$i++) {
-	$lists[] = array($templets[$i]->name,$templets[$i]->title.' ('.$templets[$i]->dir.')');
+	$lists[] = array('display'=>$templets[$i]->getTitle().' ('.$templets[$i]->getDir().')','value'=>$templets[$i]->getName());
 }
 
 $results->success = true;

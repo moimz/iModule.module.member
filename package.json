@@ -34,6 +34,10 @@
 			"type":"string",
 			"value":"default"
 		},
+		"templet_configs":{
+			"type":"object",
+			"value":{}
+		},
 		"allow_signup":{
 			"type":"boolean",
 			"value":true
@@ -518,14 +522,12 @@
 					"length":10,
 					"is_null":true
 				},
-				"zipcode":{
-					"type":"varchar",
-					"length":10,
+				"address":{
+					"type":"text",
 					"is_null":true
 				},
-				"address":{
-					"type":"varchar",
-					"length":200,
+				"extras":{
+					"type":"text",
 					"is_null":true
 				},
 				"exp":{
@@ -542,7 +544,7 @@
 					"type":"int",
 					"length":11
 				},
-				"last_login":{
+				"latest_login":{
 					"type":"int",
 					"length":11,
 					"default":0
@@ -552,10 +554,15 @@
 					"length":11,
 					"default":0
 				},
+				"verified":{
+					"type":"enum",
+					"length":"'NONE','TRUE','FALSE'",
+					"default":"NONE"
+				},
 				"status":{
 					"type":"enum",
-					"length":"'ACTIVE','VERIFYING','WAITING','LEAVE','DEACTIVE'",
-					"default":"ACTIVE"
+					"length":"'ACTIVATED','WAITING','LEAVE','DEACTIVATED'",
+					"default":"ACTIVATED"
 				}
 			},
 			"indexes":{
@@ -566,7 +573,7 @@
 				"exp":"index",
 				"point":"index",
 				"reg_date":"index",
-				"last_login":"index"
+				"latest_login":"index"
 			},
 			"auto_increment":"idx"
 		}

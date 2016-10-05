@@ -3,16 +3,24 @@
 		"form":{
 			"agree":"위의 내용에 동의합니다.",
 			"email_help":"이메일주소가 로그인 아이디로 사용됩니다.",
+			"email_success":"사용하실 수 있는 이메일주소입니다.",
 			"password":"패스워드",
 			"password_confirm":"패스워드확인",
 			"password_help":"패스워드를 6글자 이상으로 입력하여 주십시오.",
-			"nickname_help":"사이트에서 사용할 닉네임을 입력하여 주십시오.(2 ~ 14글자)"
+			"nickname_help":"사이트에서 사용할 닉네임을 입력하여 주십시오.(2 ~ 14글자)",
+			"nickname_success":"사용하실 수 있는 닉네임입니다.",
+			"email_verification_email":"이메일",
+			"email_verification_email_help":"입력하신 이메일주소가 올바르지 않다면 수정 후 인증메일 재발송 버튼을 클릭하여 주십시오.",
+			"email_verification_code":"인증코드",
+			"email_verification_code_help":"입력한 이메일주소로 인증코드를 발송하였습니다. 이메일에 포함되어 있는 6자리의 인증코드를 입력하여 주십시오."
 		}
 	},
 	"text":{
 		"label":"회원라벨",
 		"no_label":"라벨없음",
 		"all_label":"전체라벨",
+		"male":"남성",
+		"female":"여성",
 		"default_label_title":"일반회원",
 		"signup_step":{
 			"agreement":"약관동의",
@@ -21,14 +29,26 @@
 			"insert":"회원정보입력",
 			"verify":"이메일주소인증",
 			"complete":"가입완료"
-		}
+		},
+		"auto_login":"자동로그인",
+		"remain_time_second":"남은시간 : {SECOND}초"
 	},
 	"button":{
-		
+		"resend_email_verification_code":"인증메일 재발송"
 	},
 	"error":{
+		"ALREADY_LOGGED":"이미 로그인중입니다.",
+		"NOT_FOUND_EMAIL":"이메일주소를 찾을 수 없습니다.",
+		"DEACTIVATED_ACCOUNT":"관리자에 의해 비활성화된 계정입니다.",
+		"INCORRECT_PASSWORD":"패스워드가 일치하지 않습니다.",
+		"DISABLED_LOGIN":"로그인을 연속으로 5회 실패하여 잠시동안 로그인을 할 수 없습니다.",
 		"NOT_ALLOWED_SIGNUP":"지금은 회원가입이 허용되지 않습니다.",
-		"INVALID_FIELD_NAME":"영문 소문자 및 언더바(_)만 입력하여 주십시오."
+		"INVALID_FIELD_NAME":"영문 소문자로 시작하고 영문소문자, 숫자, 언더바(_)만 입력하여 주십시오.",
+		"TOO_SHORT_PASSWORD":"패스워드는 최소 6글자 이상 입력하여 주십시오.",
+		"NOT_MATCHED_PASSWORD_CONFIRM":"패스워드와 패스워드 확인이 서로 일치하지 않습니다.",
+		"INVALID_GENDER":"성별 선택값이 유효하지 않습니다.",
+		"RESEND_EMAIL_VERIFICATION_CODE":"인증코드를 발송한 기록이 없습니다. 인증메일재전송을 먼저 하여 주시기 바랍니다.",
+		"INCORRECT_EMAIL_VERIFICATION_CODE":"인증코드가 일치하지 않습니다."
 	},
 	"admin":{
 		"list":{
@@ -111,6 +131,7 @@
 				"password":"암호필드",
 				"date":"날짜필드",
 				"url":"URL필드",
+				"tel":"전화번호필드",
 				"textarea":"긴 텍스트필드",
 				"wywisyg":"위지윅에디터",
 				"address":"주소필드",

@@ -7,7 +7,7 @@ var panel = new Ext.TabPanel({
 	items:[
 		new Ext.grid.Panel({
 			id:"ModuleMemberList",
-			title:Member.getLanguage("admin/list/title"),
+			title:Member.getText("admin/list/title"),
 			border:false,
 			tbar:[
 				new Ext.form.ComboBox({
@@ -38,7 +38,7 @@ var panel = new Ext.TabPanel({
 				new Ext.form.TextField({
 					id:"ModuleMemberListKeyword",
 					width:140,
-					emptyText:Member.getLanguage("text/keyword"),
+					emptyText:Member.getText("text/keyword"),
 					enableKeyEvents:true,
 					listeners:{
 						keyup:function(form,e) {
@@ -59,7 +59,7 @@ var panel = new Ext.TabPanel({
 				}),
 				"-",
 				new Ext.Button({
-					text:Member.getLanguage("admin/list/add_member"),
+					text:Member.getText("admin/list/add_member"),
 					iconCls:"fa fa-plus",
 					handler:function() {
 					}
@@ -84,9 +84,9 @@ var panel = new Ext.TabPanel({
 					load:function(store,records,success,e) {
 						if (success == false) {
 							if (e.getError()) {
-								Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+								Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
 							} else {
-								Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+								Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
 							}
 						}
 						Ext.getCmp("ModuleMemberListSearch").setIconCls("mi mi-search").enable();
@@ -95,7 +95,7 @@ var panel = new Ext.TabPanel({
 			}),
 			width:"100%",
 			columns:[{
-				text:Member.getLanguage("admin/list/columns/status"),
+				text:Member.getText("admin/list/columns/status"),
 				width:80,
 				dataIndex:"status",
 				align:"center",
@@ -105,19 +105,19 @@ var panel = new Ext.TabPanel({
 					else if (value == "VERIFYING") p.style = "color:orange;";
 					else p.style = "color:gray";
 					
-					return Member.getLanguage("admin/list/status/"+value);
+					return Member.getText("admin/list/status/"+value);
 				}
 			},{
-				text:Member.getLanguage("admin/list/columns/email"),
+				text:Member.getText("admin/list/columns/email"),
 				minWidth:150,
 				flex:1,
 				dataIndex:"email"
 			},{
-				text:Member.getLanguage("admin/list/columns/nickname"),
+				text:Member.getText("admin/list/columns/nickname"),
 				dataIndex:"nickname",
 				width:140
 			},{
-				text:Member.getLanguage("admin/list/columns/exp"),
+				text:Member.getText("admin/list/columns/exp"),
 				dataIndex:"exp",
 				sortable:true,
 				width:80,
@@ -126,7 +126,7 @@ var panel = new Ext.TabPanel({
 					return Ext.util.Format.number(value,"0,000");
 				}
 			},{
-				text:Member.getLanguage("admin/list/columns/point"),
+				text:Member.getText("admin/list/columns/point"),
 				dataIndex:"point",
 				sortable:true,
 				width:100,
@@ -135,7 +135,7 @@ var panel = new Ext.TabPanel({
 					return Ext.util.Format.number(value,"0,000");
 				}
 			},{
-				text:Member.getLanguage("admin/list/columns/reg_date"),
+				text:Member.getText("admin/list/columns/reg_date"),
 				width:130,
 				dataIndex:"reg_date",
 				sortable:true,
@@ -144,7 +144,7 @@ var panel = new Ext.TabPanel({
 					return date;
 				}
 			},{
-				text:Member.getLanguage("admin/list/columns/last_login"),
+				text:Member.getText("admin/list/columns/last_login"),
 				width:130,
 				dataIndex:"last_login",
 				sortable:true,
@@ -159,7 +159,7 @@ var panel = new Ext.TabPanel({
 				displayInfo:false,
 				items:[
 					"->",
-					{xtype:"tbtext",text:Member.getLanguage("admin/grid_help")}
+					{xtype:"tbtext",text:Member.getText("admin/grid_help")}
 				],
 				listeners:{
 					beforerender:function(tool) {
@@ -170,7 +170,7 @@ var panel = new Ext.TabPanel({
 		}),
 		new Ext.Panel({
 			id:"ModuleMemberLabel",
-			title:Member.getLanguage("admin/label/title"),
+			title:Member.getText("admin/label/title"),
 			border:false,
 			layout:{type:"hbox",align:"stretch"},
 			style:{padding:"5px"},
@@ -183,10 +183,10 @@ var panel = new Ext.TabPanel({
 					items:[
 						new Ext.grid.Panel({
 							id:"ModuleMemberLabelList",
-							title:Member.getLanguage("admin/label/label_title"),
+							title:Member.getText("admin/label/label_title"),
 							tbar:[
 								new Ext.Button({
-									text:Member.getLanguage("admin/label/add_label"),
+									text:Member.getText("admin/label/add_label"),
 									iconCls:"fa fa-plus",
 									handler:function() {
 										Member.addLabel();
@@ -211,9 +211,9 @@ var panel = new Ext.TabPanel({
 										
 										if (success == false) {
 											if (e.getError()) {
-												Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+												Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
 											} else {
-												Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+												Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
 											}
 										}
 									}
@@ -221,17 +221,17 @@ var panel = new Ext.TabPanel({
 							}),
 							width:"100%",
 							columns:[{
-								text:Member.getLanguage("admin/label/columns/title"),
+								text:Member.getText("admin/label/columns/title"),
 								minWidth:100,
 								flex:1,
 								dataIndex:"title",
 								sortable:true,
 								renderer:function(value,p,record) {
-									if (record.data.idx == "0") return "["+Member.getLanguage("admin/label/default")+"] "+value;
+									if (record.data.idx == "0") return "["+Member.getText("admin/label/default")+"] "+value;
 									return value;
 								}
 							},{
-								text:Member.getLanguage("admin/label/columns/membernum"),
+								text:Member.getText("admin/label/columns/membernum"),
 								dataIndex:"membernum",
 								sortable:true,
 								width:90,
@@ -240,7 +240,7 @@ var panel = new Ext.TabPanel({
 									return Ext.util.Format.number(value,"0,000");
 								}
 							},{
-								text:Member.getLanguage("admin/label/columns/allow_signup"),
+								text:Member.getText("admin/label/columns/allow_signup"),
 								dataIndex:"allow_signup",
 								sortable:true,
 								width:90,
@@ -248,10 +248,10 @@ var panel = new Ext.TabPanel({
 								renderer:function(value,p) {
 									if (value == true) p.style = "color:blue;";
 									else p.style = "color:red;";
-									return Member.getLanguage("admin/label/allow_signup/"+(value == true ? "TRUE" : "FALSE"));
+									return Member.getText("admin/label/allow_signup/"+(value == true ? "TRUE" : "FALSE"));
 								}
 							},{
-								text:Member.getLanguage("admin/label/columns/approve_signup"),
+								text:Member.getText("admin/label/columns/approve_signup"),
 								dataIndex:"approve_signup",
 								sortable:true,
 								width:90,
@@ -259,7 +259,7 @@ var panel = new Ext.TabPanel({
 								renderer:function(value,p) {
 									if (value == true) p.style = "color:red;";
 									else p.style = "color:blue;";
-									return Member.getLanguage("admin/label/approve_signup/"+(value == true ? "TRUE" : "FALSE"));
+									return Member.getText("admin/label/approve_signup/"+(value == true ? "TRUE" : "FALSE"));
 								}
 							}],
 							selModel:new Ext.selection.RowModel(),
@@ -286,7 +286,7 @@ var panel = new Ext.TabPanel({
 									}
 								}),
 								"->",
-								{xtype:"tbtext",text:Admin.getLanguage("text/grid_help")}
+								{xtype:"tbtext",text:Admin.getText("text/grid_help")}
 							],
 							listeners:{
 								itemdblclick:function(grid,record) {
@@ -302,12 +302,12 @@ var panel = new Ext.TabPanel({
 				}),
 				new Ext.grid.Panel({
 					id:"ModuleMemberSignUpFormList",
-					title:Member.getLanguage("admin/label/signup_title"),
+					title:Member.getText("admin/label/signup_title"),
 					flex:1,
 					disabled:true,
 					tbar:[
 						new Ext.Button({
-							text:Member.getLanguage("admin/label/add_field"),
+							text:Member.getText("admin/label/add_field"),
 							iconCls:"fa fa-plus",
 							handler:function() {
 								Member.addField();
@@ -316,7 +316,7 @@ var panel = new Ext.TabPanel({
 						"->",
 						new Ext.toolbar.TextItem({
 							id:"ModuleMemberSignUpFormHelp",
-							text:Member.getLanguage("admin/label/label_select_first")
+							text:Member.getText("admin/label/label_select_first")
 						})
 					],
 					store:new Ext.data.JsonStore({
@@ -340,15 +340,15 @@ var panel = new Ext.TabPanel({
 								if (success == true) {
 									Ext.getCmp("ModuleMemberSignUpFormList").enable();
 									if (store.getProxy().extraParams.label == "0") {
-										Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getLanguage("admin/label/default_signup_help"));
+										Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getText("admin/label/default_signup_help"));
 									} else {
-										Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getLanguage("admin/label/signup_help"));
+										Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getText("admin/label/signup_help"));
 									}
 								} else {
 									if (e.getError()) {
-										Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
 									} else {
-										Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
 									}
 								}
 							}
@@ -356,31 +356,31 @@ var panel = new Ext.TabPanel({
 					}),
 					width:"100%",
 					columns:[{
-						text:Member.getLanguage("admin/label/columns/name"),
+						text:Member.getText("admin/label/columns/name"),
 						width:180,
 						dataIndex:"name",
 						renderer:function(value,p,record) {
-							return "["+Member.getLanguage("admin/label/field_type/"+record.data.type)+"] "+value;
+							return "["+Member.getText("admin/label/field_type/"+record.data.type)+"] "+value;
 						}
 					},{
-						text:Member.getLanguage("admin/label/columns/title"),
+						text:Member.getText("admin/label/columns/title"),
 						dataIndex:"title",
 						width:150,
 						renderer:function(value,p,record) {
-							if (record.data.is_required == true) return "["+Member.getLanguage("admin/label/required")+"] "+value;
+							if (record.data.is_required == true) return "["+Member.getText("admin/label/required")+"] "+value;
 							return value;
 						}
 					},{
-						text:Member.getLanguage("admin/label/columns/help"),
+						text:Member.getText("admin/label/columns/help"),
 						dataIndex:"help",
 						minWidth:150,
 						flex:1
 					},{
-						text:Member.getLanguage("admin/label/columns/input"),
+						text:Member.getText("admin/label/columns/input"),
 						dataIndex:"input",
 						width:120,
 						renderer:function(value,p) {
-							return Member.getLanguage("admin/label/field_input/"+value);
+							return Member.getText("admin/label/field_input/"+value);
 						}
 					}],
 					selModel:new Ext.selection.CheckboxModel(),
@@ -407,11 +407,11 @@ var panel = new Ext.TabPanel({
 							}
 						}),
 						"->",
-						{xtype:"tbtext",text:Admin.getLanguage("text/grid_help")}
+						{xtype:"tbtext",text:Admin.getText("text/grid_help")}
 					],
 					listeners:{
 						disable:function() {
-							Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getLanguage("admin/label/label_select_first"));
+							Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getText("admin/label/label_select_first"));
 						},
 						itemdblclick:function(grid,record) {
 							Member.addField(record.data.name);

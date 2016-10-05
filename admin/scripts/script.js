@@ -2,7 +2,7 @@ var Member = {
 	addLabel:function(idx) {
 		new Ext.Window({
 			id:"ModuleMemberAddLabelWindow",
-			title:(idx ? Member.getLanguage("admin/label/window/label_modify") : Member.getLanguage("admin/label/window/label_add")),
+			title:(idx ? Member.getText("admin/label/window/label_modify") : Member.getText("admin/label/window/label_add")),
 			modal:true,
 			width:600,
 			border:false,
@@ -19,7 +19,7 @@ var Member = {
 							disabled:idx !== undefined ? false : true
 						}),
 						new Ext.form.FieldContainer({
-							fieldLabel:Member.getLanguage("admin/label/form/title"),
+							fieldLabel:Member.getText("admin/label/form/title"),
 							layout:{type:"vbox",align:"stretch"},
 							items:[
 								new Ext.form.FieldContainer({
@@ -31,7 +31,7 @@ var Member = {
 										}),
 										new Ext.form.Checkbox({
 											name:"is_default_language_setting",
-											boxLabel:Member.getLanguage("admin/label/form/default_language_setting"),
+											boxLabel:Member.getText("admin/label/form/default_language_setting"),
 											hidden:idx !== 0,
 											style:{marginLeft:"5px"},
 											listeners:{
@@ -42,53 +42,53 @@ var Member = {
 										})
 									]
 								}),
-								Admin.languageFieldSet("ModuleMemberAddLabelLanguages",Member.getLanguage("admin/label/form/title"),"codes","titles")
+								Admin.languageFieldSet("ModuleMemberAddLabelLanguages",Member.getText("admin/label/form/title"),"codes","titles")
 							]
 						}),
 						new Ext.form.Checkbox({
-							fieldLabel:Member.getLanguage("admin/label/form/allow_signup"),
+							fieldLabel:Member.getText("admin/label/form/allow_signup"),
 							name:"allow_signup",
 							checked:true,
-							boxLabel:Member.getLanguage("admin/label/form/allow_signup_help"),
-							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getLanguage("admin/label/form/allow_signup_help_default")+'</div>' : "")
+							boxLabel:Member.getText("admin/label/form/allow_signup_help"),
+							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getText("admin/label/form/allow_signup_help_default")+'</div>' : "")
 						}),
 						new Ext.form.Checkbox({
-							fieldLabel:Member.getLanguage("admin/label/form/approve_signup"),
+							fieldLabel:Member.getText("admin/label/form/approve_signup"),
 							name:"approve_signup",
 							checked:false,
-							boxLabel:Member.getLanguage("admin/label/form/approve_signup_help"),
-							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getLanguage("admin/label/form/approve_signup_help_default")+'</div>' : "")
+							boxLabel:Member.getText("admin/label/form/approve_signup_help"),
+							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getText("admin/label/form/approve_signup_help_default")+'</div>' : "")
 						}),
 						new Ext.form.Checkbox({
-							fieldLabel:Member.getLanguage("admin/label/form/is_change"),
+							fieldLabel:Member.getText("admin/label/form/is_change"),
 							name:"is_change",
 							checked:true,
 							readOnly:idx == 0,
-							boxLabel:Member.getLanguage("admin/label/form/is_change_help"),
-							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getLanguage("admin/label/form/is_change_help_default")+'</div>' : "")
+							boxLabel:Member.getText("admin/label/form/is_change_help"),
+							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getText("admin/label/form/is_change_help_default")+'</div>' : "")
 						}),
 						new Ext.form.Checkbox({
-							fieldLabel:Member.getLanguage("admin/label/form/is_unique"),
+							fieldLabel:Member.getText("admin/label/form/is_unique"),
 							name:"is_unique",
 							checked:false,
 							readOnly:idx == 0,
-							boxLabel:Member.getLanguage("admin/label/form/is_unique_help"),
-							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getLanguage("admin/label/form/is_unique_help_default")+'</div>' : "")
+							boxLabel:Member.getText("admin/label/form/is_unique_help"),
+							afterBodyEl:(idx == 0 ? '<div class="x-form-help">'+Member.getText("admin/label/form/is_unique_help_default")+'</div>' : "")
 						})
 					]
 				})
 			],
 			buttons:[
 				new Ext.Button({
-					text:Member.getLanguage("button/confirm"),
+					text:Member.getText("button/confirm"),
 					handler:function() {
 						Ext.getCmp("ModuleMemberAddLabelForm").getForm().submit({
 							url:ENV.getProcessUrl("member","@saveLabel"),
 							submitEmptyText:false,
-							waitTitle:Admin.getLanguage("action/wait"),
-							waitMsg:Admin.getLanguage("action/saving"),
+							waitTitle:Admin.getText("action/wait"),
+							waitMsg:Admin.getText("action/saving"),
 							success:function(form,action) {
-								Ext.Msg.show({title:Admin.getLanguage("alert/info"),msg:Admin.getLanguage("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function(button) {
+								Ext.Msg.show({title:Admin.getText("alert/info"),msg:Admin.getText("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function(button) {
 									Ext.getCmp("ModuleMemberAddLabelWindow").close();
 									Ext.getCmp("ModuleMemberLabelList").getStore().load(function() {
 										console.log("reload");
@@ -98,19 +98,19 @@ var Member = {
 							failure:function(form,action) {
 								if (action.result) {
 									if (action.result.message) {
-										Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 									} else {
-										Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("DATA_SAVE_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_SAVE_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 									}
 								} else {
-									Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("INVALID_FORM_DATA"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("INVALID_FORM_DATA"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								}
 							}
 						});
 					}
 				}),
 				new Ext.Button({
-					text:Member.getLanguage("button/cancel"),
+					text:Member.getText("button/cancel"),
 					handler:function() {
 						Ext.getCmp("ModuleMemberAddLabelWindow").close();
 					}
@@ -122,16 +122,16 @@ var Member = {
 						Ext.getCmp("ModuleMemberAddLabelForm").getForm().load({
 							url:ENV.getProcessUrl("member","@getLabel"),
 							params:{idx:idx},
-							waitTitle:Admin.getLanguage("action/wait"),
-							waitMsg:Admin.getLanguage("action/loading"),
+							waitTitle:Admin.getText("action/wait"),
+							waitMsg:Admin.getText("action/loading"),
 							success:function(form,action) {
 								if (action.result.data) Admin.parseLanguageFieldValue("ModuleMemberAddLabelLanguages",action.result.data.languages);
 							},
 							failure:function(form,action) {
 								if (action.result && action.result.message) {
-									Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								} else {
-									Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								}
 								Ext.getCmp("ModuleMemberAddLabelWindow").close();
 							}
@@ -146,7 +146,7 @@ var Member = {
 		
 		new Ext.Window({
 			id:"ModuleMemberAddFieldWindow",
-			title:(oName ? Member.getLanguage("admin/label/window/field_modify") : Member.getLanguage("admin/label/window/field_add")),
+			title:(oName ? Member.getText("admin/label/window/field_modify") : Member.getText("admin/label/window/field_add")),
 			modal:true,
 			width:800,
 			border:false,
@@ -168,7 +168,7 @@ var Member = {
 							disabled:oName ? false : true
 						}),
 						new Ext.form.FieldContainer({
-							fieldLabel:Member.getLanguage("admin/label/form/name"),
+							fieldLabel:Member.getText("admin/label/form/name"),
 							layout:"hbox",
 							items:[
 								new Ext.form.ComboBox({
@@ -177,19 +177,19 @@ var Member = {
 									store:new Ext.data.ArrayStore({
 										fields:["display","value"],
 										data:[
-											[Member.getLanguage("admin/label/field_type/agreement"),"agreement"],
-											[Member.getLanguage("admin/label/field_type/privacy"),"privacy"],
-											[Member.getLanguage("admin/label/field_type/email"),"email"],
-											[Member.getLanguage("admin/label/field_type/password"),"password"],
-											[Member.getLanguage("admin/label/field_type/name"),"name"],
-											[Member.getLanguage("admin/label/field_type/nickname"),"nickname"],
-											[Member.getLanguage("admin/label/field_type/birthday"),"birthday"],
-											[Member.getLanguage("admin/label/field_type/telephone"),"telephone"],
-											[Member.getLanguage("admin/label/field_type/cellphone"),"cellphone"],
-											[Member.getLanguage("admin/label/field_type/homepage"),"homepage"],
-											[Member.getLanguage("admin/label/field_type/gender"),"gender"],
-											[Member.getLanguage("admin/label/field_type/address"),"address"],
-											[Member.getLanguage("admin/label/field_type/etc"),"etc"]
+											[Member.getText("admin/label/field_type/agreement"),"agreement"],
+											[Member.getText("admin/label/field_type/privacy"),"privacy"],
+											[Member.getText("admin/label/field_type/email"),"email"],
+											[Member.getText("admin/label/field_type/password"),"password"],
+											[Member.getText("admin/label/field_type/name"),"name"],
+											[Member.getText("admin/label/field_type/nickname"),"nickname"],
+											[Member.getText("admin/label/field_type/birthday"),"birthday"],
+											[Member.getText("admin/label/field_type/telephone"),"telephone"],
+											[Member.getText("admin/label/field_type/cellphone"),"cellphone"],
+											[Member.getText("admin/label/field_type/homepage"),"homepage"],
+											[Member.getText("admin/label/field_type/gender"),"gender"],
+											[Member.getText("admin/label/field_type/address"),"address"],
+											[Member.getText("admin/label/field_type/etc"),"etc"]
 										]
 									}),
 									editable:false,
@@ -211,7 +211,7 @@ var Member = {
 												form.findField("input").disable();
 											}
 											
-											if ($.inArray(value,["email","password","name","nickname"]) == -1) {
+											if ($.inArray(value,["email","password","name","nickname","agreement","privacy"]) == -1) {
 												form.findField("is_required").setValue(false).enable();
 											} else {
 												form.findField("is_required").setValue(true).disable();
@@ -229,27 +229,28 @@ var Member = {
 									name:"name_etc",
 									flex:1,
 									disabled:oName ? true : false,
-									emptyText:Member.getLanguage("admin/label/form/name_etc_help")
+									emptyText:Member.getText("admin/label/form/name_etc_help")
 								})
 							],
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/name_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/name_help")+'</div>'
 						}),
 						new Ext.form.ComboBox({
 							name:"input",
-							fieldLabel:Member.getLanguage("admin/label/form/input"),
+							fieldLabel:Member.getText("admin/label/form/input"),
 							store:new Ext.data.ArrayStore({
 								fields:["display","value"],
 								data:[
-									[Member.getLanguage("admin/label/field_input/text"),"text"],
-									[Member.getLanguage("admin/label/field_input/select"),"select"],
-									[Member.getLanguage("admin/label/field_input/radio"),"radio"],
-									[Member.getLanguage("admin/label/field_input/checkbox"),"checkbox"],
-									[Member.getLanguage("admin/label/field_input/email"),"email"],
-									[Member.getLanguage("admin/label/field_input/password"),"password"],
-									[Member.getLanguage("admin/label/field_input/date"),"date"],
-									[Member.getLanguage("admin/label/field_input/url"),"url"],
-									[Member.getLanguage("admin/label/field_input/textarea"),"textarea"],
-									[Member.getLanguage("admin/label/field_input/address"),"address"]
+									[Member.getText("admin/label/field_input/text"),"text"],
+									[Member.getText("admin/label/field_input/select"),"select"],
+									[Member.getText("admin/label/field_input/radio"),"radio"],
+									[Member.getText("admin/label/field_input/checkbox"),"checkbox"],
+									[Member.getText("admin/label/field_input/email"),"email"],
+									[Member.getText("admin/label/field_input/password"),"password"],
+									[Member.getText("admin/label/field_input/date"),"date"],
+									[Member.getText("admin/label/field_input/url"),"url"],
+									[Member.getText("admin/label/field_input/tel"),"tel"],
+									[Member.getText("admin/label/field_input/textarea"),"textarea"],
+									[Member.getText("admin/label/field_input/address"),"address"]
 								]
 							}),
 							editable:false,
@@ -273,46 +274,46 @@ var Member = {
 									}
 									
 									if (value == "system") {
-										setTimeout(function(form) { form.findField("input").setRawValue(Member.getLanguage("admin/label/field_input/system")) },100,form);
+										setTimeout(function(form) { form.findField("input").setRawValue(Member.getText("admin/label/field_input/system")) },100,form);
 									}
 								}
 							}
 						}),
 						new Ext.form.FieldContainer({
-							fieldLabel:Member.getLanguage("admin/label/form/field_title"),
+							fieldLabel:Member.getText("admin/label/form/field_title"),
 							layout:{type:"vbox",align:"stretch"},
 							items:[
 								new Ext.form.TextField({
 									name:"title"
 								}),
-								Admin.languageFieldSet("ModuleMemberAddFieldTitleLanguages",Member.getLanguage("admin/label/form/title"),"title_codes","title_languages")
+								Admin.languageFieldSet("ModuleMemberAddFieldTitleLanguages",Member.getText("admin/label/form/title"),"title_codes","title_languages")
 							],
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/field_title_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/field_title_help")+'</div>'
 						}),
 						new Ext.form.FieldContainer({
-							fieldLabel:Member.getLanguage("admin/label/form/field_help"),
+							fieldLabel:Member.getText("admin/label/form/field_help"),
 							layout:{type:"vbox",align:"stretch"},
 							items:[
 								new Ext.form.TextField({
 									name:"help"
 								}),
-								Admin.languageFieldSet("ModuleMemberAddFieldHelpLanguages",Member.getLanguage("admin/label/form/title"),"help_codes","help_languages")
+								Admin.languageFieldSet("ModuleMemberAddFieldHelpLanguages",Member.getText("admin/label/form/title"),"help_codes","help_languages")
 							],
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/field_help_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/field_help_help")+'</div>'
 						}),
 						new Ext.form.FieldContainer({
 							id:"ModuleMemberAddFieldContent",
 							hidden:true,
-							fieldLabel:Member.getLanguage("admin/label/form/field_content"),
+							fieldLabel:Member.getText("admin/label/form/field_content"),
 							layout:"hbox",
 							items:[
 								Admin.wysiwygField("","content")
 							],
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/field_content_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/field_content_help")+'</div>'
 						}),
 						new Ext.form.FieldContainer({
 							id:"ModuleMemberAddFieldOptions",
-							fieldLabel:Member.getLanguage("admin/label/form/field_options"),
+							fieldLabel:Member.getText("admin/label/form/field_options"),
 							layout:{type:"vbox",align:"stretch"},
 							disabled:true,
 							hidden:true,
@@ -326,7 +327,7 @@ var Member = {
 											width:80
 										}),
 										new Ext.form.DisplayField({
-											value:"("+Member.getLanguage("admin/label/form/max")+")",
+											value:"("+Member.getText("admin/label/form/max")+")",
 											margin:"0 5 0 5",
 											flex:1
 										})
@@ -334,7 +335,7 @@ var Member = {
 								}),
 								new Ext.form.FieldSet({
 									id:"ModuleMemberAddFieldOptionItems",
-									title:Member.getLanguage("admin/label/form/field_options_item"),
+									title:Member.getText("admin/label/form/field_options_item"),
 									collapsible:true,
 									collapsed:false,
 									items:[
@@ -344,12 +345,12 @@ var Member = {
 											margin:"0 0 0 0",
 											items:[
 												new Ext.form.DisplayField({
-													fieldLabel:Member.getLanguage("admin/label/form/field_options_value"),
+													fieldLabel:Member.getText("admin/label/form/field_options_value"),
 													width:200,
 													margin:"0 5 0 0"
 												}),
 												new Ext.form.DisplayField({
-													fieldLabel:Member.getLanguage("admin/label/form/field_options_display"),
+													fieldLabel:Member.getText("admin/label/form/field_options_display"),
 													flex:1,
 													margin:"0 0 0 0"
 												})
@@ -404,28 +405,28 @@ var Member = {
 									]
 								})
 							],
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/field_options_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/field_options_help")+'</div>'
 						}),
 						new Ext.form.Checkbox({
-							fieldLabel:Member.getLanguage("admin/label/form/is_required"),
+							fieldLabel:Member.getText("admin/label/form/is_required"),
 							name:"is_required",
 							checked:false,
-							boxLabel:Member.getLanguage("admin/label/form/is_required_help")
+							boxLabel:Member.getText("admin/label/form/is_required_help")
 						})
 					]
 				})
 			],
 			buttons:[
 				new Ext.Button({
-					text:Member.getLanguage("button/confirm"),
+					text:Member.getText("button/confirm"),
 					handler:function() {
 						Ext.getCmp("ModuleMemberAddFieldForm").getForm().submit({
 							url:ENV.getProcessUrl("member","@saveSignUpForm"),
 							submitEmptyText:false,
-							waitTitle:Admin.getLanguage("action/wait"),
-							waitMsg:Admin.getLanguage("action/saving"),
+							waitTitle:Admin.getText("action/wait"),
+							waitMsg:Admin.getText("action/saving"),
 							success:function(form,action) {
-								Ext.Msg.show({title:Admin.getLanguage("alert/info"),msg:Admin.getLanguage("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function(button) {
+								Ext.Msg.show({title:Admin.getText("alert/info"),msg:Admin.getText("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function(button) {
 									Ext.getCmp("ModuleMemberAddFieldWindow").close();
 									Ext.getCmp("ModuleMemberSignUpFormList").getStore().load();
 								}});
@@ -433,19 +434,19 @@ var Member = {
 							failure:function(form,action) {
 								if (action.result) {
 									if (action.result.message) {
-										Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 									} else {
-										Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("DATA_SAVE_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_SAVE_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 									}
 								} else {
-									Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("INVALID_FORM_DATA"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("INVALID_FORM_DATA"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								}
 							}
 						});
 					}
 				}),
 				new Ext.Button({
-					text:Member.getLanguage("button/cancel"),
+					text:Member.getText("button/cancel"),
 					handler:function() {
 						Ext.getCmp("ModuleMemberAddFieldWindow").close();
 					}
@@ -457,8 +458,8 @@ var Member = {
 						Ext.getCmp("ModuleMemberAddFieldForm").getForm().load({
 							url:ENV.getProcessUrl("member","@getSignUpForm"),
 							params:{label:label,name:oName},
-							waitTitle:Admin.getLanguage("action/wait"),
-							waitMsg:Admin.getLanguage("action/loading"),
+							waitTitle:Admin.getText("action/wait"),
+							waitMsg:Admin.getText("action/loading"),
 							success:function(form,action) {
 								if (action.result.data) {
 									Admin.parseLanguageFieldValue("ModuleMemberAddFieldTitleLanguages",action.result.data.title_languages);
@@ -523,9 +524,9 @@ var Member = {
 							},
 							failure:function(form,action) {
 								if (action.result && action.result.message) {
-									Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								} else {
-									Ext.Msg.show({title:Admin.getLanguage("alert/error"),msg:Admin.getErrorMessage("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								}
 								Ext.getCmp("ModuleMemberAddFieldWindow").close();
 							}
@@ -541,7 +542,7 @@ var Member = {
 		
 		new Ext.Window({
 			id:"ModuleMemberAddFieldOptionWindow",
-			title:(data ? Member.getLanguage("admin/label/window/field_option_modify") : Member.getLanguage("admin/label/window/field_option_add")),
+			title:(data ? Member.getText("admin/label/window/field_option_modify") : Member.getText("admin/label/window/field_option_add")),
 			modal:true,
 			width:600,
 			border:false,
@@ -554,29 +555,29 @@ var Member = {
 					fieldDefaults:{labelAlign:"right",labelWidth:100,anchor:"100%",allowBlank:true},
 					items:[
 						new Ext.form.TextField({
-							fieldLabel:Member.getLanguage("admin/label/form/field_options_value"),
+							fieldLabel:Member.getText("admin/label/form/field_options_value"),
 							name:"value",
 							allowBlank:false,
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/field_options_value_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/field_options_value_help")+'</div>'
 						}),
 						new Ext.form.FieldContainer({
-							fieldLabel:Member.getLanguage("admin/label/form/field_options_display"),
+							fieldLabel:Member.getText("admin/label/form/field_options_display"),
 							layout:{type:"vbox",align:"stretch"},
 							items:[
 								new Ext.form.TextField({
 									name:"display",
 									allowBlank:false
 								}),
-								Admin.languageFieldSet("ModuleMemberAddFieldOptionDisplayLanguages",Member.getLanguage("admin/label/form/field_options_display"),"codes","values")
+								Admin.languageFieldSet("ModuleMemberAddFieldOptionDisplayLanguages",Member.getText("admin/label/form/field_options_display"),"codes","values")
 							],
-							afterBodyEl:'<div class="x-form-help">'+Member.getLanguage("admin/label/form/field_options_display_help")+'</div>'
+							afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/label/form/field_options_display_help")+'</div>'
 						})
 					]
 				})
 			],
 			buttons:[
 				new Ext.Button({
-					text:Member.getLanguage("button/confirm"),
+					text:Member.getText("button/confirm"),
 					handler:function() {
 						var form = Ext.getCmp("ModuleMemberAddFieldOptionForm").getForm();
 						if (form.isValid() == true) {
@@ -649,7 +650,7 @@ var Member = {
 					}
 				}),
 				new Ext.Button({
-					text:Member.getLanguage("button/cancel"),
+					text:Member.getText("button/cancel"),
 					handler:function() {
 						Ext.getCmp("ModuleMemberAddFieldOptionWindow").close();
 					}
@@ -681,7 +682,7 @@ var Member = {
 			}
 			
 			if (stepSort.insert === undefined) {
-				step.add({step:"insert",title:Member.getLanguage("admin/configs/signup_step/insert"),sort:step.getCount()});
+				step.add({step:"insert",title:Member.getText("admin/configs/signup_step/insert"),sort:step.getCount()});
 				continue;
 			}
 			

@@ -25,18 +25,24 @@ if ($oName) {
 	$is_system = in_array($oName,$reservation);
 	$type = $is_system == true ? $oName : 'etc';
 	$input = $is_system == true ? 'system' : Request('input');
+	$name = $oName;
 } else {
 	$is_system = $name !== 'etc';
 	$type = $is_system == true ? $name : 'etc';
 	$input = $is_system == true ? 'system' : Request('input');
 	$name = $name == 'etc' ? $name_etc : $name;
 	
-	if (preg_match('/^[a-z_]+$/',$name) == false) {
-		$errors['name_etc'] = $this->getErrorMessage('INVALID_FIELD_NAME');
+	if (preg_match('/^[a-z]+[a-z_0-9]*$/',$name) == false) {
+		$errors['name_etc'] = $this->getErrorText('INVALID_FIELD_NAME');
+	}
+	
+	if ($this->db()->select($this->table->signup)->where('name',$name)->where('label',$label)->has() == true) {
+		if ($is_system == true) $errors['name'] = $this->getErrorText('DUPLICATED');
+		else $errors['name_etc'] = $this->getErrorText('DUPLICATED');
 	}
 }
 
-$title = Request('title') ? Request('title') : $errors['title'] = $this->getErrorMessage('REQUIRED');
+$title = Request('title') ? Request('title') : $errors['title'] = $this->getErrorText('REQUIRED');
 $codes = Request('title_codes');
 $languages = Request('title_languages');
 $title_languages = new stdClass();
@@ -55,9 +61,10 @@ for ($i=0, $loop=count($codes);$i<$loop;$i++) {
 	}
 }
 $is_required = Request('is_required') == 'on' ? 'TRUE' : 'FALSE';
+if (in_array($name,array('agreement','privacy','email','password','name','nickname')) == true) $is_required = true;
 
 if ($is_system === false && in_array($name,$reservation) == true) {
-	$errors['name_etc'] = $this->getErrorMessage('RESERVED_NAME');
+	$errors['name_etc'] = $this->getErrorText('RESERVED_NAME');
 }
 
 $configs = new stdClass();
@@ -90,7 +97,15 @@ if (count($errors) == 0) {
 	} else {
 		$insert['label'] = $label;
 		$insert['name'] = $name;
-		$insert['sort'] = $this->db()->select($this->table->signup)->where('label',$label)->count();
+		
+		if ($name == 'agreement') {
+			$insert['sort'] = -2;
+		} elseif ($name == 'privacy') {
+			$insert['sort'] = -1;
+		} else {
+			$sort = $this->db()->select($this->table->signup,'MAX(sort) as sort')->where('label',$label)->count();
+			$insert['sort'] = isset($sort->sort) == true ? $sort->sort + 1 : 0;
+		}
 		$this->db()->insert($this->table->signup,$insert)->execute();
 	}
 	

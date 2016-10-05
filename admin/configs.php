@@ -1,15 +1,15 @@
 <script>
 new Ext.form.Panel({
-	id:"ModuleConfigsForm",
+	id:"ModuleConfigForm",
 	border:false,
 	bodyPadding:10,
 	fieldDefaults:{labelAlign:"right",labelWidth:100,anchor:"100%",allowBlank:true},
 	items:[
 		new Ext.form.FieldSet({
-			title:Member.getLanguage("admin/configs/form/default_setting"),
+			title:Member.getText("admin/configs/form/default_setting"),
 			items:[
 				new Ext.form.ComboBox({
-					fieldLabel:Member.getLanguage("admin/configs/form/templet"),
+					fieldLabel:Member.getText("admin/configs/form/templet"),
 					name:"templet",
 					store:new Ext.data.JsonStore({
 						proxy:{
@@ -22,28 +22,42 @@ new Ext.form.Panel({
 						remoteSort:false,
 						sorters:[{property:"sort",direction:"ASC"}],
 						pageSize:0,
-						fields:["templet","title"]
+						fields:["display","value"]
 					}),
 					editable:false,
-					displayField:"title",
-					valueField:"templet",
-					value:"default"
+					displayField:"display",
+					valueField:"value",
+					value:"",
+					listeners:{
+						change:function(form,value) {
+							$.send(ENV.getProcessUrl("member","@getTempletConfigs"),{templet:value},function(result) {
+								if (result.success == true) {
+									Admin.setTempletConfigs("ModuleConfigTempletConfigs","@templet_configs-",result.configs);
+								}
+							});
+						}
+					}
 				})
 			]
 		}),
 		new Ext.form.FieldSet({
-			title:Member.getLanguage("admin/configs/form/signup_setting"),
+			id:"ModuleConfigTempletConfigs",
+			title:Admin.getText("text/templet_configs"),
+			hidden:true
+		}),
+		new Ext.form.FieldSet({
+			title:Member.getText("admin/configs/form/signup_setting"),
 			items:[
 				new Ext.form.Checkbox({
-					fieldLabel:Member.getLanguage("admin/configs/form/allow_signup"),
-					boxLabel:Member.getLanguage("admin/configs/form/allow_signup_help"),
+					fieldLabel:Member.getText("admin/configs/form/allow_signup"),
+					boxLabel:Member.getText("admin/configs/form/allow_signup_help"),
 					name:"allow_signup",
 					uncheckedValue:"",
 					checked:true
 				}),
 				new Ext.form.Checkbox({
-					fieldLabel:Member.getLanguage("admin/configs/form/approve_signup"),
-					boxLabel:Member.getLanguage("admin/configs/form/approve_signup_help"),
+					fieldLabel:Member.getText("admin/configs/form/approve_signup"),
+					boxLabel:Member.getText("admin/configs/form/approve_signup_help"),
 					name:"approve_signup",
 					uncheckedValue:"",
 					checked:true
@@ -52,13 +66,13 @@ new Ext.form.Panel({
 					layout:"hbox",
 					items:[
 						new Ext.form.NumberField({
-							fieldLabel:Member.getLanguage("admin/configs/form/point"),
+							fieldLabel:Member.getText("admin/configs/form/point"),
 							name:"point",
 							value:1000,
 							flex:1
 						}),
 						new Ext.form.NumberField({
-							fieldLabel:Member.getLanguage("admin/configs/form/exp"),
+							fieldLabel:Member.getText("admin/configs/form/exp"),
 							name:"exp",
 							value:0,
 							flex:1
@@ -66,7 +80,7 @@ new Ext.form.Panel({
 					]
 				}),
 				new Ext.form.ComboBox({
-					fieldLabel:Member.getLanguage("admin/configs/form/label"),
+					fieldLabel:Member.getText("admin/configs/form/label"),
 					name:"label",
 					store:new Ext.data.JsonStore({
 						proxy:{
@@ -88,14 +102,14 @@ new Ext.form.Panel({
 					value:"0"
 				}),
 				new Ext.form.Checkbox({
-					fieldLabel:Member.getLanguage("admin/configs/form/universal_login"),
-					boxLabel:Member.getLanguage("admin/configs/form/universal_login_help"),
+					fieldLabel:Member.getText("admin/configs/form/universal_login"),
+					boxLabel:Member.getText("admin/configs/form/universal_login_help"),
 					name:"universal_login",
 					uncheckedValue:"",
 					checked:true
 				}),
 				new Ext.form.FieldContainer({
-					fieldLabel:Member.getLanguage("admin/configs/form/signup_step"),
+					fieldLabel:Member.getText("admin/configs/form/signup_step"),
 					layout:"hbox",
 					items:[
 						new Ext.form.Hidden({
@@ -106,7 +120,7 @@ new Ext.form.Panel({
 										var step = value.split(",");
 										for (var i=0, loop=step.length;i<loop;i++) {
 											Ext.getCmp("ModuleMemberSignupStepAvailable").getStore().removeAt(Ext.getCmp("ModuleMemberSignupStepAvailable").getStore().findExact("step",step[i]));
-											Ext.getCmp("ModuleMemberSignupStepUsed").getStore().add({step:step[i],title:Member.getLanguage("text/signup_step/"+step[i]),sort:i});
+											Ext.getCmp("ModuleMemberSignupStepUsed").getStore().add({step:step[i],title:Member.getText("text/signup_step/"+step[i]),sort:i});
 										}
 									}
 								}
@@ -114,7 +128,7 @@ new Ext.form.Panel({
 						}),
 						new Ext.grid.Panel({
 							id:"ModuleMemberSignupStepAvailable",
-							title:Member.getLanguage("admin/configs/form/signup_step_available"),
+							title:Member.getText("admin/configs/form/signup_step_available"),
 							border:true,
 							hideHeaders:true,
 							tbar:[
@@ -126,7 +140,7 @@ new Ext.form.Panel({
 								}),
 								"->",
 								new Ext.Button({
-									text:Member.getLanguage("admin/configs/form/add_signup_step"),
+									text:Member.getText("admin/configs/form/add_signup_step"),
 									iconCls:"fa fa-arrow-right",
 									iconAlign:"right",
 									handler:function() {
@@ -143,14 +157,14 @@ new Ext.form.Panel({
 										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
 											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
 										}
-										Ext.getCmp("ModuleConfigsForm").getForm().findField("signup_step").setValue(step.join(","));
+										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
 									}
 								})
 							],
 							store:new Ext.data.ArrayStore({
 								fields:["step","title","sort"],
 								sorters:[{property:"sort",direction:"ASC"}],
-								data:[["agreement",Member.getLanguage("text/signup_step/agreement"),0],["label",Member.getLanguage("text/signup_step/label"),1],["cert",Member.getLanguage("text/signup_step/cert"),2],["insert",Member.getLanguage("text/signup_step/insert"),3],["verify",Member.getLanguage("text/signup_step/verify"),4],["complete",Member.getLanguage("text/signup_step/complete"),5]]
+								data:[["agreement",Member.getText("text/signup_step/agreement"),0],["label",Member.getText("text/signup_step/label"),1],["cert",Member.getText("text/signup_step/cert"),2],["insert",Member.getText("text/signup_step/insert"),3],["verify",Member.getText("text/signup_step/verify"),4],["complete",Member.getText("text/signup_step/complete"),5]]
 							}),
 							flex:1,
 							height:300,
@@ -162,13 +176,13 @@ new Ext.form.Panel({
 						}),
 						new Ext.grid.Panel({
 							id:"ModuleMemberSignupStepUsed",
-							title:Member.getLanguage("admin/configs/form/signup_step_used"),
+							title:Member.getText("admin/configs/form/signup_step_used"),
 							border:true,
 							hideHeaders:true,
 							margin:"0 0 0 5",
 							tbar:[
 								new Ext.Button({
-									text:Member.getLanguage("admin/configs/form/delete_signup_step"),
+									text:Member.getText("admin/configs/form/delete_signup_step"),
 									iconCls:"fa fa-arrow-left",
 									handler:function() {
 										var sort = ["agreement","label","cert","insert","verify","complete"];
@@ -190,7 +204,7 @@ new Ext.form.Panel({
 										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
 											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
 										}
-										Ext.getCmp("ModuleConfigsForm").getForm().findField("signup_step").setValue(step.join(","));
+										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
 									}
 								}),
 								"-",
@@ -203,7 +217,7 @@ new Ext.form.Panel({
 										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
 											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
 										}
-										Ext.getCmp("ModuleConfigsForm").getForm().findField("signup_step").setValue(step.join(","));
+										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
 									}
 								}),
 								new Ext.Button({
@@ -216,7 +230,7 @@ new Ext.form.Panel({
 											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
 										}
 										
-										Ext.getCmp("ModuleConfigsForm").getForm().findField("signup_step").setValue(step.join(","));
+										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
 									}
 								})
 							],

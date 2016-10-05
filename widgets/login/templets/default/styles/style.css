@@ -1,3 +1,8 @@
+div[data-role=widget][data-widget=member-login][data-templet=default] section {border:1px solid #e1e1e1; border-top:2px solid #f44336; padding:10px;}
+div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=button] {padding:0px; display:flex; flex-direction:row; flex-wrap:nowrap;}
+div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=button] > button {flex-grow:1; margin:0;}
+div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=button] > a {flex-basis:40px; margin-right:5px;}
+
 .WidgetMemberLoginDefault {}
 .WidgetMemberLoginDefault .inputBlock {margin-bottom:10px;}
 .WidgetMemberLoginDefault .buttons {display:table; width:100%; table-layout:fixed;}

@@ -10,19 +10,21 @@
  * @version 3.0.0.160922
  * @see /modules/member/ModuleMember.class.php -> getSignUpContext()
  */
+
+if (defined('__IM__') == false) exit;
 ?>
 
 <ul class="step">
 	<?php for ($i=0, $loop=count($steps);$i<$loop;$i++) { ?>
 	<li class="<?php echo $steps[$i]; ?><?php echo $steps[$i] == $step ? ' selected' : ''; ?>">
 		<i></i>
-		<?php echo $Module->getLanguage('text/signup_step/'.$steps[$i]); ?>
+		<?php echo $me->getText('text/signup_step/'.$steps[$i]); ?>
 	</li>
 	<?php } ?>
 </ul>
 
 <section class="<?php echo $step; ?>">
-	<h4><?php echo $Module->getLanguage('text/signup_step/'.$step); ?></h4>
+	<h4><?php echo $me->getText('text/signup_step/'.$step); ?></h4>
 	
 	<?php if ($step == 'agreement') { ?>
 	<!-- 약관동의 -->
@@ -70,11 +72,32 @@
 	<?php } ?>
 	
 	
-	<?php
-	if ($step == 'insert') {
-		
-	?>
+	<?php if ($step == 'insert') { ?>
 	<!-- 회원정보입력 -->
+	
+	<?php if ($agreement != null) { // 회원약관이 있을 경우, ?>
+	<h5><?php echo $agreement->title; ?></h5>
+	
+	<article>
+		<?php echo $agreement->content; ?>
+	</article>
+	
+	<div data-role="input">
+		<label><input type="checkbox" name="agreements[]" value="<?php echo $agreement->value; ?>"><?php echo $agreement->help; ?></label>
+	</div>
+	<?php } ?>
+	
+	<?php if ($privacy != null) { // 개인정보보호정책이 있을 경우, ?>
+	<h5><?php echo $privacy->title; ?></h5>
+	
+	<article>
+		<?php echo $privacy->content; ?>
+	</article>
+	
+	<div data-role="input">
+		<label><input type="checkbox" name="agreements[]" value="<?php echo $privacy->value; ?>"><?php echo $privacy->help; ?></label>
+	</div>
+	<?php } ?>
 	
 	<h5>기본정보입력</h5>
 	
@@ -104,8 +127,25 @@
 	
 	<!--// 회원정보입력 -->
 	<?php } ?>
+	
+	<?php if ($step == 'verify') { ?>
+	<!-- 이메일주소 인증 -->
+	
+	<ul data-role="table" class="red form inner outer">
+		<?php foreach ($fields as $field) { ?>
+		<li>
+			<span class="thead"><?php echo $field->title; ?></span>
+			<span class="tbody">
+				<?php echo $field->inputHtml; ?>
+			</span>
+		</li>
+		<?php } ?>
+	</ul>
+	
+	<?php } ?>
 
-<div data-role="button">
-	<button type="submit"><?php echo $Module->getLanguage('button/next'); ?></button>
-	<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $Module->getLanguage('button/cancel'); ?></a>
-</div>
+	<div data-role="button">
+		<button type="submit"><?php echo $step == 'complete' ? $me->getText('button/back_to_main') : $me->getText('button/next'); ?></button>
+		<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $me->getText('button/cancel'); ?></a>
+	</div>
+</section>
