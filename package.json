@@ -158,7 +158,7 @@
 					"type":"text",
 					"is_null":true
 				},
-				"membernum":{
+				"member":{
 					"type":"int",
 					"length":11,
 					"default":0
@@ -490,8 +490,7 @@
 				},
 				"name":{
 					"type":"varchar",
-					"length":20,
-					"is_null":true
+					"length":20
 				},
 				"nickname":{
 					"type":"varchar",
@@ -514,8 +513,8 @@
 				},
 				"gender":{
 					"type":"enum",
-					"length":"'','MALE','FEMALE'",
-					"default":""
+					"length":"'MALE','FEMALE'",
+					"is_null":true
 				},
 				"birthday":{
 					"type":"varchar",

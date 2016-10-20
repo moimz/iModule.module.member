@@ -134,7 +134,11 @@ class ModuleMember {
 	 */
 	function getApi($api) {
 		$data = new stdClass();
-		$values = new stdClass();
+		
+		/**
+		 * 이벤트를 호출한다.
+		 */
+		$this->IM->fireEvent('beforeGetApi','member',$api,$values,null);
 		
 		/**
 		 * 모듈의 api 폴더에 $api 에 해당하는 파일이 있을 경우 불러온다.
@@ -279,8 +283,8 @@ class ModuleMember {
 				$idx = $this->db()->insert($this->table->member,$insert)->execute();
 				if ($label != 0) {
 					$this->db()->insert($this->table->member_label,array('idx'=>$idx,'label'=>$label,'reg_date'=>$insert['reg_date']))->execute();
-					$membernum = $this->db()->select($this->table->member_label)->where('label',$label)->count();
-					$this->db()->update($this->table->label,array('membernum'=>$membernum))->where('idx',$label)->execute();
+					$count = $this->db()->select($this->table->member_label)->where('label',$label)->count();
+					$this->db()->update($this->table->label,array('member'=>$count))->where('idx',$label)->execute();
 				}
 				
 				if ($idx !== false) {
@@ -359,18 +363,21 @@ class ModuleMember {
 			}
 		}
 		
+		/**
+		 * 이벤트를 호출한다.
+		 */
 		$this->IM->fireEvent('afterGetApi','member',$api,$values,$data);
 		
 		return $data;
 	}
 	
 	/**
-	 * [코어] 푸시메세지를 구성한다.
+	 * [코어] 알림메세지를 구성한다.
 	 *
-	 * @param string $code Push Code
-	 * @param int $fromcode Push target idx
-	 * @param array $content Push datas array
-	 * @return string $push convert push code to push message string
+	 * @param string $code 알림코드
+	 * @param int $fromcode 알림이 발생한 대상의 고유값
+	 * @param array $content 알림데이터
+	 * @return string $push 알림메세지
 	 */
 	function getPush($code,$fromcode,$content) {
 		$latest = array_pop($content);
@@ -440,8 +447,7 @@ class ModuleMember {
 	/**
 	 * [사이트관리자] 모듈의 전체 컨텍스트 목록을 반환한다.
 	 *
-	 * @param object $site call by site data
-	 * @return object $contexts
+	 * @return object $lists 전체 컨텍스트 목록
 	 */
 	function getContexts() {
 		$contexts = $this->getText('admin/contexts');
@@ -507,12 +513,12 @@ class ModuleMember {
 	 */
 	function getText($code,$replacement=null) {
 		if ($this->lang == null) {
-			if (file_exists($this->getModule()->getPath().'/languages/'.$this->IM->language.'.json') == true) {
+			if (is_file($this->getModule()->getPath().'/languages/'.$this->IM->language.'.json') == true) {
 				$this->lang = json_decode(file_get_contents($this->getModule()->getPath().'/languages/'.$this->IM->language.'.json'));
-				if ($this->IM->language != $this->getModule()->getPackage()->language) {
+				if ($this->IM->language != $this->getModule()->getPackage()->language && is_file($this->getModule()->getPath().'/languages/'.$this->getModule()->getPackage()->language.'.json') == true) {
 					$this->oLang = json_decode(file_get_contents($this->getModule()->getPath().'/languages/'.$this->getModule()->getPackage()->language.'.json'));
 				}
-			} else {
+			} elseif (is_file($this->getModule()->getPath().'/languages/'.$this->getModule()->getPackage()->language.'.json') == true) {
 				$this->lang = json_decode(file_get_contents($this->getModule()->getPath().'/languages/'.$this->getModule()->getPackage()->language.'.json'));
 				$this->oLang = null;
 			}
@@ -1015,7 +1021,7 @@ class ModuleMember {
 	 */
 	function login($midx) {
 		$member = $this->getMember($midx);
-		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVE')) == true) return false;
+		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		
 		$logged = new stdClass();
 		$logged->idx = $midx;
@@ -1027,6 +1033,8 @@ class ModuleMember {
 		
 		$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
 		$activity = $this->addActivity($midx,0,'member','login',array('ip'=>$logged->ip,'browser'=>$_SERVER['HTTP_USER_AGENT']));
+		
+		unset($_SESSION['LOGGED_FAIL']);
 		
 		return true;
 	}
@@ -1070,6 +1078,17 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 세션토큰을 생성한다.
+	 * 서로 다른 도메인간 통합로그인을 사용하기 위해 사용된다.
+	 *
+	 * @return string $token
+	 */
+	function makeSessionToken() {
+		$token = array('idx'=>$this->getLogged(),'ip'=>ip2long($_SERVER['REMOTE_ADDR']),'lifetime'=>time() + 60);
+		return Encoder(json_encode($token));
+	}
+	
+	/**
 	 * 회원라벨 정보를 가져온다.
 	 *
 	 * @param int $idx 라벨고유값
@@ -1098,12 +1117,22 @@ class ModuleMember {
 				$label->is_change = $label->is_change == 'TRUE';
 				$label->is_unique = $label->is_unique == 'TRUE';
 				
-				unset($label->languages,$label->membernum,$label->sort);
+				unset($label->languages,$label->member,$label->sort);
 			}
 		}
 		
 		$this->labels[$idx] = $label;
 		return $this->labels[$idx];
+	}
+	
+	/**
+	 * 회원라벨 정보를 업데이트한다.
+	 *
+	 * @param int $label 라벨고유번호
+	 */
+	function updateLabel($label) {
+		$count = $this->db()->select($this->table->member_label)->where('label',$label)->count();
+		$this->db()->update($this->table->label,array('member'=>$count))->where('idx',$label)->execute();
 	}
 	
 	/**
@@ -1152,15 +1181,26 @@ class ModuleMember {
 				$member->nickcon = null;
 				$member->level = $this->getLevel(0);
 				$member->label = array();
+				$member->extras = null;
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
-				$member->photo = file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.jpg' : $this->getModule()->getDir().'/images/nophoto.png';
-				$member->nickcon = file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.gif' : null;
+				$member->photo = is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.jpg' : $this->getModule()->getDir().'/images/nophoto.png';
+				$member->nickcon = is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.gif' : null;
 				$member->level = $this->getLevel($member->exp);
 				$temp = explode('-',$member->birthday);
 				$member->birthday = count($temp) == 3 ? $temp[2].'-'.$temp[0].'-'.$temp[1] : '';
 				$member->label = $this->getMemberLabel($midx);
+				$member->extras = json_decode($member->extras);
+				
+				/**
+				 * 추가정보를 $member 객체에 추가한다.
+				 */
+				if ($member->extras !== null) {
+					foreach ($member->extras as $key=>$value) {
+						$member->$key = $value;
+					}
+				}
 			}
 			
 			$this->members[$midx] = $member;
@@ -1232,214 +1272,139 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get member label
+	 * 회원라벨을 가지고 온다.
 	 *
-	 * @param int $midx(optional) im_member_table idx, if not exists this param, used logged member idx
-	 * @param int[] $label(optional) if exists this param and member has this label return true or false
-	 * @return int[] $labels member's all label idx (im_member_label_table) or $label param is exists, return boolean
+	 * @param int $midx(옵션) 회원고유번호, 이 값이 없는 경우 현재 로그인한 회원고유번호
+	 * @param int $label(옵션) 라벨고유번호, 이 값이 없는 경우 회원이 가지고 있는 모든 라벨을 배열로 반환하고, 있는 경우 해당 라벨이 있는지 여부를 boolean 으로 반환한다.
+	 * @param boolean $isIdx 라벨고유번호만 리턴받을지 여부
+	 * @return object[] $labels 회원라벨
 	 */
-	function getMemberLabel($midx=null,$label=null) {
-		if ($midx === null && $this->isLogged() == false) { // midx not exists and not logged
-			if ($label == null) return false; // no member doesn't have label
-			else return [];
-		}
+	function getMemberLabel($midx=null,$label=null,$isIdx=false) {
 		$midx = $midx == null ? $this->getLogged() : $midx;
-		$label = $label !== null && is_array($label) == false ? array($label) : $label;
 		
-		$labels = $this->db()->select($this->table->member_label.' m','l.title')->join($this->table->label.' l','m.label=l.idx','LEFT')->where('m.idx',$midx)->get(); // get member's all label
-		for ($i=0, $loop=count($labels);$i<$loop;$i++) {
-			if ($label !== null && in_array($labels[$i]->title,$label) == true) return true;
-			$labels[$i] = $labels[$i]->title;
-		}
-		
-		return $label !== null ? false : $labels;
-	}
-	
-	function getForceLoginUrl($idx,$redirectUrl='') {
-		$code = Encoder(json_encode(array('idx'=>$idx,'ip'=>$_SERVER['REMOTE_ADDR'])));
-		return 'Member.forceLogin(\''.$code.'\',\''.$redirectUrl.'\');';
-	}
-	
-	function getAccountPage($view=null) {
-		$page = new stdClass();
-		$page->domain = $this->IM->domain;
-		$page->language = $this->IM->language;
-		$page->menu = 'account';
-		$page->page = $view == null ? 'dashboard' : $view;
-		$page->title = $this->getText('account/title');
-		$page->type = 'MODULE';
-		$page->layout = 'empty';
-		$page->context = new stdClass();
-		$page->context->module = 'member';
-		$page->context->context = 'account';
-		$page->context->config = new stdClass();
-		$page->description = null;
-		$page->image = null;
-		
-		return $page;
-	}
-	/*
-	function getPhotoEditModal($this->getTemplet($configs)) {
-		ob_start();
-		
-		$this->getTemplet($configs)->getPath() = $this->getTempletPath('modify',$this->getTemplet($configs));
-		$this->getTemplet($configs)->getDir() = $this->getTempletDir('modify',$this->getTemplet($configs));
-		
-		$title = $this->getText('photoEdit/title');
-		echo '<form id="ModuleMemberPhotoEditForm">'.PHP_EOL;
-
-		$content = '<style>'.PHP_EOL;
-		$content.= '.cropit-image-preview-container {width:250px; height:250px; margin:10px auto; margin-bottom:30px;}'.PHP_EOL;
-		$content.= '.cropit-image-preview {background-color:#f8f8f8; background-size:cover; border:1px solid #ccc; border-radius:3px; width:250px; height:250px; cursor:move;}'.PHP_EOL;
-		$content.= 'input.cropit-image-input {display:none;}'.PHP_EOL;
-		$content.= '.cropit-image-background {opacity:0.3; cursor:auto;}'.PHP_EOL;
-		$content.= '.cropit-image-zoom-container {height:20px; width:250px; margin:0 auto; font-size:0px; text-align:center;}'.PHP_EOL;
-		$content.= '.cropit-image-zoom-container span {width:20px; height:17px; display:inline-block; vertical-align:middle; line-height:17px; margin-top:3px;}'.PHP_EOL;
-		$content.= '.cropit-image-zoom-container span.cropit-image-zoom-out i {font-size:10px; margin-top:2px;}'.PHP_EOL;
-		$content.= '.cropit-image-zoom-container span.cropit-image-zoom-in i {font-size:14px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input {-webkit-appearance:none; border:1px solid white; width:140px; position:relative; z-index:10; vertical-align:middle; margin:0px 10px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-webkit-slider-runnable-track {width:100%; height:5px; background:#ddd; border:none; border-radius:3px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-webkit-slider-thumb {-webkit-appearance:none; border:none; height:16px; width:16px; border-radius:50%; background:#e4232c; margin-top:-5px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input:focus {outline:none;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input:focus::-webkit-slider-runnable-track {background:#ccc;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-moz-range-track {width:100%; height:5px; background:#ddd; border:none; border-radius:3px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-moz-range-thumb {border:none; height:16px; width:16px; border-radius:50%; background:#e4232c;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input:-moz-focusring{outline:1px solid white; outline-offset:-1px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-ms-track {width:300px; height:5px; background:transparent; border-color:transparent; border-width:6px 0; color:transparent;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-ms-fill-lower {background:#777; border-radius:10px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-ms-fill-upper {background:#ddd; border-radius:10px;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input::-ms-thumb {border:none; height:16px; width:16px; border-radius:50%; background:#e4232c;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input:focus::-ms-fill-lower {background:#888;}'.PHP_EOL;
-		$content.= 'input.cropit-image-zoom-input:focus::-ms-fill-upper {background:#ccc;}'.PHP_EOL;
-		$content.= '</style>'.PHP_EOL;
-		
-		$content.= '<div class="photo-editor">'.PHP_EOL;
-		$content.= '	<input type="file" class="cropit-image-input">'.PHP_EOL;
-		$content.= '	<div class="cropit-image-preview-container">'.PHP_EOL;
-		$content.= '		<div class="cropit-image-preview"></div>'.PHP_EOL;
-		$content.= '	</div>'.PHP_EOL;
-		
-		$content.= '	<div class="cropit-image-zoom-container">'.PHP_EOL;
-		$content.= '		<span class="cropit-image-zoom-out"><i class="fa fa-picture-o"></i></span>'.PHP_EOL;
-		$content.= '		<input type="range" class="cropit-image-zoom-input">'.PHP_EOL;
-		$content.= '		<span class="cropit-image-zoom-in"><i class="fa fa-picture-o"></i></span>'.PHP_EOL;
-		$content.= '	</div>';
-		$content.= '</div>';
-		
-		$actionButton = '<button type="button" class="danger" onclick="$(\'input.cropit-image-input\').click();">사진선택</button>';
-		
-		$IM = $this->IM;
-		$Module = $this;
-		
-		if (file_exists($this->getTemplet($configs)->getPath().'/modal.php') == true) {
-			INCLUDE $this->getTemplet($configs)->getPath().'/modal.php';
+		/**
+		 * 회원이 가지고 있는 전체라벨을 반환한다.
+		 */
+		if ($label == null) {
+			$labels = $this->db()->select($this->table->member_label)->where('idx',$midx)->get();
+			for ($i=0, $loop=count($labels);$i<$loop;$i++) {
+				if ($isIdx === true) {
+					$labels[$i] = $labels[$i]->label;
+				} else {
+					$label = $this->getLabel($labels[$i]->label);
+					$label->reg_date = $labels[$i]->reg_date;
+					$labels[$i] = $label;
+				}
+			}
+			
+			return $labels;
 		} else {
-			INCLUDE $this->getModule()->getPath().'/templets/modal.php';
+			return $this->db()->select($this->table->member_label)->where('idx',$midx)->where('label',$label)->has();
 		}
-		
-		echo '</form>'.PHP_EOL.'<script>Member.photoEdit.init();</script>';
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
 	}
 	
-	
-	function getModifyEmail($this->getTemplet($configs)) {
-		ob_start();
-		
-		if (preg_match('/^@/',$this->getTemplet($configs)) == true) {
-			$this->getTemplet($configs)->getPath() = $this->IM->getTempletPath().'/templets/modules/member/templets/modify/'.preg_replace('/^@/','',$this->getTemplet($configs));
-			$this->getTemplet($configs)->getDir() = $this->IM->getTempletDir().'/templets/modules/member/templets/modify/'.preg_replace('/^@/','',$this->getTemplet($configs));
-		} else {
-			$this->getTemplet($configs)->getPath() = $this->getModule()->getPath().'/templets/modify/'.$this->getTemplet($configs);
-			$this->getTemplet($configs)->getDir() = $this->getModule()->getDir().'/templets/modify/'.$this->getTemplet($configs);
-		}
-		
-		$title = $this->getText('modifyEmail/title');
-		echo '<form name="ModuleMemberModifyEmailForm" onsubmit="return Member.modify.modifyEmail(this);">'.PHP_EOL;
-		echo '<input type="hidden" name="confirm" value="TRUE">'.PHP_EOL;
-		
-		$content = '<div class="message">'.$this->getText('modifyEmail/email').'</div>'.PHP_EOL;
-		$content.= '<div class="inputBlock">'.PHP_EOL;
-		$content.= '	<input type="text" name="email" class="inputControl" required>'.PHP_EOL;
-		$content.= '	<div class="helpBlock" data-default="'.$this->getText('modifyEmail/help/email/default').'"></div>'.PHP_EOL;
-		$content.= '</div>'.PHP_EOL;
-		
-		$content.= '<button type="button" class="btn btnRed" style="margin:5px 0px; width:100%;" data-loading="'.$this->getText('modifyEmail/sending').'" onclick="Member.modify.sendVerifyEmail(this);"><i class="fa fa-check"></i> '.$this->getText('modifyEmail/sendVerifyEmail').'</button>'.PHP_EOL;
-		
-		$content.= '<div class="message">'.$this->getText('modifyEmail/code').'</div>'.PHP_EOL;
-		$content.= '<div class="inputBlock">'.PHP_EOL;
-		$content.= '	<input type="text" name="code" class="inputControl" required>'.PHP_EOL;
-		$content.= '	<div class="helpBlock" data-default="'.$this->getText('modifyEmail/help/code/default').'"></div>'.PHP_EOL;
-		$content.= '</div>'.PHP_EOL;
-		
-//		$actionButton = '<button type="button" class="danger" onclick="$(\'input.cropit-image-input\').click();">사진선택</button>';
-		
-		$IM = $this->IM;
-		$Module = $this;
-		
-		if (file_exists($this->getTemplet($configs)->getPath().'/modal.php') == true) {
-			INCLUDE $this->getTemplet($configs)->getPath().'/modal.php';
-		} else {
-			INCLUDE $this->getModule()->getPath().'/templets/modal.php';
-		}
-		
-		echo '</form>'.PHP_EOL;
-		
-		$context = ob_get_contents();
-		ob_end_clean();
-		
-		return $context;
-	}
-	*/
 	/**
-	 * Check social oauth token and scope
+	 * 회원라벨을 추가한다.
 	 *
-	 * @param string $code (google, facebook, github ... etc)
-	 * @param string[] $scope checking exists scope
-	 * @param boolean $isOffline checking refresh_token for offline access (not support facebook oauth api)
-	 * @param int $midx member idx (if checking current logged user, set null)
-	 * @return boolean $existed if user token stored for request scope, return true
+	 * @param int $midx 회원고유번호
+	 * @param int $label 회원라벨고유번호
+	 * @return boolean $success 추가여부
 	 */
-	function checkSocialScope($code,$scope=array(),$isOffline=false,$midx=null) {
-		$midx = $midx == null ? $this->getLogged() : $midx;
-		if ($midx == null) return false;
+	function addMemberLabel($midx,$label) {
+		$label = $this->getLabel($label);
+		if ($label == null) return false;
 		
-		$_oauth = $this->db()->select($this->table->social_oauth)->where('domain',$this->IM->domain)->where('code',$code)->getOne();
-		if ($_oauth == null) return false;
-		$check = $this->db()->select($this->table->social_token)->where('midx',$midx)->where('code',$code)->where('client_id',$_oauth->client_id)->getOne();
-		if ($check == null) {
-			$this->db()->insert($this->table->social_token,array('midx'=>$midx,'code'=>$code,'client_id'=>$_oauth->client_id))->execute();
-			return false;
-		}
-		$store_scope = $check->scope ? explode(',',$check->scope) : array();
-		if (count($scope) > 0 && count(array_diff($scope,$store_scope)) > 0) {
-			$request_scope = $check->request_scope ? explode(',',$check->request_scope) : array();
-			$scope = array_unique(array_merge($scope,$request_scope));
-			$this->db()->update($this->table->social_token,array('request_scope'=>implode(',',$scope)))->where('midx',$midx)->where('code',$code)->where('client_id',$_oauth->client_id)->execute();
-			return false;
-		}
-		if ($isOffline == true) {
-			if ($code == 'google' && strlen($check->refresh_token) == 0) return false;
-		}
+		/**
+		 * 이미 해당라벨을 가지고 있는 경우 중단한다.
+		 */
+		if ($this->db()->select($this->table->member_label)->where('idx',$midx)->where('label',$label->idx)->has() == true) return false;
+		
+		/**
+		 * 추가하고자 하는 라벨이 UNIQUE 라벨일 경우 모든 라벨을 지운다.
+		 */
+		if ($label->is_unique == true) $this->deleteMemberLabel($midx);
+		
+		$this->db()->insert($this->table->member_label,array('idx'=>$midx,'label'=>$label->idx,'reg_date'=>time()))->execute();
+		$this->updateLabel($label->idx);
 		
 		return true;
 	}
 	
-	function getSocialToken($code,$midx=null) {
-		$midx = $midx == null ? $this->getLogged() : $midx;
-		if ($midx == null) return null;
+	/**
+	 * 회원라벨을 제거한다.
+	 *
+	 * @param int $midx 회원고유번호
+	 * @param int $label(옵션) 회원라벨고유번호 (없을 경우 모든 라벨을 지운다.)
+	 * @return boolean $success 제거여부
+	 */
+	function deleteMemberLabel($midx,$label=null) {
+		/**
+		 * 대상회원의 라벨정보를 가져온다.
+		 */
+		$labels = $this->db()->select($this->table->member_label,'label')->where('idx',$midx);
+		if ($label !== null) $labels->where('label',$label);
+		$labels = $labels->get();
 		
-		$_oauth = $this->db()->select($this->table->social_oauth)->where('domain',$this->IM->domain)->where('code',$code)->getOne();
-		if ($_oauth == null) return null;
-		
-		$token = $this->db()->select($this->table->social_token)->where('midx',$midx)->where('code',$code)->where('client_id',$_oauth->client_id)->getOne();
-		if ($token !== null) {
-			$token->client_secret = $_oauth->client_secret;
+		for ($i=0, $loop=count($labels);$i<$loop;$i++) {
+			$this->db()->delete($this->table->member_label)->where('idx',$midx)->where('label',$labels[$i]->label)->execute();
+			$this->updateLabel($labels[$i]->label);
 		}
-		return $token;
+		
+		return count($labels) > 0;
+	}
+	
+	/**
+	 * 회원의 추가정보를 가져온다.
+	 *
+	 * @param int $midx(옵션) 회원고유값, 없다면 현재 로그인한 회원고유값
+	 * @param string $key 가져올 키값
+	 * @return object $data
+	 */
+	function getMemberExtraValue($midx=null,$key) {
+		$member = $this->getMember($midx);
+		if ($member->extras != null && isset($member->extras->$key) == true) return $member->extras->$key;
+		return null;
+	}
+	
+	/**
+	 * 회원의 추가정보를 저장한다.
+	 *
+	 * @param int $midx 회원고유값
+	 * @param string $key 저장할 키값
+	 * @param object $value 저장할 값
+	 * @return boolean $success 저장여부
+	 */
+	function setMemberExtraValue($midx,$key,$value) {
+		$member = $this->db()->select($this->table->member,array('extras'))->where('idx',$midx)->getOne();
+		if ($member == null) return false;
+		
+		$extras = json_decode($member->extras);
+		if ($extras == null) $extras = new stdClass();
+		$extras->$key = $value;
+		$extras = json_encode($extras,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+		
+		$this->db()->update($this->table->member,array('extras'=>$extras))->where('idx',$midx)->execute();
+		return true;
+	}
+	
+	/**
+	 * 회원활동기록을 추가한다.
+	 *
+	 * @param int $midx 회원 고유번호
+	 * @param int $exp 활동에 따른 경험치
+	 * @param string $module 활동이 발생한 모듈명
+	 * @param string $code 활동코드
+	 * @param object[] $content 활동에 따른 정보
+	 * @return int $activity 활동 고유번호
+	 */
+	function addActivity($midx,$exp,$module,$code,$content=array()) {
+		$member = $this->getMember($midx);
+		if ($member->idx == 0) return false;
+		
+		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>time()))->execute();
+		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
+		
+		return $idx;
 	}
 	
 	function sendPoint($midx,$point,$module='',$code='',$content=array(),$isForce=false) {
@@ -1515,47 +1480,6 @@ class ModuleMember {
 		}
 		
 		return 'SENDING';
-	}
-	
-	/**
-	 * Add member label
-	 *
-	 * @param int $midx member idx
-	 * @param int $label label idx
-	 * @return boolean $result
-	 */
-	function addMemberLabel($midx,$label) {
-		$label = $this->db()->select($this->table->label)->where('idx',$label)->getOne();
-		
-		if ($label !== null && $this->db()->select($this->table->member_label)->where('idx',$midx)->where('label',$label->idx)->has() == false) {
-			$this->db()->insert($this->table->member_label,array('idx'=>$midx,'label'=>$label->idx,'reg_date'=>time()))->execute();
-			$membernum = $this->db()->select($this->table->member_label)->where('label',$label->idx)->count();
-			$this->db()->update($this->table->label,array('membernum'=>$membernum))->where('idx',$label->idx)->execute();
-			
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	/**
-	 * 회원활동기록을 추가한다.
-	 *
-	 * @param int $midx 회원 고유번호
-	 * @param int $exp 활동에 따른 경험치
-	 * @param string $module 활동이 발생한 모듈명
-	 * @param string $code 활동코드
-	 * @param object[] $content 활동에 따른 정보
-	 * @return int $activity 활동 고유번호
-	 */
-	function addActivity($midx,$exp,$module,$code,$content=array()) {
-		$member = $this->getMember($midx);
-		if ($member->idx == 0) return false;
-		
-		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>time()))->execute();
-		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
-		
-		return $idx;
 	}
 	
 	/**

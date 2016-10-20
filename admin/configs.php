@@ -1,3 +1,17 @@
+<?php
+/**
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ *
+ * 회원모듈 설정을 위한 설정폼을 생성한다.
+ * 
+ * @file /modules/member/admin/configs.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160910
+ */
+
+if (defined('__IM__') == false) exit;
+?>
 <script>
 new Ext.form.Panel({
 	id:"ModuleConfigForm",

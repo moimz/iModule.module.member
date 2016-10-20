@@ -22,7 +22,7 @@ if ($type == 'title') {
 	$lists[] = array(
 		'idx'=>'0',
 		'title'=>$this->Module->getConfig('default_label_title') == 'LANGUAGE_SETTING' ? $this->getText('text/default_label_title') : $this->Module->getConfig('default_label_title'),
-		'membernum'=>$this->db()->select($this->table->member)->count(),
+		'member'=>$this->db()->select($this->table->member)->count(),
 		'allow_signup'=>$this->Module->getConfig('allow_signup'),
 		'approve_signup'=>$this->Module->getConfig('approve_signup'),
 		'is_change'=>true,
