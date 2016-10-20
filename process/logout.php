@@ -17,6 +17,7 @@ if (defined('__IM__') == false) exit;
 unset($_SESSION['MEMBER_LOGGED']);
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) == true) {
 	$results->success = true;
+	$results->universal_login = $this->getModule()->getConfig('universal_login');
 } else {
 	$redirect = Request('redirect') ? Request('redirect') : __IM_DIR__.'/'.$this->IM->language;
 	header("location:".urldecode($redirect));

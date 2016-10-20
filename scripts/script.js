@@ -17,31 +17,81 @@ var Member = {
 	 */
 	login:function($form) {
 		$form.send(ENV.getProcessUrl("member","login"),function(result) {
+			/**
+			 * 이벤트를 발생시킨다.
+			 */
+			if ($(document).triggerHandler("Member.login",[$form,result]) === false) return false;
+			
 			if (result.success == true) {
 				location.href = location.href;
 			}
 		});
 	},
+	/**
+	 * 회원 로그아웃
+	 *
+	 * @param DOM button(옵션) 로그아웃 버튼
+	 */
 	logout:function(button) {
-		iModule.buttonStatus($(button),"loading");
+		if (button) {
+			var $button = $(button);
+			$button.status("loading");
+		}
 		
-		$.ajax({
-			type:"POST",
-			url:ENV.getProcessUrl("member","logout"),
-			dataType:"json",
-			success:function(result) {
-				if (result.success == true) {
-					location.href = location.href.split("#").shift();
+		$.send(ENV.getProcessUrl("member","logout"),function(result) {
+			if (result.success == true) {
+				if (result.universal_login === true) {
+					Member.syncSession(function() {
+						location.href = location.href.split("#").shift();
+					});
 				} else {
-					if (result.message) iModule.alertMessage.show("error",result.message,5);
-					
-					iModule.buttonStatus($(button),"reset");
+					location.href = location.href.split("#").shift();
 				}
-			},
-			error:function() {
-				iModule.alertMessage.show("Server Connect Error!");
 			}
 		});
+	},
+	/**
+	 * 다른 도메인간 통합로그인을 위한 로그인 세션 동기화
+	 *
+	 * @param string domain 동기화할 사이트 도메인
+	 * @param string token 사용자 세션토큰
+	 */
+	syncSessionTotal:0,
+	syncSessionComplete:0,
+	syncSession:function(domain,token,callback,count) {
+		if (typeof domain == "string") {
+			var count = count ? count : 0;
+			
+			$.ajax({
+				type:"GET",
+				url:domain+ENV.getProcessUrl("member","syncSession"),
+				data:{token:token},
+				dataType:"jsonp",
+				success:function(result) {
+					Member.syncSessionComplete++;
+					if (typeof callback == "function" && Member.syncSessionTotal == Member.syncSessionComplete) callback();
+				},
+				error:function() {
+					if (count == 3) {
+						Member.syncSessionComplete++;
+						if (typeof callback == "function" && Member.syncSessionTotal == Member.syncSessionComplete) callback();
+						return;
+					}
+					setTimeout(Member.syncSession,1000,domain,token,callback,++count);
+				}
+			});
+		} else {
+			if (typeof domain == "function") var callback = domain;
+			else callback = null;
+			
+			$.send(ENV.getProcessUrl("member","getUniversalSites"),function(result) {
+				Member.syncSessionTotal = result.sites.length;
+				Member.syncSessionComplete = 0;
+				for (var i=0, loop=result.sites.length;i<loop;i++) {
+					Member.syncSession(result.sites[i],result.token,callback);
+				}
+			});
+		}
 	},
 	/**
 	 * 회원가입
@@ -56,13 +106,13 @@ var Member = {
 			var next = $("input[name=next]",$form).val();
 			
 			if (step == "agreement") {
-				$("button[type=submit]",$form).prop("disabled",true);
+				$("button[type=submit]",$form).disable();
 				$("input[type=checkbox]",$form).on("change",function() {
-					$("button[type=submit]",$form).prop("disabled",$("input[type=checkbox]",$form).length != $("input[type=checkbox]:checked",$form).length);
+					$("button[type=submit]",$form).setDisabled($("input[type=checkbox]",$form).length != $("input[type=checkbox]:checked",$form).length);
 				});
 				
 				$form.on("submit",function() {
-					$("input[name=agreement]",$form).prop("disabled",true);
+					$("input[name=agreement]",$form).disable();
 				});
 			}
 			
@@ -73,11 +123,11 @@ var Member = {
 					Member.signup.check();
 					
 					if ($("input[type=checkbox][name='agreements[]']",$form).length > 0) {
-						$("button[type=submit]",$form).prop("disabled",true);
+						$("button[type=submit]",$form).disable();
 					}
 					
 					$("input[type=checkbox][name='agreements[]']",$form).on("change",function() {
-						$("button[type=submit]",$form).prop("disabled",$("input[type=checkbox][name='agreements[]']",$form).length != $("input[type=checkbox][name='agreements[]']:checked",$form).length);
+						$("button[type=submit]",$form).setDisabled($("input[type=checkbox][name='agreements[]']",$form).length != $("input[type=checkbox][name='agreements[]']:checked",$form).length);
 					});
 				}
 				
@@ -87,10 +137,10 @@ var Member = {
 			} else if (next) {
 				$form.attr("method","post");
 				$form.attr("action",ENV.getUrl(null,null,next,false));
-				$("input[name=step]",$form).prop("disabled",true);
-				$("input[name=prev]",$form).prop("disabled",true);
-				$("input[name=next]",$form).prop("disabled",true);
-				$("input[name=templet]",$form).prop("disabled",true);
+				$("input[name=step]",$form).disable();
+				$("input[name=prev]",$form).disable();
+				$("input[name=next]",$form).disable();
+				$("input[name=templet]",$form).disable();
 			} else {
 				$form.on("submit",function() {
 					location.href = ENV.getUrl(false);
