@@ -659,7 +659,9 @@ class ModuleMember {
 	 * @param string $this->getTemplet($configs) 템플릿명
 	 * @return string $package 템플릿 정보
 	 */
-	function getTemplet($templet) {
+	function getTemplet($templet=null) {
+		$templet = $templet == null ? '#' : $templet;
+		
 		/**
 		 * 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정일 경우
 		 */
