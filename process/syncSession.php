@@ -6,7 +6,7 @@
  *
  * @file /modules/member/process/syncSession.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
+ * @license MIT License
  * @version 3.0.0.160923
  *
  * @post int $token 세션토큰

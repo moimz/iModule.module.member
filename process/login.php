@@ -6,7 +6,7 @@
 *
 * @file /modules/member/process/signup.php
 * @author Arzz (arzz@arzz.com)
-* @license GPLv3
+* @license MIT License
 * @version 3.0.0.161001
 *
 * @return object $results

@@ -6,7 +6,7 @@
  *
  * @file /modules/member/process/liveCheckValue.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
+ * @license MIT License
  * @version 3.0.0.160923
  *
  * @post string $name 입력값 종류
