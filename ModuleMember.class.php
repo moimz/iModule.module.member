@@ -19,8 +19,10 @@ class ModuleMember {
 	/**
 	 * DB 관련 변수정의
 	 *
+	 * @private object $DB DB접속객체
 	 * @private string[] $table DB 테이블 별칭 및 원 테이블명을 정의하기 위한 변수
 	 */
+	private $DB;
 	private $table;
 	
 	/**
@@ -111,7 +113,8 @@ class ModuleMember {
 	 * @return DB $DB
 	 */
 	function db() {
-		return $this->IM->db($this->getModule()->getInstalled()->database);
+		if ($this->DB == null || $this->DB->ping() === false) $this->DB = $this->IM->db($this->getModule()->getInstalled()->database);
+		return $this->DB;
 	}
 	
 	/**
