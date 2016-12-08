@@ -490,11 +490,11 @@
 				},
 				"name":{
 					"type":"varchar",
-					"length":20
+					"length":30
 				},
 				"nickname":{
 					"type":"varchar",
-					"length":20
+					"length":30
 				},
 				"homepage":{
 					"type":"varchar",
