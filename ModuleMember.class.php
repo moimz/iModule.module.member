@@ -771,6 +771,46 @@ class ModuleMember {
 	}
 	
 	/**
+	 * API 호출에서 회원인증을 처리한다.
+	 *
+	 * @param string $authorization 인증헤더를 통해 넘어온 엑세스 토큰
+	 */
+	function authorizationToken($authorization) {
+		$authorization = explode(' ',$authorization);
+		$type = strtoupper(array_shift($authorization));
+		$token = implode(' ',$authorization);
+		
+		/**
+		 * iModule 의 경우 BEARER 형식의 토큰만 처리한다.
+		 * 다른 방식의 경우 Event 를 발생시켜 다른 플러그인 또는 모듈에서 받아서 처리할 수 있도록 한다.
+		 */
+		if ($type != 'BEARER') {
+			$this->IM->fireEvent('authorization','member',$type,$token);
+			
+			/**
+			 * 이벤트 처리결과 로그인 상태가 아니라면 에러메세지를 발생한다.
+			 */
+			if ($this->isLogged() == false) {
+				header("HTTP/1.1 401 Unauthorized");
+				header("Content-type: text/json; charset=utf-8",true);
+				
+				$results = new stdClass();
+				$results->success = false;
+				$results->message = 'Access token Error : Unauthorized';
+		
+				exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+			}
+		} else {
+			$data = json_decode(Decoder($token));
+			$midx = array_pop($data);
+			$client_id = array_pop($data);
+			$this->login($midx);
+		}
+		
+		return true;
+	}
+	
+	/**
 	 * 회원가입 컨텍스트를 가져온다.
 	 *
 	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정

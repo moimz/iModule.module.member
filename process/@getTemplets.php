@@ -13,7 +13,7 @@
  */
 if (defined('__IM__') == false) exit;
 
-$templets = $this->Module->getTemplets();
+$templets = $this->getModule()->getTemplets();
 $lists = array();
 for ($i=0, $loop=count($templets);$i<$loop;$i++) {
 	$lists[] = array('display'=>$templets[$i]->getTitle().' ('.$templets[$i]->getDir().')','value'=>$templets[$i]->getName());
