@@ -1134,6 +1134,21 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 전체 회원라벨을 가져온다.
+	 *
+	 * @return object[] $labels
+	 */
+	function getLabels() {
+		$labels = $this->db()->select($this->table->label)->orderBy('sort','asc')->get();
+		for ($i=0, $loop=count($labels);$i<$loop;$i++) {
+			$labels[$i] = $this->getLabel($labels[$i]->idx);
+		}
+		
+		return $labels;
+	}
+	
+	
+	/**
 	 * 회원라벨 정보를 가져온다.
 	 *
 	 * @param int $idx 라벨고유값
