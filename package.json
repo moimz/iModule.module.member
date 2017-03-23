@@ -292,7 +292,8 @@
 				}
 			},
 			"indexes":{
-				"idx,label":"primary_key"
+				"idx,label":"primary_key",
+				"idx":"index"
 			}
 		},
 		"member_point_table":{
