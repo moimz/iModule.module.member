@@ -32,47 +32,47 @@
 	"configs":{
 		"templet":{
 			"type":"string",
-			"value":"default"
+			"default":"default"
 		},
 		"templet_configs":{
 			"type":"object",
-			"value":{}
+			"default":{}
 		},
 		"allow_signup":{
 			"type":"boolean",
-			"value":true
+			"default":true
 		},
 		"approve_signup":{
 			"type":"boolean",
-			"value":true
+			"default":true
 		},
 		"label":{
 			"type":"int",
-			"value":0
+			"default":0
 		},
 		"default_label_title":{
 			"type":"string",
-			"value":"LANGUAGE_SETTING"
+			"default":"LANGUAGE_SETTING"
 		},
 		"default_label_title_languages":{
 			"type":"object",
-			"value":{}
+			"default":{}
 		},
 		"point":{
 			"type":"int",
-			"value":1000
+			"default":1000
 		},
 		"exp":{
 			"type":"int",
-			"value":0
+			"default":0
 		},
 		"universal_login":{
 			"type":"boolean",
-			"value":true
+			"default":true
 		},
 		"signup_step":{
 			"type":"array",
-			"value":["agreement","insert","complete"]
+			"default":["agreement","insert","complete"]
 		}
 	},
 	"databases":{
