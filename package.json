@@ -514,8 +514,8 @@
 				},
 				"gender":{
 					"type":"enum",
-					"length":"'MALE','FEMALE'",
-					"is_null":true
+					"length":"'NONE','MALE','FEMALE'",
+					"default":"NONE"
 				},
 				"birthday":{
 					"type":"varchar",
