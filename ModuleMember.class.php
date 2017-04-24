@@ -599,6 +599,7 @@ class ModuleMember {
 		$error = new stdClass();
 		$error->message = $message;
 		$error->description = $description;
+		$error->type = 'BACK';
 		
 		if ($isRawData === true) return $error;
 		else return $this->IM->getErrorText($error);
@@ -1097,11 +1098,12 @@ class ModuleMember {
 	/**
 	 * 현재 로그인한 사용자가 최고관리자인지 확인한다.
 	 *
+	 * @param int $midx 회원고유번호 (없을경우 현재 로그인한 사용자)
 	 * @return boolean $isAdmin
 	 */
-	function isAdmin() {
-		if ($this->isLogged() == true && $this->getMember()->type == 'ADMINISTRATOR') return true;
-		return false;
+	function isAdmin($midx=null) {
+		$member = $this->getMember($midx);
+		return $member->type == 'ADMINISTRATOR';
 	}
 	
 	/**
