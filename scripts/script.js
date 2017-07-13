@@ -85,10 +85,14 @@ var Member = {
 			else callback = null;
 			
 			$.send(ENV.getProcessUrl("member","getUniversalSites"),function(result) {
-				Member.syncSessionTotal = result.sites.length;
-				Member.syncSessionComplete = 0;
-				for (var i=0, loop=result.sites.length;i<loop;i++) {
-					Member.syncSession(result.sites[i],result.token,callback);
+				if (result.sites.length == 0) {
+					if (callback != null) callback();
+				} else {
+					Member.syncSessionTotal = result.sites.length;
+					Member.syncSessionComplete = 0;
+					for (var i=0, loop=result.sites.length;i<loop;i++) {
+						Member.syncSession(result.sites[i],result.token,callback);
+					}
 				}
 			});
 		}
