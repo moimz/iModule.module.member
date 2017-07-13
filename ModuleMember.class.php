@@ -1273,6 +1273,20 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 코드값으로 회원정보를 가져온다.
+	 *
+	 * @param string $code
+	 * @return object $member
+	 */
+	function getMemberByCode($code) {
+		if ($code == null || $code == '') return null;
+		$member = $this->db()->select($this->table->member,'idx')->where('code',$code)->getOne();
+		if ($member == null) return null;
+		
+		return $this->getMember($member->idx);
+	}
+	
+	/**
 	 * Get Member name
 	 *
 	 * @param int $midx(optional) im_member_table idx, if not exists this param, used logged member idx
