@@ -28,6 +28,15 @@ var Member = {
 		});
 	},
 	/**
+	 * 로그인모달
+	 */
+	loginModal:function() {
+		iModule.modal.get(ENV.getProcessUrl("member","getModal"),{modal:"login"},function($modal,$form) {
+			$form.inits(Member.login);
+			return false;
+		});
+	},
+	/**
 	 * 회원 로그아웃
 	 *
 	 * @param DOM button(옵션) 로그아웃 버튼

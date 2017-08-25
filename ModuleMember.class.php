@@ -772,6 +772,32 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 로그인 모달을 가져온다.
+	 * 이벤트를 발생시켜 각 대학모듈에서 처리할 사항이 있으면 처리한다.
+	 */
+	function getLoginModal() {
+		$title = '회원 로그인';
+		
+		$content = PHP_EOL;
+		$content.= '<div data-role="input"><input type="email" name="email" placeholder="이메일"></div>';
+		$content.= '<div data-role="input"><input type="password" name="password" placeholder="패스워드"></div>';
+		
+		$buttons = array();
+		
+		$button = new stdClass();
+		$button->type = 'close';
+		$button->text = '취소';
+		$buttons[] = $button;
+		
+		$button = new stdClass();
+		$button->type = 'submit';
+		$button->text = '로그인';
+		$buttons[] = $button;
+		
+		return $this->getTemplet()->getModal($title,$content,true,array('width'=>300),$buttons);
+	}
+	
+	/**
 	 * API 호출에서 회원인증을 처리한다.
 	 *
 	 * @param string $authorization 인증헤더를 통해 넘어온 엑세스 토큰
