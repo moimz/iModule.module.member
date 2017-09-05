@@ -1,3 +1,16 @@
-.ModuleMemberInfoNickname {font-weight:bold; cursor:pointer; position:relative; display:inline-block; height:16px !important; line-height:16px !important;}
-.ModuleMemberInfoNickname img {vertical-align:middle;}
-.ModuleMemberInfoPhoto {font-weight:bold; cursor:pointer; position:relative;}
+/**
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ *
+ * 회원모듈과 관련된 공통요소의 스타일을 정의한다.
+ * 
+ * @file /modules/member/styles/style.css
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160910
+ */
+
+i[data-module=member][data-role=photo] {display:inline-block; background-position:50% 50%; background-repeat:no-repeat; background-size:cover; border-radius:50%; border:1px solid #ccc; box-sizing:border-box; vertical-align:middle;}
+i[data-module=member][data-role=photo][data-idx] {cursor:pointer;}
+
+span[data-module=member][data-role=name] {display:inline-block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; vertical-align:middle;}
+span[data-module=member][data-role=name][data-idx] {font-weight:bold; cursor:pointer;}

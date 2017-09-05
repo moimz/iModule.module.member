@@ -1313,64 +1313,67 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get Member name
+	 * 회원이름을 가져온다.
 	 *
-	 * @param int $midx(optional) im_member_table idx, if not exists this param, used logged member idx
-	 * @param string $replaceName(optional) if not found member information, return this name
+	 * @param int $midx 회원번호, 없을 경우 현재 로그인한 회원번호
+	 * @param string $replacement 비회원일 경우 대치할 이름
+	 * @param boolean $nickcon 닉이미지 사용여부 (기본값 : true)
 	 * @return string $name
 	 */
-	function getMemberName($midx=null,$replaceName='') {
-		if ($midx == null && $this->isLogged() == false) return $replaceName;
-
-		$member = $this->getMember($midx);
-		if ($member->idx == null && empty($replaceName) == false) return $replaceName;
-		
-		return $member->name;
-	}
-	
-	/**
-	 * Get Member name
-	 *
-	 * @param int $midx(optional) im_member_table idx, if not exists this param, used logged member idx
-	 * @param boolean $nickcon(optional, default true) return nickcon image or not
-	 * @param string $replaceName(optional) if not found member information, return this name
-	 * @return string $name name string or nickcon image html tag
-	 */
-	function getMemberNickname($midx=null,$nickcon=true,$replaceName='') {
-		if ($midx === null && $this->isLogged() == false) return $replaceName;
-
-		$member = $this->getMember($midx);
-		if ($member->idx == null && empty($replaceName) == false) return $replaceName;
-		
-		$nickname = '<span data-member-idx="'.$member->idx.'" class="ModuleMemberInfoNickname">';
-		if ($nickcon == true && $member->nickcon != null) {
-			$nickname.= '<img src="'.$member->nickcon.'" alt="'.$member->nickname.'" title="'.$member->nickname.'">';
+	function getMemberName($midx=null,$replacement='') {
+		if ($midx === 0) {
+			$name = $replacement;
 		} else {
-			$nickname.= $member->nickname;
+			$member = $this->getMember($midx);
+			$midx = $member->idx;
+			$name = $member->idx == 0 ? $replacement : $member->name;
 		}
-		$nickname.= '</span>';
-		return $nickname;
+		
+		return '<span data-module="member" data-role="name"'.($midx ? ' data-idx="'.$midx.'"' : '').'>'.$name.'</span>';
 	}
 	
 	/**
-	 * Get member photo html (img tag)
+	 * 회원 닉네임을 가져온다.
 	 *
-	 * @param int $midx(optional) im_member_table idx, if not exists this param, used logged member idx
-	 * @param int $width(optional) member photo's width, if not exists this param, used default width (500px)
-	 * @param int $height(optional) member photo's height, if not exists this param, used default width (500px)
-	 * @return string $photo member's photo img tag
+	 * @param int $midx 회원번호, 없을 경우 현재 로그인한 회원번호
+	 * @param string $replacement 비회원일 경우 대치할 이름
+	 * @param boolean $nickcon 닉이미지 사용여부 (기본값 : true)
+	 * @return string $nickname
+	 */
+	function getMemberNickname($midx=null,$nickcon=true,$replacement='') {
+		if ($midx === 0) {
+			$nickname = $replacement;
+		} else {
+			$member = $this->getMember($midx);
+			$midx = $member->idx;
+			$nickname = $member->idx == 0 ? $replacement : $member->nickname;
+		}
+		
+		return '<span data-module="member" data-role="name"'.($midx ? ' data-idx="'.$midx.'"' : '').'>'.$nickname.'</span>';
+	}
+	
+	/**
+	 * 회원 사진을 가져온다.
+	 *
+	 * @param int $midx 회원번호, 없을 경우 현재 로그인한 회원번호
+	 * @param int $width 가로크기
+	 * @param int $height 세로크기
+	 * @return string $photo 회원사진 태그
 	 */
 	function getMemberPhoto($midx=null,$width=null,$height=null) {
-		if ($midx === null && $this->isLogged() == false) return '<img src="'.$this->getModule()->getDir().'/images/nophoto.png" alt="unknown">';
+		if ($midx === 0) {
+			$photo = $this->getModule()->getDir().'/images/nophoto.png';
+		} else {
+			$member = $this->getMember($midx);
+			$midx = $member->idx;
+			$photo = $member->photo;
+		}
 		
-		$member = $this->getMember($midx);
+		$style = 'background-image:url('.$photo.');';
+		if ($width) $style.= ' width:'.$width.'px;';
+		if ($height) $style.= ' height:'.$height.'px;';
 		
-		$photo = '<img data-member-idx="'.$member->idx.'" src="'.$member->photo.'" class="ModuleMemberInfoPhoto" alt="'.$member->nickname.'" style="';
-		if ($width !== null) $photo.= 'width:'.$width.';';
-		if ($height !== null) $photo.= 'height:'.$height.';';
-		$photo.= '">';
-		
-		return $photo;
+		return '<i data-module="member" data-role="photo"'.($midx ? ' data-idx="'.$midx.'"' : '').' style="'.$style.'"></i>';
 	}
 	
 	/**
