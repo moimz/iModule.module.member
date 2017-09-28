@@ -729,6 +729,29 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 모듈 외부컨테이너를 가져온다.
+	 *
+	 * @param string $container 컨테이너명
+	 * @return string $html 컨텍스트 HTML / FileBytes 파일 바이너리
+	 */
+	function getContainer($container) {
+		if ($container == 'photo') {
+			$midx = $this->IM->view ? $this->IM->view : 0;
+			
+			$path = $this->getModule()->getConfig('photo_privacy') == false && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg' : $this->getModule()->getPath().'/images/nophoto.png';
+			$extension = explode('.',$path);
+			
+			header('Content-Type: image/'.end($extension));
+			header('Content-Length: '.filesize($path));
+			
+			readfile($path);
+			exit;
+		} else {
+			return '';
+		}
+	}
+	
+	/**
 	 * 컨텍스트 헤더를 가져온다.
 	 *
 	 * @param string $context 컨테이너 종류
@@ -1108,6 +1131,12 @@ class ModuleMember {
 		
 		unset($_SESSION['LOGGED_FAIL']);
 		
+		$results = new stdClass();
+		$results->success = true;
+		
+		$values = new stdClass();
+		$this->IM->fireEvent('afterDoProcess','member','login',$values,$results);
+		
 		return true;
 	}
 	
@@ -1273,7 +1302,7 @@ class ModuleMember {
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
-				$member->photo = is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.jpg' : $this->getModule()->getDir().'/images/nophoto.png';
+				$member->photo = $this->IM->getModuleUrl('member','photo',$member->idx).'/profile.jpg';
 				$member->nickcon = is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.gif' : null;
 				$member->level = $this->getLevel($member->exp);
 				$temp = explode('-',$member->birthday);

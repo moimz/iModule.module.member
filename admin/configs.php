@@ -22,42 +22,18 @@ new Ext.form.Panel({
 		new Ext.form.FieldSet({
 			title:Member.getText("admin/configs/form/default_setting"),
 			items:[
-				new Ext.form.ComboBox({
-					fieldLabel:Member.getText("admin/configs/form/templet"),
-					name:"templet",
-					store:new Ext.data.JsonStore({
-						proxy:{
-							type:"ajax",
-							simpleSortMode:true,
-							url:ENV.getProcessUrl("member","@getTemplets"),
-							reader:{type:"json",root:"lists",totalProperty:"totalCount"}
-						},
-						autoLoad:true,
-						remoteSort:false,
-						sorters:[{property:"sort",direction:"ASC"}],
-						pageSize:0,
-						fields:["display","value"]
-					}),
-					editable:false,
-					displayField:"display",
-					valueField:"value",
-					value:"",
-					listeners:{
-						change:function(form,value) {
-							$.send(ENV.getProcessUrl("member","@getTempletConfigs"),{templet:value},function(result) {
-								if (result.success == true) {
-									Admin.setTempletConfigs("ModuleConfigTempletConfigs","@templet_configs-",result.configs);
-								}
-							});
-						}
-					}
-				})
+				Admin.templetField(Member.getText("admin/configs/form/templet"),"templet","member",false)
 			]
 		}),
 		new Ext.form.FieldSet({
-			id:"ModuleConfigTempletConfigs",
-			title:Admin.getText("text/templet_configs"),
-			hidden:true
+			title:"보안설정",
+			items:[
+				new Ext.form.Checkbox({
+					boxLabel:"로그인을 하지 않은 경우 모든 회원들의 사진을 기본사진으로 보이게 설정합니다.",
+					name:"photo_privacy",
+					uncheckedValue:""
+				})
+			]
 		}),
 		new Ext.form.FieldSet({
 			title:Member.getText("admin/configs/form/signup_setting"),

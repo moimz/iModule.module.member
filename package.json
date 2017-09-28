@@ -38,6 +38,10 @@
 			"type":"object",
 			"default":{}
 		},
+		"photo_privacy":{
+			"type":"boolean",
+			"default":false
+		},
 		"allow_signup":{
 			"type":"boolean",
 			"default":true
