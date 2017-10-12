@@ -83,8 +83,10 @@ class ModuleMember {
 		 * 회원메뉴를 제공하기 위한 자바스크립트 및 스타일시트를 로딩한다.
 		 * 회원모듈은 글로벌모듈이기 때문에 모듈클래스 선언부에서 선언해주어야 사이트 레이아웃에 반영된다.
 		 */
-		$this->IM->addHeadResource('style',$this->getModule()->getDir().'/styles/style.css');
-		$this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/script.js');
+		if (defined('__IM_ADMIN__') == false) {
+			$this->IM->addHeadResource('style',$this->getModule()->getDir().'/styles/style.css');
+			$this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/script.js');
+		}
 		
 		/**
 		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
@@ -94,7 +96,7 @@ class ModuleMember {
 		/**
 		 * 통합로그인을 사용한다고 설정되어 있을 경우 통합로그인 세션처리를 위한 자바스크립트 파일을 로딩한다.
 		 */
-		if ($this->getModule()->getConfig('universal_login') == true) $this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/session.js');
+		if (defined('__IM_ADMIN__') == false && $this->getModule()->getConfig('universal_login') == true) $this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/session.js');
 	}
 	
 	/**
