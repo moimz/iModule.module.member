@@ -329,6 +329,11 @@
 					"type":"text",
 					"is_null":true
 				},
+				"accumulation":{
+					"type":"int",
+					"length":11,
+					"default":0
+				},
 				"reg_date":{
 					"type":"int",
 					"length":11

@@ -15,3 +15,29 @@ div[data-role=context][data-module=member] {}
  * 회원가입 컨텍스트
  */
 div[data-role=context][data-module=member] section.signup {}
+
+/**
+ * 포인트내역 컨텍스트
+ */
+div[data-module=member] div[data-role=tool] {margin-bottom:10px;}
+div[data-module=member] div[data-role=tool] > h4 {display:inline-block; height:40px; line-height:40px; padding:0; margin:0;}
+div[data-module=member] div[data-role=tool] > div[data-role=input] {width:150px; float:right;}
+div[data-module=member] ul[data-role=table].point > li {min-width:500px;}
+div[data-module=member] ul[data-role=table].point > li > span.loopnum {width:70px; text-align:center;}
+div[data-module=member] ul[data-role=table].point > li > span.title {width:100%;}
+div[data-module=member] ul[data-role=table].point > li > span.title > a {color:#2196F3; text-decoration:none; font-weight:bold;}
+div[data-module=member] ul[data-role=table].point > li > span.count {width:70px;}
+div[data-module=member] ul[data-role=table].point > li > span.date {width:160px; text-align:center;}
+div[data-module=member] ul[data-role=table].point > li > span.accumulation {width:100px;}
+div[data-module=member] ul[data-role=table].point > li.tbody > span.count {text-align:right; font-weight:bold;}
+div[data-module=member] ul[data-role=table].point > li.tbody > span.accumulation {text-align:right; font-weight:bold;}
+
+div[data-module=member] ul[data-role=table].point > li.tbody > span > span.increase {color:#4CAF50;}
+div[data-module=member] ul[data-role=table].point > li.tbody > span > span.decrease {color:#F44336;}
+
+@media (max-width:767px) {
+	div[data-module=member] div[data-role=tool] > h4 {display:block;}
+	div[data-module=member] div[data-role=tool] > div[data-role=input] {display:block; width:100%; float:none;}
+	div[data-module=member] ul[data-role=table].point > li > span.loopnum {display:none;}
+	div[data-module=member] ul[data-role=table].point > li > span.accumulation {display:none;}
+}

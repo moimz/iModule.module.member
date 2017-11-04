@@ -507,6 +507,20 @@ var Member = {
 			}
 		}
 	},
+	/**
+	 * 포인트내역 컨텍스트
+	 */
+	point:{
+		init:function(id) {
+			var $form = $("#"+id);
+			
+			if (id == "ModuleMemberPointForm") {
+				$("select[name=type]",$form).on("change",function() {
+					location.href = ENV.getUrl(null,null,$(this).val(),1);
+				});
+			}
+		}
+	},
 	photoEdit:{
 		init:function() {
 			$("#ModuleMemberPhotoEditForm").formInit(Member.photoEdit.submit);

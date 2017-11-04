@@ -712,6 +712,10 @@ class ModuleMember {
 				$html.= $this->getModifyContext($configs);
 				break;
 				
+			case 'point' :
+				$html.= $this->getPointContext($configs);
+				break;
+				
 			case 'social' :
 				$html.= $this->getSocialContext($configs);
 				break;
@@ -794,6 +798,54 @@ class ModuleMember {
 		 */
 		$error = $this->getErrorText($code,$value,true);
 		return $this->IM->getError($error);
+	}
+	
+	/**
+	 * 포인트현황 컨텍스트를 가져온다.
+	 *
+	 * @param object $confgs 사이트맵
+	 * @return $html 컨텍스트 HTML
+	 */
+	function getPointContext($configs=null) {
+		if ($this->isLogged() == false) return $this->getError('REQUIRED_LOGIN');
+		
+		$member = $this->getMember();
+		
+		$view = $this->IM->view ? $this->IM->view : 'all';
+		$p = is_numeric($this->IM->idx) == true ? $this->IM->idx : 1;
+		$limit = 20;
+		$start = ($p - 1) * $limit;
+		$lists = $this->db()->select($this->table->point)->where('midx',$this->getLogged());
+		if ($view == 'increase') $lists->where('point',0,'>');
+		elseif ($view == 'decrease') $lists->where('point',0,'<');
+		
+		$total = $lists->copy()->count();
+		$lists = $lists->orderBy('reg_date','desc')->limit($start,$limit)->get();
+		
+		$loopnum = $total - ($p - 1) * $limit;
+		for ($i=0, $loop=count($lists);$i<$loop;$i++) {
+			$lists[$i]->loopnum = $loopnum - $i;
+			
+			if ($lists[$i]->module) {
+				$mModule = $this->IM->getModule($lists[$i]->module);
+				if (method_exists($mModule,'syncMember') == true) {
+					$code = new stdClass();
+					$code->code = $lists[$i]->code;
+					$code->content = json_decode($lists[$i]->content);
+					$lists[$i]->content = $mModule->syncMember('point_history',$code);
+				}
+			}
+		}
+		
+		$pagination = $this->getTemplet()->getPagination($p,ceil($total/$limit),10,$this->IM->getUrl(null,null,$view,'{PAGE}'));
+		
+		$header = PHP_EOL.'<form id="ModuleMemberPointForm">'.PHP_EOL;
+		$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.point.init("ModuleMemberPointForm");</script>'.PHP_EOL;
+		
+		/**
+		 * 템플릿파일을 호출한다.
+		 */
+		return $this->getTemplet($configs)->getContext('point',get_defined_vars(),$header,$footer);
 	}
 	
 	/**
@@ -1543,6 +1595,16 @@ class ModuleMember {
 		return $idx;
 	}
 	
+	/**
+	 * 포인트를 적립한다.
+	 *
+	 * @param int $midx 회원번호
+	 * @param int $point 적립할 포인트
+	 * @param string $module 포인트 적립을 요청한 모듈명
+	 * @param any[] $content 포인트 적립을 요청한 모듈에서 사용할 데이터
+	 * @param boolean $isForce - 포인트를 사용할 지 여부
+	 * @return boolean $success
+	 */
 	function sendPoint($midx,$point,$module='',$code='',$content=array(),$isForce=false) {
 		if ($point == 0) return false;
 		
@@ -1550,13 +1612,17 @@ class ModuleMember {
 		if ($member == null) return false;
 		if ($isForce == false && $point < 0 && $member->point < $point * -1) return false;
 		
-		if (in_array($module,array('board','dataroom','qna','forum')) == true && $point > 0) {
-			$check = $this->db()->select($this->table->point,'sum(point) as total_point')->where('midx',$midx)->where('reg_date',time() - 60 * 60 * 24,'>=')->getOne();
-			if ($check->total_point > $member->level->level * 5000) return true;
+		if ($module && $this->IM->getModule()->isInstalled($module) == true) {
+			$mModule = $this->IM->getModule($module);
+			if (method_exists($mModule,'syncMember') == true) {
+				if ($mModule->syncMember('send_point',$midx) === false) return false;
+			}
 		}
 		
+		$this->db()->setLockMethod('WRITE')->lock(array($this->table->member,$this->table->point));
 		$this->db()->update($this->table->member,array('point'=>$member->point + $point))->where('idx',$member->idx)->execute();
-		$this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'reg_date'=>time()))->execute();
+		$this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$member->point + $point,'reg_date'=>time()))->execute();
+		$this->db()->unlock();
 		
 		return true;
 	}
