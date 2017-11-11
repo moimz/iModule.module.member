@@ -1168,7 +1168,7 @@ class ModuleMember {
 	 * @param int $midx 회원 고유번호
 	 * @param boolean $isLogged 로그인여부
 	 */
-	function login($midx) {
+	function login($midx,$is_fire_event=true) {
 		$member = $this->getMember($midx);
 		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		
@@ -1185,11 +1185,13 @@ class ModuleMember {
 		
 		unset($_SESSION['LOGGED_FAIL']);
 		
-		$results = new stdClass();
-		$results->success = true;
-		
-		$values = new stdClass();
-		$this->IM->fireEvent('afterDoProcess','member','login',$values,$results);
+		if ($is_fire_event == true) {
+			$results = new stdClass();
+			$results->success = true;
+			
+			$values = new stdClass();
+			$this->IM->fireEvent('afterDoProcess','member','login',$values,$results);
+		}
 		
 		return true;
 	}
