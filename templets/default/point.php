@@ -26,6 +26,11 @@
 		<span class="date"><?php echo GetTime('Y-m-d(D) H:i',$item->reg_date); ?></span>
 	</li>
 	<?php } ?>
+	<?php if (count($lists) == 0) { ?>
+	<li class="empty">
+		내역이 없습니다.
+	</li>
+	<?php } ?>
 </ul>
 
 <div class="pagination"><?php echo $pagination; ?></div>
