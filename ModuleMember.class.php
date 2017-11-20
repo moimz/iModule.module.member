@@ -143,7 +143,7 @@ class ModuleMember {
 		/**
 		 * 이벤트를 호출한다.
 		 */
-		$this->IM->fireEvent('beforeGetApi','member',$api,$values,null);
+		$this->IM->fireEvent('beforeGetApi','member',$api,$values);
 		
 		/**
 		 * 모듈의 api 폴더에 $api 에 해당하는 파일이 있을 경우 불러온다.
@@ -1610,7 +1610,7 @@ class ModuleMember {
 	function sendPoint($midx,$point,$module='',$code='',$content=array(),$isForce=false) {
 		if ($point == 0) return false;
 		
-		$member = $this->getMember($midx);
+		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
 		if ($member == null) return false;
 		if ($isForce == false && $point < 0 && $member->point < $point * -1) return false;
 		
