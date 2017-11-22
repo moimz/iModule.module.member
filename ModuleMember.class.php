@@ -7,7 +7,8 @@
  * @file /modules/member/ModuleMember.class.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160910
+ * @version 3.0.0
+ * @modified 2017. 11. 22.
  */
 class ModuleMember {
 	/**
@@ -133,280 +134,31 @@ class ModuleMember {
 	 * [코어] 사이트 외부에서 현재 모듈의 API를 호출하였을 경우, API 요청을 처리하기 위한 함수로 API 실행결과를 반환한다.
 	 * 소스코드 관리를 편하게 하기 위해 각 요쳥별로 별도의 PHP 파일로 관리한다.
 	 *
+	 * @param string $protocol API 호출 프로토콜 (get, post, put, delete)
 	 * @param string $api API명
+	 * @param any $idx API 호출대상 고유값
+	 * @param object $params API 호출시 전달된 파라메터
 	 * @return object $datas API처리후 반환 데이터 (해당 데이터는 /api/index.php 를 통해 API호출자에게 전달된다.)
 	 * @see /api/index.php
 	 */
-	function getApi($api) {
+	function getApi($protocol,$api,$idx=null,$params=null) {
 		$data = new stdClass();
 		
-		/**
-		 * 이벤트를 호출한다.
-		 */
-		$this->IM->fireEvent('beforeGetApi','member',$api,$values);
+		$values = (object)get_defined_vars();
+		$this->IM->fireEvent('beforeGetApi',$this->getModule()->getName(),$api,$values);
 		
 		/**
 		 * 모듈의 api 폴더에 $api 에 해당하는 파일이 있을 경우 불러온다.
 		 */
-		if (is_file($this->getModule()->getPath().'/api/'.$api.'.php') == true) {
-			INCLUDE $this->getModule()->getPath().'/api/'.$api.'.php';
+		if (is_file($this->getModule()->getPath().'/api/'.$api.'.'.$protocol.'.php') == true) {
+			INCLUDE $this->getModule()->getPath().'/api/'.$api.'.'.$protocol.'.php';
 		}
 		
-		/**
-		 * SignUp
-		 *
-		 * @param string $email
-		 * @todo member labeling
-		 */
-		if ($api == 'signup') {
-			$label = Request('label') ? Request('label') : 0;
-			$client_id = Request('client_id');
-			
-			$siteType = $this->IM->getSite()->member;
-			
-			$insert = array();
-			$errors = array();
-			
-			if ($label == 0) {
-				$autoActive = $this->getModule()->getConfig('autoActive');
-				$allowSignup = $this->getModule()->getConfig('allowSignup');
-			} else {
-				$label = $this->db()->select($this->table->label)->where('idx',$label)->getOne();
-				if ($label == null) {
-					$autoActive = $allowSignup = false;
-					$errors['label'] = $this->getText('error/not_found');
-					$label = 0;
-				} else {
-					$autoActive = $label->auto_active == 'TRUE';
-					$allowSignup = $label->allow_signup == 'TRUE';
-					$label = $label->idx;
-				}
-			}
-			
-			$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->get();
-			for ($i=0, $loop=count($forms);$i<$loop;$i++) {
-				$configs = json_decode($forms[$i]->configs);
-				
-				switch ($forms[$i]->type) {
-					case 'email' :
-						$insert['email'] = CheckEmail(Request('email')) == true ? Request('email') : $errors['email'] = $this->getText('signup/help/email/error');
-						if ($this->db()->select($this->table->member)->where('email',$insert['email'])->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('email',$insert['email'])->where('type','ADMINISTRATOR')->has() == true) {
-							$errors['email'] = $this->getText('signup/help/email/duplicated');
-						}
-						break;
-					
-					case 'password' :
-						$insert['password'] = strlen(Request('password')) >= 4 ? Request('password') : $errors['password'] = $this->getText('signup/help/password/error');
-						if (strlen(Request('password')) < 4 || Request('password') != Request('password_confirm')) {
-							$errors['password_confirm'] = $this->getText('signup/help/password_confirm/error');
-						}
-						break;
-						
-					case 'name' :
-						$insert['name'] = CheckNickname(Request('name')) == true ? Request('name') : $errors['name'] = $this->getText('signup/help/name/error');
-						break;
-						
-					case 'nickname' :
-						$insert['nickname'] = CheckNickname(Request('nickname')) == true ? Request('nickname') : $errors['nickname'] = $this->getText('signup/help/nickname/error');
-						if ($this->db()->select($this->table->member)->where('nickname',$insert['nickname'])->where('domain',$siteType == 'MERGE' ? '*' : $this->IM->domain)->has() == true || $this->db()->select($this->table->member)->where('nickname',$insert['nickname'])->where('type','ADMINISTRATOR')->has() == true) {
-							$errors['nickname'] = $this->getText('signup/help/nickname/duplicated');
-						}
-						break;
-						
-					case 'telephone' :
-						if (Request('telephone1') != null && Request('telephone2') != null && Request('telephone3') != null) {
-							$insert['telephone'] = Request('telephone1').Request('telephone2').Request('telephone3');
-						} elseif (Request('telephone') != null) {
-							$insert['telephone'] = Request('telephone');
-						} else {
-							$insert['telephone'] = '';
-						}
-						
-						if ($configs->useCountryCode == true) {
-							if ($insert['telephone'] && Request('telephone_country_code')) {
-								$insert['telephone'] = Request('telephone_country_code').preg_replace('/^0/','',$insert['telephone']);
-							} elseif (!Request('telephone_country_code')) {
-								$errors['telephone'] = $this->getText('error/required');
-							}
-						}
-						
-						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['telephone']) < 10) $errors['telephone'] = $this->getText('error/required');
-						break;
-						
-					case 'cellphone' :
-						if (Request('cellphone1') != null && Request('cellphone2') != null && Request('cellphone3') != null) {
-							$insert['cellphone'] = Request('cellphone1').Request('cellphone2').Request('cellphone3');
-						} elseif (Request('cellphone') != null) {
-							$insert['cellphone'] = Request('cellphone');
-						} else {
-							$insert['cellphone'] = '';
-						}
-						
-						if ($configs->useCountryCode == true) {
-							if ($insert['cellphone'] && Request('cellphone_country_code')) {
-								$insert['cellphone'] = Request('cellphone_country_code').preg_replace('/^0/','',$insert['cellphone']);
-							} elseif (!Request('cellphone_country_code')) {
-								$errors['cellphone'] = $this->getText('error/required');
-							}
-						}
-						
-						if ($forms[$i]->allow_blank == 'FALSE' && strlen($insert['cellphone']) < 10) $errors['cellphone'] = $this->getText('error/required');
-						break;
-						
-					case 'birthday' :
-						$birthday = Request('birthday') ? strtotime(Request('birthday')) : 0;
-						$insert['birthday'] = $birthday > 0 ? date('m-d-Y',$birthday) : '';
-						
-						if ($forms[$i]->allow_blank == 'FALSE' && !$insert['birthday']) $errors['birthday'] = $this->getText('error/required');
-						break;
-						
-					case 'gender' :
-						$insert['gender'] = in_array(Request('gender'),array('MALE','FEMALE')) == true ? Request('gender') : '';
-						
-						if ($forms[$i]->allow_blank == 'FALSE' && !$insert['gender']) $errors['gender'] = $this->getText('error/required');
-						break;
-				}
-			}
-			
-			$values = new stdClass();
-			$values->insert = $insert;
-			$values->errors = $errors;
-			$this->IM->fireEvent('beforeGetApi','member',$api,$values);
-			$insert = $values->insert;
-			$errors = $values->errors;
-			
-			$values = new stdClass();
-			if (empty($errors) == true) {
-				$mHash = new Hash();
-				
-				$insert['domain'] = $siteType == 'MERGE' ? '*' : $this->IM->domain;
-				$insert['password'] = $mHash->password_hash($insert['password']);
-				$insert['status'] = in_array('verify',$this->getModule()->getConfig('signupStep')) === true ? 'VERIFYING' : ($autoActive == true ? 'ACTIVE' : 'WAITING');
-				$insert['point'] = $this->getModule()->getConfig('signupPoint');
-				$insert['reg_date'] = time();
-				
-				$idx = $this->db()->insert($this->table->member,$insert)->execute();
-				if ($label != 0) {
-					$this->db()->insert($this->table->member_label,array('idx'=>$idx,'label'=>$label,'reg_date'=>$insert['reg_date']))->execute();
-					$count = $this->db()->select($this->table->member_label)->where('label',$label)->count();
-					$this->db()->update($this->table->label,array('member'=>$count))->where('idx',$label)->execute();
-				}
-				
-				if ($idx !== false) {
-					$data->success = true;
-					if (in_array('verify',$this->getModule()->getConfig('signupStep')) === true) $this->sendVerifyEmail($idx);
-					$data->idx = $idx;
-					$data->access_token = $this->makeAuthToken($client_id,$data->idx);
-				} else {
-					$data->success = false;
-				}
-			} else {
-				$data->success = false;
-				$data->errors = $errors;
-			}
-		}
-		
-		/**
-		 * Login
-		 *
-		 * @param string $email
-		 * @param string $password
-		 * @param string $client_id app id using iModule API
-		 * @todo check app id
-		 */
-		if ($api == 'login') {
-			$email = Request('email');
-			$password = Request('password');
-			$client_id = Request('client_id');
-			
-			$loginIdx = $this->isValidate($email,$password);
-			if ($loginIdx === false) {
-				$data->success = false;
-			} else {
-				$data->success = true;
-				$data->idx = $loginIdx;
-				$data->access_token = $this->makeAuthToken($client_id,$loginIdx);
-			}
-		}
-		
-		if ($api == 'tokenLogin') {
-			$token = urldecode(Request('token'));
-			$token = str_replace(' ','+',$token);
-			$token = Decoder($token);
-			
-			if ($token !== false) {
-				$user = json_decode($token);
-				
-				if ($user != null && $user->ip == $_SERVER['REMOTE_ADDR'] && $user->time > time() - 60) {
-					$this->login($user->idx);
-					$data->success = true;
-				} else {
-					$data->success = false;
-					$data->message = 'TOKEN_EXPIRED';
-				}
-			} else {
-				$data->success = false;
-				$data->message = 'INVALID_TOKEN';
-			}
-		}
-		
-		/**
-		 * Get My information
-		 *
-		 * @param string $token (oauth2.0 protocol's access_token in HTTP header)
-		 * @return object $memberInfo
-		 * @todo remove some information (likes password hash)
-		 */
-		if ($api == 'me') {
-			if ($this->isLogged() == false) {
-				$data->success = false;
-				$data->message = 'NOT LOGGED';
-			} else {
-				$data->success = true;
-				$data->me = $this->getMember();
-				$data->me->photo = $this->IM->getHost(true).$data->me->photo;
-			}
-		}
-		
-		/**
-		 * 이벤트를 호출한다.
-		 */
-		$this->IM->fireEvent('afterGetApi','member',$api,$values,$data);
+		unset($values);
+		$values = (object)get_defined_vars();
+		$this->IM->fireEvent('afterGetApi',$this->getModule()->getName(),$api,$values,$data);
 		
 		return $data;
-	}
-	
-	/**
-	 * [코어] 알림메세지를 구성한다.
-	 *
-	 * @param string $code 알림코드
-	 * @param int $fromcode 알림이 발생한 대상의 고유값
-	 * @param array $content 알림데이터
-	 * @return string $push 알림메세지
-	 */
-	function getPush($code,$fromcode,$content) {
-		$latest = array_pop($content);
-		$count = count($content);
-		
-		$push = new stdClass();
-		$push->image = null;
-		$push->link = null;
-		if ($count > 0) $push->content = $this->getText('push/'.$code.'s');
-		else $push->content = $this->getText('push/'.$code);
-		/** example
-		if ($code == 'ment') {
-			$ment = $this->getMent($latest->idx);
-			$from = $ment->name;
-			$push->image = $this->IM->getModule('member')->getMember($ment->midx)->photo;
-			$post = $this->getPost($fromcode);
-			$title = GetCutString($post->title,15);
-			$push->content = str_replace(array('{from}','{title}'),array('<b>'.$from.'</b>','<b>'.$title.'</b>'),$push->content);
-			$page = $this->getPostPage($post->idx);
-			$push->link = $this->IM->getUrl($page->menu,$page->page,'view',$post->idx,false,$page->domain);
-		}
-		*/
-		$push->content = str_replace('{count}','<b>'.$count.'</b>',$push->content);
-		return $push;
 	}
 	
 	/**
@@ -465,6 +217,16 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 특정 컨텍스트에 대한 제목을 반환한다.
+	 *
+	 * @param string $context 컨텍스트명
+	 * @return string $title 컨텍스트 제목
+	 */
+	function getContextTitle($context) {
+		return $this->getText('admin/contexts/'.$context);
+	}
+	
+	/**
 	 * [사이트관리자] 모듈의 컨텍스트 환경설정을 구성한다.
 	 *
 	 * @param object $site 설정대상 사이트
@@ -506,6 +268,21 @@ class ModuleMember {
 		$configs[] = $templet;
 		
 		return $configs;
+	}
+	
+	/**
+	 * 사이트맵에 나타날 뱃지데이터를 생성한다.
+	 *
+	 * @param string $context 컨텍스트종류
+	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return object $badge 뱃지데이터 ($badge->count : 뱃지숫자, $badge->latest : 뱃지업데이트 시각(UNIXTIME), $badge->text : 뱃지텍스트)
+	 * @todo check count information
+	 */
+	function getContextBadge($context,$config) {
+		/**
+		 * null 일 경우 뱃지를 표시하지 않는다.
+		 */
+		return null;
 	}
 	
 	/**
@@ -559,6 +336,8 @@ class ModuleMember {
 			
 			if ($string != null) $returnString = $string;
 		}
+		
+		$this->IM->fireEvent('afterGetText',$this->getModule()->getName(),$code,$returnString);
 		
 		/**
 		 * 언어셋 텍스트가 없는경우 iModule 코어에서 불러온다.
@@ -633,31 +412,6 @@ class ModuleMember {
 		return $this->memberPages[$view];
 	}
 	*/
-	
-	/**
-	 * 특정 컨텍스트에 대한 제목을 반환한다.
-	 *
-	 * @param string $context 컨텍스트명
-	 * @return string $title 컨텍스트 제목
-	 */
-	function getContextTitle($context) {
-		return $this->getText('admin/contexts/'.$context);
-	}
-	
-	/**
-	 * 사이트맵에 나타날 뱃지데이터를 생성한다.
-	 *
-	 * @param string $context 컨텍스트종류
-	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
-	 * @return object $badge 뱃지데이터 ($badge->count : 뱃지숫자, $badge->latest : 뱃지업데이트 시각(UNIXTIME), $badge->text : 뱃지텍스트)
-	 * @todo check count information
-	 */
-	function getContextBadge($context,$config) {
-		/**
-		 * null 일 경우 뱃지를 표시하지 않는다.
-		 */
-		return null;
-	}
 	
 	/**
 	 * 템플릿 정보를 가져온다.
@@ -889,7 +643,7 @@ class ModuleMember {
 		 * 다른 방식의 경우 Event 를 발생시켜 다른 플러그인 또는 모듈에서 받아서 처리할 수 있도록 한다.
 		 */
 		if ($type != 'BEARER') {
-			$this->IM->fireEvent('authorization','member',$type,$token);
+			$this->IM->fireEvent('authorization',$this->getModule()->getName(),$type,$token);
 			
 			/**
 			 * 이벤트 처리결과 로그인 상태가 아니라면 에러메세지를 발생한다.
@@ -1190,7 +944,7 @@ class ModuleMember {
 			$results->success = true;
 			
 			$values = new stdClass();
-			$this->IM->fireEvent('afterDoProcess','member','login',$values,$results);
+			$this->IM->fireEvent('afterDoProcess',$this->getModule()->getName(),'login',$values,$results);
 		}
 		
 		return true;
@@ -1379,7 +1133,7 @@ class ModuleMember {
 			$this->members[$midx] = $member;
 		}
 		
-		$this->IM->fireEvent('afterGetData','member','member',$this->members[$midx]);
+		$this->IM->fireEvent('afterGetData',$this->getModule()->getName(),'member',$this->members[$midx]);
 		return $this->members[$midx];
 	}
 	
@@ -2345,6 +2099,9 @@ class ModuleMember {
 	function doProcess($action) {
 		$results = new stdClass();
 		
+		$values = (object)get_defined_vars();
+		$this->IM->fireEvent('beforeDoProcess',$this->getModule()->getName(),$action,$values);
+		
 		/**
 		 * 모듈의 process 폴더에 $action 에 해당하는 파일이 있을 경우 불러온다.
 		 */
@@ -2352,8 +2109,9 @@ class ModuleMember {
 			INCLUDE $this->getModule()->getPath().'/process/'.$action.'.php';
 		}
 		
+		unset($values);
 		$values = (object)get_defined_vars();
-		$this->IM->fireEvent('afterDoProcess','member',$action,$values,$results);
+		$this->IM->fireEvent('afterDoProcess',$this->getModule()->getName(),$action,$values,$results);
 		
 		return $results;
 	}
