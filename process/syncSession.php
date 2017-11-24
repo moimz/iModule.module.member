@@ -2,15 +2,13 @@
 /**
  * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
  * 
- * 회원 로그인 세션을 동기화한다.
+ * 서로 다른 도메인간 회원 로그인 세션을 동기화한다.
  *
  * @file /modules/member/process/syncSession.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160923
- *
- * @post int $token 세션토큰
- * @return object $results
+ * @version 3.0.0
+ * @modified 2017. 11. 23.
  */
 if (defined('__IM__') == false) exit;
 
@@ -26,7 +24,7 @@ if ($token !== false) {
 		$results->success = true;
 		$results->success = null;
 	} else {
-		$member = $this->getMember($session->idx);
+		$member = $this->db()->select($this->table->member)->where('idx',$session->idx)->getOne();
 		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) {
 			$results->success = false;
 			$results->message = 'NOT_FOUND';
