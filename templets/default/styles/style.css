@@ -6,15 +6,65 @@
  * @file /modules/member/templets/default/styles/style.css
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160922
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
 
-div[data-role=context][data-module=member] {}
+div[data-module=member] {}
 
 /**
  * 회원가입 컨텍스트
  */
-div[data-role=context][data-module=member] section.signup {}
+div[data-module=member][data-context=signup] section.box > div > div {display:block; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; width:100%; box-sizing:border-box; text-align:left;}
+
+div[data-module=member][data-context=signup] section.box > div > div > h4 {font-size:16px; height:24px; line-height:24px; margin-bottom:10px;}
+div[data-module=member][data-context=signup] section.box > div > div > article {border:1px solid #ccc; background:#fff; font-size:12px; line-height:1.6; padding:15px; overflow-y:auto; height:200px; -webkit-overflow-scrolling:touch;}
+
+div[data-module=member][data-context=signup] section.box > div > div > *[data-role] + h4 {margin-top:40px;}
+div[data-module=member][data-context=signup] section.box > div > div > div[data-role=button] {margin-top:20px;}
+
+/**
+ * 소셜계정연결 컨텍스트
+ */
+div[data-module=member][data-context=connect] {width:100%; height:100%; background:#f2f3f5;}
+div[data-module=member][data-context=connect] > form {width:100%; height:100%;}
+div[data-module=member][data-context=connect] section.box {width:100%; height:100%; display:table;}
+div[data-module=member][data-context=connect] section.box > div {display:table-cell; width:100%; height:100%; vertical-align:middle; text-align:center;}
+div[data-module=member][data-context=connect] section.box > div > div {display:block; margin:50px auto; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; width:90%; max-width:360px; box-sizing:border-box; text-align:left;}
+
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect {list-style:none; width:200px; height:80px; display:block; margin:20px auto; font-size:0;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li {height:80px; display:inline-block; vertical-align:middle;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon {width:80px; position:relative;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.link {width:40px; line-height:80px; text-align:center;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.link > i {font-size:20px;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi {display:block; width:30px; height:30px; position:absolute; font-size:20px; border-radius:50%; top:-5px; left:-5px; text-align:center; line-height:30px;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.facebook {background:#4367b0; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.facebook:before {content:"\e819";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.google {background:#da483f; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.google:before {content:"\e81a";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.naver {background:#15c642; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.naver:before {content:"\e820";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.kakao {background:#fddc2f; color:#3b1f1f;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.kakao:before {content:"\e899";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.github {background:#444; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.github:before {content:"\e82e";}
+
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site {display:block; width:30px; height:30px; position:absolute; font-size:20px; border-radius:50%; top:-5px; left:-5px; text-align:center; line-height:30px; background-color:#fff; background-size:contain; background-position:50% 50%; background-repeat:no-repeat; border:1px solid #ccc; box-sizing:border-box; box-shadow:1px 1px 3px rgba(0,0,0,0.3);}
+
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.photo {display:block; width:80px; height:80px; box-sizing:border-box; border-radius:50%; background-repeat:no-repeat; background-size:cover; background-position:50% 50%; box-sizing:border-box; border:1px solid #ccc;}
+
+div[data-module=member][data-context=connect] section.box > div > div > h1 {font-weight:400; font-size:14px; color:#666; line-height:1.6; display:block; text-align:justify; text-align:center; margin-bottom:20px;}
+div[data-module=member][data-context=connect] section.box > div > div > p {margin-top:10px; margin-bottom:10px; font-weight:200; font-size:13px; color:#666; line-height:1.6; display:block; text-align:left;}
+div[data-module=member][data-context=connect] section.box > div > div > a, div[data-module=member][data-context=connect] section.box > div > div > button {display:block; width:100%; height:40px; line-height:40px; margin-top:10px; background:#f44336; color:#fff; font-size:14px; text-align:center; text-decoration:none; border:0; cursor:pointer;}
+div[data-module=member][data-context=connect] section.box > div > div > a:hover, div[data-module=member][data-context=connect] section.box > div > div > button:hover {background:#e53935;}
+
+div[data-module=member][data-context=connect] section.box > div > div > ul.select {list-style:none; width:100%; height:auto; display:block;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.select > li {padding:5px 0px;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.select > li > a {display:block; border:1px solid #e5e5e5; padding:10px; text-decoration:none; color:#222; font-size:0;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.select > li > a > i {display:block; width:50px; height:50px; box-sizing:border-box; border-radius:50%; background-repeat:no-repeat; background-size:cover; background-position:50% 50%; box-sizing:border-box; border:1px solid #ccc; float:left; margin-right:20px;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.select > li > a > b {display:block; width:calc(100% - 70px); height:30px; line-height:30px; font-size:16px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.select > li > a > small {display:block; width:calc(100% - 70px); height:20px; line-height:20px; font-size:14px; color:#666; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.select > li > a:hover {background:#f4f4f4;}
 
 /**
  * 포인트내역 컨텍스트

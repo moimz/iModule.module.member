@@ -2,150 +2,97 @@
 /**
  * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
  *
- * 회원가입 컨텍스트를 위한 기본템플릿
+ * 회원가입 템플릿
  *
  * @file /modules/member/templets/default/signup.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160922
- * @see /modules/member/ModuleMember.class.php -> getSignUpContext()
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
-
 if (defined('__IM__') == false) exit;
 ?>
-
-<ul class="step">
-	<?php for ($i=0, $loop=count($steps);$i<$loop;$i++) { ?>
-	<li class="<?php echo $steps[$i]; ?><?php echo $steps[$i] == $step ? ' selected' : ''; ?>">
-		<i></i>
-		<?php echo $me->getText('text/signup_step/'.$steps[$i]); ?>
-	</li>
-	<?php } ?>
-</ul>
-
-<section class="<?php echo $step; ?>">
-	<h4><?php echo $me->getText('text/signup_step/'.$step); ?></h4>
-	
-	<?php if ($step == 'agreement') { ?>
-	<!-- 약관동의 -->
-	
-	<?php if ($agreement != null) { // 회원약관이 있을 경우, ?>
-	<h5><?php echo $agreement->title; ?></h5>
-	
-	<article>
-		<?php echo $agreement->content; ?>
-	</article>
-	
-	<div data-role="input">
-		<label><input type="checkbox" name="agreements[]" value="<?php echo $agreement->value; ?>"><?php echo $agreement->help; ?></label>
-	</div>
-	<?php } ?>
-	
-	<?php if ($privacy != null) { // 개인정보보호정책이 있을 경우, ?>
-	<h5><?php echo $privacy->title; ?></h5>
-	
-	<article>
-		<?php echo $privacy->content; ?>
-	</article>
-	
-	<div data-role="input">
-		<label><input type="checkbox" name="agreements[]" value="<?php echo $privacy->value; ?>"><?php echo $privacy->help; ?></label>
-	</div>
-	<?php } ?>
-	
-	<!--// 약관동의 -->
-	<?php } ?>
-	
-	
-	<?php if ($step == 'label') { ?>
-	<!-- 회원유형선택 -->
-	
-	<div data-role="inputset" class="inline">
-		<?php for ($i=0, $loop=count($labels);$i<$loop;$i++) { ?>
-		<div data-role="input">
-			<label><input type="radio" name="label" value="<?php echo $labels[$i]->idx; ?>"<?php echo $labels[$i]->allow_signup == false ? ' disabled="disabled"' : ''; ?>><?php echo $labels[$i]->title; ?></label>
+<section class="box">
+	<div>
+		<div class="<?php echo $step; ?>">
+			<?php if ($step == 'agreement') { ?>
+			
+				<?php if ($agreement != null) { ?>
+				<h4><?php echo $agreement->title; ?></h4>
+				
+				<article>
+					<?php echo $agreement->content; ?>
+				</article>
+				
+				<div data-role="input">
+					<label><input type="checkbox" name="<?php echo $agreement->name; ?>" value="<?php echo $privacy->value; ?>"><?php echo $privacy->help; ?></label>
+				</div>
+				<?php } ?>
+				
+				<?php if ($privacy != null) { ?>
+				<h4><?php echo $privacy->title; ?></h4>
+				
+				<article>
+					<?php echo $privacy->content; ?>
+				</article>
+				
+				<div data-role="input">
+					<label><input type="checkbox" name="<?php echo $privacy->name; ?>" value="<?php echo $privacy->value; ?>"><?php echo $privacy->help; ?></label>
+				</div>
+				<?php } ?>
+				
+			<?php } ?>
+			
+			<?php if ($step == 'register') { ?>
+			
+				<h4>기본정보입력</h4>
+			
+				<ul data-role="form" class="inner black">
+					<?php foreach ($defaults as $field) { ?>
+					<li>
+						<label><?php echo $field->title; ?></label>
+						<?php echo $field->inputHtml; ?>
+					</li>
+					<?php } ?>
+				</ul>
+				
+				<?php if (count($extras) > 0) { ?>
+				<h4>부가정보입력</h4>
+				<ul data-role="form" class="inner exteras">
+					<?php foreach ($extras as $field) { ?>
+					<li>
+						<label><?php echo $field->title; ?></label>
+						<?php echo $field->inputHtml; ?>
+					</li>
+					<?php } ?>
+				</ul>
+				<?php } ?>
+			
+			<?php } ?>
+			
+			<div data-role="button">
+				<button type="submit"><?php echo $step == 'complete' ? $me->getText('button/back_to_main') : $me->getText('button/next'); ?></button>
+				<?php if (defined('__IM_CONTAINER__') == false) { ?><a href="<?php echo $IM->getUrl(false); ?>"><?php echo $me->getText('button/cancel'); ?></a><?php } ?>
+			</div>
 		</div>
-		<?php } ?>
-	</div>
-	
-	<!--// 회원유형선택 -->
-	<?php } ?>
-	
-	
-	<?php if ($step == 'insert') { ?>
-	<!-- 회원정보입력 -->
-	
-	<?php if ($agreement != null) { // 회원약관이 있을 경우, ?>
-	<h5><?php echo $agreement->title; ?></h5>
-	
-	<article>
-		<?php echo $agreement->content; ?>
-	</article>
-	
-	<div data-role="input">
-		<label><input type="checkbox" name="agreements[]" value="<?php echo $agreement->value; ?>"><?php echo $agreement->help; ?></label>
-	</div>
-	<?php } ?>
-	
-	<?php if ($privacy != null) { // 개인정보보호정책이 있을 경우, ?>
-	<h5><?php echo $privacy->title; ?></h5>
-	
-	<article>
-		<?php echo $privacy->content; ?>
-	</article>
-	
-	<div data-role="input">
-		<label><input type="checkbox" name="agreements[]" value="<?php echo $privacy->value; ?>"><?php echo $privacy->help; ?></label>
-	</div>
-	<?php } ?>
-	
-	<h5>기본정보입력</h5>
-	
-	<ul data-role="table" class="red form inner outer">
-		<?php foreach ($defaults as $field) { ?>
-		<li>
-			<span class="thead"><?php echo $field->title; ?></span>
-			<span class="tbody">
-				<?php echo $field->inputHtml; ?>
-			</span>
-		</li>
-		<?php } ?>
-	</ul>
-	
-	<h5>추가정보입력</h5>
-	
-	<ul data-role="table" class="red form inner outer">
-		<?php foreach ($extras as $field) { ?>
-		<li>
-			<span class="thead"><?php echo $field->title; ?></span>
-			<span class="tbody">
-				<?php echo $field->inputHtml; ?>
-			</span>
-		</li>
-		<?php } ?>
-	</ul>
-	
-	<!--// 회원정보입력 -->
-	<?php } ?>
-	
-	<?php if ($step == 'verify') { ?>
-	<!-- 이메일주소 인증 -->
-	
-	<ul data-role="table" class="red form inner outer">
-		<?php foreach ($fields as $field) { ?>
-		<li>
-			<span class="thead"><?php echo $field->title; ?></span>
-			<span class="tbody">
-				<?php echo $field->inputHtml; ?>
-			</span>
-		</li>
-		<?php } ?>
-	</ul>
-	
-	<?php } ?>
-
-	<div data-role="button">
-		<button type="submit"><?php echo $step == 'complete' ? $me->getText('button/back_to_main') : $me->getText('button/next'); ?></button>
-		<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $me->getText('button/cancel'); ?></a>
 	</div>
 </section>
+
+<?php if (defined('__IM_CONTAINER__') == true) { ?>
+<script>
+$(document).ready(function() {
+	if (opener) {
+		var lastHeight = 0;
+		var popupResize = function() {
+			if (lastHeight != $("section.box").outerHeight()) {
+				iModule.resizeWindow(null,$("section.box").outerHeight());
+				lastHeight = $("section.box").outerHeight();
+			}
+			setTimeout(popupResize,500);
+		};
+		iModule.resizeWindow(null,$("section.box").outerHeight(),true);
+		setTimeout(popupResize,500);
+	}
+});
+</script>
+<?php } ?>

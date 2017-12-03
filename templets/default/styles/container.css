@@ -1,0 +1,18 @@
+/**
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ *
+ * 회원모듈 기본템플릿이 컨테이너로 열렸을 때 스타일정의
+ *
+ * @file /modules/member/templets/default/styles/container.css
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
+ */
+
+div[data-module=member] {}
+
+div[data-module=member][data-context=signup] {width:100%; min-height:100%; background:#f2f3f5;}
+div[data-module=member][data-context=signup] > form {min-width:100%; min-height:100%;}
+div[data-module=member][data-context=signup] section.box {padding:10px;}
+div[data-module=member][data-context=signup] section.box > div > div {margin:0px auto;}
