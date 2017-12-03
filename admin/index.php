@@ -74,7 +74,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					"-",
 					new Ext.Button({
 						text:Member.getText("admin/list/add_member"),
-						iconCls:"fa fa-plus",
+						iconCls:"mi mi-plus",
 						handler:function() {
 						}
 					})
@@ -90,7 +90,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					sorters:[{property:"reg_date",direction:"DESC"}],
 					autoLoad:true,
 					pageSize:50,
-					fields:["status","email","name","nickname","exp","point","reg_date","last_login"],
+					fields:["status","email","name","nickname","exp","point","reg_date","latest_login"],
 					listeners:{
 						beforeload:function() {
 							Ext.getCmp("ModuleMemberListSearch").setIconCls("mi mi-loading").disable();
@@ -107,29 +107,45 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						}
 					}
 				}),
-				width:"100%",
 				columns:[{
 					text:Member.getText("admin/list/columns/status"),
 					width:80,
 					dataIndex:"status",
 					align:"center",
 					renderer:function(value,p) {
-						if (value == "ACTIVE") p.style = "color:blue;";
-						else if (value == "DEACTIVE") p.style = "color:red;";
+						if (value == "ACTIVATED") p.style = "color:blue;";
+						else if (value == "DEACTIVATED") p.style = "color:red;";
 						else if (value == "VERIFYING") p.style = "color:orange;";
 						else p.style = "color:gray";
 						
-						return Member.getText("admin/list/status/"+value);
+						return Member.getText("status/"+value);
 					}
 				},{
 					text:Member.getText("admin/list/columns/email"),
 					minWidth:150,
 					flex:1,
-					dataIndex:"email"
+					dataIndex:"email",
+					renderer:function(value) {
+						return '<a href="mailto:'+value+'">'+value+'</a>';
+					}
+				},{
+					text:Member.getText("admin/list/columns/name"),
+					dataIndex:"name",
+					width:100
 				},{
 					text:Member.getText("admin/list/columns/nickname"),
 					dataIndex:"nickname",
-					width:140
+					width:150,
+					renderer:function(value,p,record) {
+						return '<i style="width:24px; height:24px; float:left; display:block; background:url('+record.data.photo+'); background-size:cover; background-repeat:no-repeat; border:1px solid #ccc; border-radius:50%; margin:-3px 5px -3px -5px;"></i>'+value;
+					}
+				},{
+					text:Member.getText("admin/list/columns/cellphone"),
+					dataIndex:"cellphone",
+					width:150,
+					renderer:function(value) {
+						return value;
+					}
 				},{
 					text:Member.getText("admin/list/columns/exp"),
 					dataIndex:"exp",
@@ -150,21 +166,19 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					}
 				},{
 					text:Member.getText("admin/list/columns/reg_date"),
-					width:130,
+					width:150,
 					dataIndex:"reg_date",
 					sortable:true,
 					renderer:function(value,p,record) {
-						var date = moment.unix(value).format("YYYY.MM.DD, HH:mm");
-						return date;
+						return moment(value * 1000).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
 					}
 				},{
 					text:Member.getText("admin/list/columns/last_login"),
-					width:130,
-					dataIndex:"last_login",
+					width:150,
+					dataIndex:"latest_login",
 					sortable:true,
 					renderer:function(value,p,record) {
-						var date = moment.unix(value).format("YYYY.MM.DD, HH:mm");
-						return date;
+						return moment(value * 1000).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
 					}
 				}],
 				selModel:new Ext.selection.CheckboxModel(),
@@ -200,10 +214,17 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 								title:Member.getText("admin/label/label_title"),
 								tbar:[
 									new Ext.Button({
-										text:Member.getText("admin/label/add_label"),
-										iconCls:"fa fa-plus",
+										text:Member.getText("admin/label/add"),
+										iconCls:"mi mi-plus",
 										handler:function() {
-											Member.addLabel();
+											Member.label.add();
+										}
+									}),
+									new Ext.Button({
+										text:Member.getText("admin/label/delete"),
+										iconCls:"mi mi-trash",
+										handler:function() {
+											Member.label.delete();
 										}
 									})
 								],
@@ -221,7 +242,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 									fields:["idx","title","membernum",{name:"allow_signup",type:"boolean"},{name:"approve_signup",type:"boolean"},{name:"is_change",type:"boolean"},{name:"is_unique",type:"boolean"},{name:"sort",type:"int"}],
 									listeners:{
 										load:function(store,records,success,e) {
-											Ext.getCmp("ModuleMemberSignUpFormList").disable();
+											Ext.getCmp("ModuleMemberSignUpFieldList").disable();
 											
 											if (success == false) {
 												if (e.getError()) {
@@ -233,9 +254,8 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 										}
 									}
 								}),
-								width:"100%",
 								columns:[{
-									text:Member.getText("admin/label/columns/title"),
+									text:Member.getText("admin/label/column/title"),
 									minWidth:100,
 									flex:1,
 									dataIndex:"title",
@@ -245,7 +265,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 										return value;
 									}
 								},{
-									text:Member.getText("admin/label/columns/membernum"),
+									text:Member.getText("admin/label/column/membernum"),
 									dataIndex:"membernum",
 									sortable:true,
 									width:90,
@@ -254,7 +274,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 										return Ext.util.Format.number(value,"0,000");
 									}
 								},{
-									text:Member.getText("admin/label/columns/allow_signup"),
+									text:Member.getText("admin/label/column/allow_signup"),
 									dataIndex:"allow_signup",
 									sortable:true,
 									width:90,
@@ -265,7 +285,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 										return Member.getText("admin/label/allow_signup/"+(value == true ? "TRUE" : "FALSE"));
 									}
 								},{
-									text:Member.getText("admin/label/columns/approve_signup"),
+									text:Member.getText("admin/label/column/approve_signup"),
 									dataIndex:"approve_signup",
 									sortable:true,
 									width:90,
@@ -289,7 +309,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 										text:'<i class="fa fa-caret-down"></i>',
 										handler:function() {
 											Admin.gridSort(Ext.getCmp("ModuleMemberLabelList"),"sort","down");
-											Admin.gridSave(Ext.getCmp("ModuleMemberSignUpFormList"),ENV.getProcessUrl("member","@saveSignUpFormSort"),500);
+											Admin.gridSave(Ext.getCmp("ModuleMemberLabelList"),ENV.getProcessUrl("member","@saveLabelSort"),500);
 										}
 									}),
 									"-",
@@ -304,32 +324,65 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 								],
 								listeners:{
 									itemdblclick:function(grid,record) {
-										Member.addLabel(record.data.idx);
+										Member.label.add(record.data.idx);
 									},
 									select:function(grid,record) {
-										Ext.getCmp("ModuleMemberSignUpFormList").getStore().getProxy().setExtraParam("label",record.data.idx);
-										Ext.getCmp("ModuleMemberSignUpFormList").getStore().reload();
+										Ext.getCmp("ModuleMemberSignUpFieldList").getStore().getProxy().setExtraParam("label",record.data.idx);
+										Ext.getCmp("ModuleMemberSignUpFieldList").getStore().reload();
+									},
+									itemcontextmenu:function(grid,record,item,index,e) {
+										var menu = new Ext.menu.Menu();
+										
+										menu.add('<div class="x-menu-title">'+record.data.title+'</div>');
+										
+										menu.add({
+											iconCls:"xi xi-form",
+											text:Member.getText("admin/label/modify"),
+											handler:function() {
+												Member.label.add(record.data.name);
+											}
+										});
+										
+										if (record.data.idx != 0) {
+											menu.add({
+												iconCls:"mi mi-trash",
+												text:Member.getText("admin/label/delete"),
+												handler:function() {
+													Member.label.delete();
+												}
+											});
+										}
+										
+										e.stopEvent();
+										menu.showAt(e.getXY());
 									}
 								}
 							})
 						]
 					}),
 					new Ext.grid.Panel({
-						id:"ModuleMemberSignUpFormList",
+						id:"ModuleMemberSignUpFieldList",
 						title:Member.getText("admin/label/signup_title"),
 						flex:1,
 						disabled:true,
 						tbar:[
 							new Ext.Button({
-								text:Member.getText("admin/label/add_field"),
-								iconCls:"fa fa-plus",
+								text:Member.getText("admin/field/add"),
+								iconCls:"mi mi-plus",
 								handler:function() {
-									Member.addField();
+									Member.field.add();
+								}
+							}),
+							new Ext.Button({
+								text:Member.getText("admin/field/delete"),
+								iconCls:"mi mi-trash",
+								handler:function() {
+									Member.field.delete();
 								}
 							}),
 							"->",
 							new Ext.toolbar.TextItem({
-								id:"ModuleMemberSignUpFormHelp",
+								id:"ModuleMemberSignUpFieldHelp",
 								text:Member.getText("admin/label/label_select_first")
 							})
 						],
@@ -337,7 +390,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 							proxy:{
 								type:"ajax",
 								simpleSortMode:true,
-								url:ENV.getProcessUrl("member","@getSignUpForms"),
+								url:ENV.getProcessUrl("member","@getSignUpFields"),
 								extraParams:{label:""},
 								reader:{type:"json"}
 							},
@@ -345,18 +398,18 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 							sorters:[{property:"sort",direction:"ASC"}],
 							autoLoad:false,
 							pageSize:50,
-							fields:["name","type","input","title","help",{name:"is_required",type:"boolean"}],
+							fields:["name","type","input","title","help",{name:"is_required",type:"boolean"},{name:"sort",type:"int"}],
 							listeners:{
 								beforeload:function() {
-									Ext.getCmp("ModuleMemberSignUpFormList").disable();
+									Ext.getCmp("ModuleMemberSignUpFieldList").disable();
 								},
 								load:function(store,records,success,e) {
 									if (success == true) {
-										Ext.getCmp("ModuleMemberSignUpFormList").enable();
+										Ext.getCmp("ModuleMemberSignUpFieldList").enable();
 										if (store.getProxy().extraParams.label == "0") {
-											Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getText("admin/label/default_signup_help"));
+											Ext.getCmp("ModuleMemberSignUpFieldHelp").setText(Member.getText("admin/label/default_signup_help"));
 										} else {
-											Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getText("admin/label/signup_help"));
+											Ext.getCmp("ModuleMemberSignUpFieldHelp").setText(Member.getText("admin/label/signup_help"));
 										}
 									} else {
 										if (e.getError()) {
@@ -368,16 +421,15 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 								}
 							}
 						}),
-						width:"100%",
 						columns:[{
-							text:Member.getText("admin/label/columns/name"),
+							text:Member.getText("admin/field/column/name"),
 							width:180,
 							dataIndex:"name",
 							renderer:function(value,p,record) {
-								return "["+Member.getText("admin/label/field_type/"+record.data.type)+"] "+value;
+								return "["+Member.getText("admin/field/type/"+record.data.type)+"] "+value;
 							}
 						},{
-							text:Member.getText("admin/label/columns/title"),
+							text:Member.getText("admin/field/column/title"),
 							dataIndex:"title",
 							width:150,
 							renderer:function(value,p,record) {
@@ -385,16 +437,16 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 								return value;
 							}
 						},{
-							text:Member.getText("admin/label/columns/help"),
+							text:Member.getText("admin/field/column/help"),
 							dataIndex:"help",
 							minWidth:150,
 							flex:1
 						},{
-							text:Member.getText("admin/label/columns/input"),
+							text:Member.getText("admin/field/column/input"),
 							dataIndex:"input",
 							width:120,
 							renderer:function(value,p) {
-								return Member.getText("admin/label/field_input/"+value);
+								return Member.getText("admin/field/input/"+value);
 							}
 						}],
 						selModel:new Ext.selection.CheckboxModel(),
@@ -402,22 +454,22 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 							new Ext.Button({
 								text:'<i class="fa fa-caret-up"></i>',
 								handler:function() {
-									Admin.gridSort(Ext.getCmp("ModuleMemberSignUpFormList"),"sort","up");
-									Admin.gridSave(Ext.getCmp("ModuleMemberSignUpFormList"),ENV.getProcessUrl("member","@saveSignUpFormSort"),500);
+									Admin.gridSort(Ext.getCmp("ModuleMemberSignUpFieldList"),"sort","up");
+									Admin.gridSave(Ext.getCmp("ModuleMemberSignUpFieldList"),ENV.getProcessUrl("member","@saveSignUpFieldSort"),500);
 								}
 							}),
 							new Ext.Button({
 								text:'<i class="fa fa-caret-down"></i>',
 								handler:function() {
-									Admin.gridSort(Ext.getCmp("ModuleMemberSignUpFormList"),"sort","down");
-									Admin.gridSave(Ext.getCmp("ModuleMemberSignUpFormList"),ENV.getProcessUrl("member","@saveSignUpFormSort"),500);
+									Admin.gridSort(Ext.getCmp("ModuleMemberSignUpFieldList"),"sort","down");
+									Admin.gridSave(Ext.getCmp("ModuleMemberSignUpFieldList"),ENV.getProcessUrl("member","@saveSignUpFieldSort"),500);
 								}
 							}),
 							"-",
 							new Ext.Button({
 								text:'<i class="fa fa-refresh"></i>',
 								handler:function() {
-									Ext.getCmp("ModuleMemberSignUpFormList").getStore().reload();
+									Ext.getCmp("ModuleMemberSignUpFieldList").getStore().reload();
 								}
 							}),
 							"->",
@@ -425,10 +477,36 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						],
 						listeners:{
 							disable:function() {
-								Ext.getCmp("ModuleMemberSignUpFormHelp").setText(Member.getText("admin/label/label_select_first"));
+								Ext.getCmp("ModuleMemberSignUpFieldHelp").setText(Member.getText("admin/label/label_select_first"));
 							},
 							itemdblclick:function(grid,record) {
-								Member.addField(record.data.name);
+								Member.field.add(record.data.name);
+							},
+							itemcontextmenu:function(grid,record,item,index,e) {
+								var menu = new Ext.menu.Menu();
+								
+								menu.add('<div class="x-menu-title">'+record.data.title+'</div>');
+								
+								menu.add({
+									iconCls:"xi xi-form",
+									text:Member.getText("admin/field/modify"),
+									handler:function() {
+										Member.field.add(record.data.name);
+									}
+								});
+								
+								if ($.inArray(record.data.name,["email","password","nickname"]) == -1) {
+									menu.add({
+										iconCls:"mi mi-trash",
+										text:Member.getText("admin/field/delete"),
+										handler:function() {
+											Member.field.delete();
+										}
+									});
+								}
+								
+								e.stopEvent();
+								menu.showAt(e.getXY());
 							}
 						}
 					})
