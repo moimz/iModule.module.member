@@ -1,37 +1,49 @@
 {
-	"signup":{
-		"form":{
-			"agree":"위의 내용에 동의합니다.",
-			"email_help":"이메일주소가 로그인 아이디로 사용됩니다.",
-			"email_success":"사용하실 수 있는 이메일주소입니다.",
-			"password":"패스워드",
-			"password_confirm":"패스워드확인",
-			"password_help":"패스워드를 6글자 이상으로 입력하여 주십시오.",
-			"nickname_help":"사이트에서 사용할 닉네임을 입력하여 주십시오.(2 ~ 14글자)",
-			"nickname_success":"사용하실 수 있는 닉네임입니다.",
-			"email_verification_email":"이메일",
-			"email_verification_email_help":"입력하신 이메일주소가 올바르지 않다면 수정 후 인증메일 재발송 버튼을 클릭하여 주십시오.",
-			"email_verification_code":"인증코드",
-			"email_verification_code_help":"입력한 이메일주소로 인증코드를 발송하였습니다. 이메일에 포함되어 있는 6자리의 인증코드를 입력하여 주십시오."
-		}
-	},
 	"text":{
+		"login":"로그인",
+		"signup":"회원가입",
+		"modify":"회원정보수정",
+		"help":"패스워드 찾기",
 		"label":"회원라벨",
 		"no_label":"라벨없음",
 		"all_label":"전체라벨",
 		"male":"남성",
 		"female":"여성",
 		"default_label_title":"일반회원",
-		"signup_step":{
-			"agreement":"약관동의",
-			"label":"회원유형선택",
-			"cert":"실명인증",
-			"insert":"회원정보입력",
-			"verify":"이메일주소인증",
-			"complete":"가입완료"
-		},
 		"auto_login":"자동로그인",
 		"remain_time_second":"남은시간 : {SECOND}초"
+	},
+	"context":{
+		"signup":"회원가입",
+		"modify":"회원정보수정",
+		"help":"패스워드 찾기",
+		"point":"포인트 내역"
+	},
+	"social":{
+		"facebook":"페이스북 아이디로 로그인",
+		"google":"구글 아이디로 로그인",
+		"naver":"네이버 아이디로 로그인",
+		"kakao":"카카오 아이디로 로그인"
+	},
+	"status":{
+		"ACTIVATED":"활성",
+		"DEACTIVATED":"비활성",
+		"VERIFYING":"인증전",
+		"WAITING":"승인대기"
+	},
+	"signup":{
+		"agree":"위의 내용에 동의합니다.",
+		"email_help":"이메일주소가 로그인 아이디로 사용됩니다.",
+		"email_success":"사용하실 수 있는 이메일주소입니다.",
+		"password":"패스워드",
+		"password_confirm":"패스워드확인",
+		"password_help":"패스워드를 6글자 이상으로 입력하여 주십시오.",
+		"nickname_help":"사이트에서 사용할 닉네임을 입력하여 주십시오.(2 ~ 14글자)",
+		"nickname_success":"사용하실 수 있는 닉네임입니다.",
+		"email_verification_email":"이메일",
+		"email_verification_email_help":"입력하신 이메일주소가 올바르지 않다면 수정 후 인증메일 재발송 버튼을 클릭하여 주십시오.",
+		"email_verification_code":"인증코드",
+		"email_verification_code_help":"입력한 이메일주소로 인증코드를 발송하였습니다. 이메일에 포함되어 있는 6자리의 인증코드를 입력하여 주십시오."
 	},
 	"button":{
 		"resend_email_verification_code":"인증메일 재발송"
@@ -40,6 +52,7 @@
 		"ALREADY_LOGGED":"이미 로그인중입니다.",
 		"NOT_FOUND_EMAIL":"이메일주소를 찾을 수 없습니다.",
 		"DEACTIVATED_ACCOUNT":"관리자에 의해 비활성화된 계정입니다.",
+		"NOT_ACTIVATED_ACCOUNT":"관리자의 승인을 기다리고 있거나, 활성화된 계정이 아닙니다.",
 		"INCORRECT_PASSWORD":"패스워드가 일치하지 않습니다.",
 		"DISABLED_LOGIN":"로그인을 연속으로 5회 실패하여 잠시동안 로그인을 할 수 없습니다.",
 		"NOT_ALLOWED_SIGNUP":"지금은 회원가입이 허용되지 않습니다.",
@@ -54,16 +67,12 @@
 		"list":{
 			"title":"회원관리",
 			"add_member":"회원추가",
-			"status":{
-				"ACTIVE":"활성",
-				"DEACTIVE":"비활성",
-				"VERIFYING":"인증전",
-				"WAITING":"승인대기"
-			},
 			"columns":{
 				"status":"상태",
 				"email":"이메일주소",
+				"name":"이름",
 				"nickname":"닉네임",
+				"cellphone":"휴대전화번호",
 				"exp":"경험치",
 				"point":"포인트",
 				"reg_date":"가입일",
@@ -71,33 +80,26 @@
 			}
 		},
 		"label":{
+			"add":"라벨추가",
+			"modify":"라벨수정",
+			"delete":"라벨삭제",
 			"title":"회원라벨 및 가입양식관리",
 			"label_title":"라벨목록",
-			"add_label":"라벨추가",
 			"default":"기본",
 			"signup_title":"가입양식관리",
-			"add_field":"필드추가",
 			"default_signup_help":"(기본라벨의 가입양식은 모든 회원라벨에 공통으로 적용됩니다.)",
 			"signup_help":"(기본라벨의 가입양식과 함께 아래에 추가한 가입양식이 추가로 적용됩니다.)",
 			"label_select_first":"(가입양식을 수정할 라벨을 먼저 선택하여 주십시오.)",
 			"required":"필수",
 			"window":{
 				"label_add":"라벨추가",
-				"label_modify":"라벨수정",
-				"field_add":"필드추가",
-				"field_modify":"필드수정",
-				"field_option_add":"선택항목추가",
-				"field_option_modify":"선택항목수정"
+				"label_modify":"라벨수정"
 			},
-			"columns":{
+			"column":{
 				"title":"라벨명",
 				"membernum":"소속회원수",
 				"allow_signup":"가입여부",
-				"approve_signup":"가입승인",
-				"name":"필드명",
-				"title":"필드제목",
-				"input":"필드종류",
-				"help":"필드도움말"
+				"approve_signup":"가입승인"
 			},
 			"allow_signup":{
 				"TRUE":"가입가능",
@@ -106,36 +108,6 @@
 			"approve_signup":{
 				"TRUE":"승인필요",
 				"FALSE":"자동승인"
-			},
-			"field_type":{
-				"agreement":"회원약관",
-				"privacy":"개인정보보호정책",
-				"email":"이메일",
-				"password":"암호",
-				"name":"실명",
-				"nickname":"닉네임",
-				"birthday":"생일",
-				"telephone":"전화번호",
-				"cellphone":"휴대전화",
-				"homepage":"홈페이지",
-				"gender":"성별",
-				"address":"주소",
-				"etc":"사용자정의"
-			},
-			"field_input":{
-				"text":"텍스트필드",
-				"select":"옵션필드",
-				"radio":"라디오버튼",
-				"checkbox":"체크박스",
-				"email":"이메일필드",
-				"password":"암호필드",
-				"date":"날짜필드",
-				"url":"URL필드",
-				"tel":"전화번호필드",
-				"textarea":"긴 텍스트필드",
-				"wywisyg":"위지윅에디터",
-				"address":"주소필드",
-				"system":"시스템필드"
 			},
 			"form":{
 				"title":"라벨명",
@@ -151,40 +123,85 @@
 				"is_change_help_default":"(기본라벨은 해당 설정이 불가능합니다.)",
 				"is_unique":"단독라벨여부",
 				"is_unique_help":"해당 라벨에 속한 회원은 다른 라벨을 선택할 수 없습니다.",
-				"is_unique_help_default":"(기본라벨은 해당 설정이 불가능합니다.)",
+				"is_unique_help_default":"(기본라벨은 해당 설정이 불가능합니다.)"
+			}
+		},
+		"field":{
+			"add":"필드추가",
+			"modify":"필드수정",
+			"delete":"필드삭제",
+			"column":{
+				"name":"필드명",
+				"title":"필드제목",
+				"input":"필드종류",
+				"help":"필드도움말"
+			},
+			"type":{
+				"agreement":"회원약관",
+				"privacy":"개인정보보호정책",
+				"email":"이메일",
+				"password":"암호",
+				"name":"실명",
+				"nickname":"닉네임",
+				"birthday":"생일",
+				"telephone":"전화번호",
+				"cellphone":"휴대전화",
+				"homepage":"홈페이지",
+				"gender":"성별",
+				"address":"주소",
+				"etc":"사용자정의"
+			},
+			"input":{
+				"text":"텍스트필드",
+				"select":"옵션필드",
+				"radio":"라디오버튼",
+				"checkbox":"체크박스",
+				"email":"이메일필드",
+				"password":"암호필드",
+				"date":"날짜필드",
+				"url":"URL필드",
+				"tel":"전화번호필드",
+				"textarea":"긴 텍스트필드",
+				"wywisyg":"위지윅에디터",
+				"address":"주소필드",
+				"system":"시스템필드"
+			},
+			"window":{
+				"add":"필드추가",
+				"modify":"필드수정",
+				"option_add":"선택항목추가",
+				"option_modify":"선택항목수정"
+			},
+			"form":{
 				"name":"필드명",
 				"name_help":"데이터를 저장할 변수명을 설정합니다. (<?php echo $member->필드명; ?> 으로 해당 필드의 데이터를 가져옵니다.",
 				"name_etc_help":"영어소문자 및 언더바(_)만 입력가능합니다.",
 				"input":"필드종류",
-				"field_title":"필드제목",
-				"field_title_help":"회원가입/정보수정페이지에서 해당 필드앞에 보일 제목을 입력합니다.",
-				"field_help":"필드설명",
-				"field_help_help":"회원가입/정보수정페이지에서 해당 필드 아래에 보일 설명을 입력합니다.",
-				"field_content":"내용",
-				"field_content_help":"회원약관 및 개인정보보호정책은 회원모듈설정의 가입단계설정에 약관동의 단계를 사용할 경우 약관동의 단계에 나타나며, 해당 단계를 사용하지 않을 경우 회원정보입력 페이지에 정해진 순서에 맞게 나오게 됩니다.",
-				"field_options":"선택항목",
-				"field_options_help":"해당 필드종류는 유저가 선택할 수 있는 항목을 정의해야 합니다.",
-				"field_options_item":"항목",
-				"field_options_display":"보여지는 값",
-				"field_options_display_help":"회원가입/정보수정페이지에서 사용자가 실제로 보고 선택하게 되는 값을 입력합니다.",
-				"field_options_value":"저장되는 값",
-				"field_options_value_help":"회원정보에 실제로 저장되는 값을 입력합니다.",
+				"title":"필드제목",
+				"title_help":"회원가입/정보수정페이지에서 해당 필드앞에 보일 제목을 입력합니다.",
+				"help":"필드설명",
+				"help_help":"회원가입/정보수정페이지에서 해당 필드 아래에 보일 설명을 입력합니다.",
+				"content":"내용",
+				"content_help":"회원약관 및 개인정보보호정책은 회원모듈설정의 가입단계설정에 약관동의 단계를 사용할 경우 약관동의 단계에 나타나며, 해당 단계를 사용하지 않을 경우 회원정보입력 페이지에 정해진 순서에 맞게 나오게 됩니다.",
+				"options":"선택항목",
+				"options_help":"해당 필드종류는 유저가 선택할 수 있는 항목을 정의해야 합니다.",
+				"options_item":"항목",
+				"options_display":"보여지는 값",
+				"options_display_help":"회원가입/정보수정페이지에서 사용자가 실제로 보고 선택하게 되는 값을 입력합니다.",
+				"options_value":"저장되는 값",
+				"options_value_help":"회원정보에 실제로 저장되는 값을 입력합니다.",
 				"max":"최대선택수(0 : 제한없음)",
 				"is_required":"필수항목",
 				"is_required_help":"해당필드를 반드시 입력해야하는 필수항목으로 설정합니다."
 			}
 		},
-		"contexts":{
-			"signup":"회원가입",
-			"help":"아이디/패스워드 찾기",
-			"modify":"회원정보수정",
-			"leave":"회원탈퇴",
-			"activity":"활동내역보기"
-		},
 		"configs":{
 			"form":{
 				"default_setting":"모듈기본설정",
 				"templet":"템플릿",
+				"private":"개인정보보호 설정",
+				"private_photo":"회원사진보호",
+				"private_photo_help":"로그인을 하지 않은 경우 모든 회원들의 사진을 기본사진으로 보이게 설정합니다.",
 				"point":"기본포인트",
 				"exp":"기본경험치",
 				"label":"기본라벨",
@@ -195,11 +212,8 @@
 				"allow_signup_help":"회원가입을 허용합니다. (라벨설정의 회원가입허용보다 우선됩니다.)",
 				"approve_signup":"가입승인",
 				"approve_signup_help":"회원가입후 관리자의 승인이 필요합니다. (라벨설정의 가입승인설정보다 우선됩니다.)",
-				"signup_step":"회원가입단계",
-				"signup_step_available":"사용가능단계",
-				"signup_step_used":"사용중인단계",
-				"add_signup_step":"선택단계사용",
-				"delete_signup_step":"선택단계삭제"
+				"verified_email":"이메일인증",
+				"verified_email_help":"회원가입 후 가입시 입력한 이메일주소가 유효한지 확인합니다."
 			}
 		}
 	}
