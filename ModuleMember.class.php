@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2017. 11. 22.
+ * @modified 2017. 11. 29.
  */
 class ModuleMember {
 	/**
@@ -87,6 +87,10 @@ class ModuleMember {
 		if (defined('__IM_ADMIN__') == false) {
 			$this->IM->addHeadResource('style',$this->getModule()->getDir().'/styles/style.css');
 			$this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/script.js');
+			
+			if ($this->db()->select($this->table->social_oauth)->count() > 0) {
+				$this->IM->loadWebFont('XEIcon');
+			}
 		}
 		
 		/**
@@ -128,6 +132,44 @@ class ModuleMember {
 	 */
 	function getTable($table) {
 		return empty($this->table->$table) == true ? null : $this->table->$table;
+	}
+	
+	/**
+	 * URL 을 가져온다.
+	 *
+	 * @param string $view
+	 * @param string $idx
+	 * @return string $url
+	 */
+	function getUrl($view=null,$idx=null) {
+		return $this->IM->getUrl(null,null,$view,$idx);
+	}
+	
+	/**
+	 * view 값을 가져온다.
+	 *
+	 * @return string $view
+	 */
+	function getView() {
+		return $this->IM->getView();
+	}
+	
+	/**
+	 * view 값을 변경한다.
+	 *
+	 * @param string $view
+	 */
+	function setView($view) {
+		return $this->IM->setView($view);
+	}
+	
+	/**
+	 * idx 값을 가져온다.
+	 *
+	 * @return string $idx
+	 */
+	function getIdx() {
+		return $this->IM->getIdx();
 	}
 	
 	/**
@@ -207,9 +249,8 @@ class ModuleMember {
 	 * @return object $lists 전체 컨텍스트 목록
 	 */
 	function getContexts() {
-		$contexts = $this->getText('admin/contexts');
 		$lists = array();
-		foreach ($contexts as $context=>$title) {
+		foreach ($this->getText('context') as $context=>$title) {
 			$lists[] = array('context'=>$context,'title'=>$title);
 		}
 		
@@ -223,7 +264,7 @@ class ModuleMember {
 	 * @return string $title 컨텍스트 제목
 	 */
 	function getContextTitle($context) {
-		return $this->getText('admin/contexts/'.$context);
+		return $this->getText('context/'.$context);
 	}
 	
 	/**
@@ -387,33 +428,6 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get member module page URL
-	 * If not exists container code in im_page_table, use account menu url @see iModule.class.php doLayout() method.
-	 * @param string $view container code (signup, modify, password ... etc)
-	 * @return object $page {menu:string $menu,page:string $page}, 1st and 2nd page code
-	 *
-	function getMemberPage($view) {
-		if (isset($this->memberPages[$view]) == true) return $this->memberPages[$view];
-		
-		$this->memberPages[$view] = null;
-		$sitemap = $this->IM->getPages();
-		foreach ($sitemap as $menu=>$pages) {
-			for ($i=0, $loop=count($pages);$i<$loop;$i++) {
-				if ($pages[$i]->type == 'MODULE') {
-					if ($pages[$i]->context != null && $pages[$i]->context->module == 'member' && $pages[$i]->context->context == $view) {
-						$this->memberPages[$view] = $pages[$i];
-						break;
-					}
-				}
-			}
-		}
-		
-		if ($this->memberPages[$view] == null) return $this->getAccountPage($view == 'mypage' ? null : $view);
-		return $this->memberPages[$view];
-	}
-	*/
-	
-	/**
 	 * 템플릿 정보를 가져온다.
 	 *
 	 * @param string $this->getTemplet($configs) 템플릿명
@@ -447,7 +461,7 @@ class ModuleMember {
 		/**
 		 * 컨텍스트 컨테이너를 설정한다.
 		 */
-		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->getModule()->getName().'">'.PHP_EOL;
+		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->getModule()->getName().'" data-context="'.$context.'">'.PHP_EOL;
 		
 		/**
 		 * 컨텍스트 헤더
@@ -470,8 +484,8 @@ class ModuleMember {
 				$html.= $this->getPointContext($configs);
 				break;
 				
-			case 'social' :
-				$html.= $this->getSocialContext($configs);
+			case 'connect' :
+				$html.= $this->getConnectContext($configs);
 				break;
 		}
 		
@@ -495,20 +509,29 @@ class ModuleMember {
 	 * @return string $html 컨텍스트 HTML / FileBytes 파일 바이너리
 	 */
 	function getContainer($container) {
-		if ($container == 'photo') {
-			$midx = $this->IM->view ? $this->IM->view : 0;
+		switch ($container) {
+			case 'signup' :
+				$html = $this->getContext($container);
+				break;
+				
+			case 'photo' :
+				$midx = $this->IM->view ? $this->IM->view : 0;
 			
-			$path = $this->getModule()->getConfig('photo_privacy') == false && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg' : $this->getModule()->getPath().'/images/nophoto.png';
-			$extension = explode('.',$path);
-			
-			header('Content-Type: image/'.end($extension));
-			header('Content-Length: '.filesize($path));
-			
-			readfile($path);
-			exit;
-		} else {
-			return '';
+				$path = $this->getModule()->getConfig('photo_privacy') == false && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg' : $this->getModule()->getPath().'/images/nophoto.png';
+				$extension = explode('.',$path);
+				
+				header('Content-Type: image/'.end($extension));
+				header('Content-Length: '.filesize($path));
+				
+				readfile($path);
+				exit;
 		}
+		
+		$this->IM->removeTemplet();
+		$footer = $this->IM->getFooter();
+		$header = $this->IM->getHeader();
+		
+		return $header.$html.$footer;
 	}
 	
 	/**
@@ -555,9 +578,138 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 회원가입 컨텍스트를 가져온다.
+	 *
+	 * @param object $confgs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
+	 * @return $html 컨텍스트 HTML
+	 */
+	function getSignUpContext($configs=null) {
+		if ($this->isLogged() == true) return $this->getError('ALREADY_LOGGED');
+		if ($this->getModule()->getConfig('allow_signup') == false) return $this->getError('NOT_ALLOWED_SIGNUP');
+		
+		$step = $this->getView() !== null ? $this->getView() : 'start';
+		$label = $this->getIdx() !== null ? $this->getIdx() : null;
+		
+		if ($step == 'start') {
+			if ($label == null && $this->db()->select($this->table->label)->where('allow_signup')->count() > 0) {
+				// @todo 회원가입을 받는 회원라벨이 여러개일 경우 어떤 회원으로 가입할지 결정하는 페이지를 띄운다.
+				
+				return;
+			} elseif ($label == null) {
+				$label = 0;
+			}
+			
+			// 약관동의나, 개인정보보호정책 등 동의항목이 있는 경우
+			if ($this->db()->select($this->table->signup)->where('label',$label)->where('(type=? or type=?)',array('agreement','privacy'))->has() == true) {
+				header("location:".$this->getUrl('agreement',$label));
+				exit;
+			} else {
+				header("location:".$this->getUrl('register',$label));
+				exit;
+			}
+		}
+		
+		if ($step != 'start' && $label == null) return $this->getError('NOT_FOUND_PAGE');
+		if ($this->getLabel($label) == null || $this->getLabel($label)->allow_signup == false) return $this->getTemplet($configs)->getError('NOT_ALLOWED_SIGNUP',$this->getLabel($label));
+		
+		if ($step == 'agreement') {
+			/**
+			 * 선택 회원라벨의 약관내용을 가져온다. 개인정보보호정책을 가져온다.
+			 */
+			$form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','agreement')->orderBy('label','desc')->getOne();
+			
+			if ($form != null) {
+				$title_languages = json_decode($form->title_languages);
+				$help_languages = json_decode($form->help_languages);
+				$configs = json_decode($form->configs);
+				
+				$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
+				$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
+				
+				$agreement = new stdClass();
+				$agreement->name = $agreement->name;
+				$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
+				$agreement->content = $configs->content;
+				$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
+				$agreement->value = 'TRUE';
+			} else {
+				$agreement = null;
+			}
+			
+			/**
+			 * 선택 회원라벨의 개인정보보호정책을 가져온다.
+			 */
+			$form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','privacy')->orderBy('label','desc')->getOne();
+			
+			if ($form != null) {
+				$title_languages = json_decode($form->title_languages);
+				$help_languages = json_decode($form->help_languages);
+				$configs = json_decode($form->configs);
+				
+				$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
+				$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
+				
+				$privacy = new stdClass();
+				$privacy->name = $form->name;
+				$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
+				$privacy->content = $configs->content;
+				$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
+				$privacy->value = 'TRUE';
+			} else {
+				$privacy = null;
+			}
+			
+			$nextStep = 'register';
+		}
+		
+		if ($step == 'register') {
+			/**
+			 * 가입폼을 가져온다.
+			 * 회원약관이나, 개인정보보호정책 등 이미 동의한 항목은 생략한다.
+			 */
+			$defaults = $extras = array();
+			$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->orderBy('sort','asc')->get();
+			for ($i=0, $loop=count($forms);$i<$loop;$i++) {
+				if (in_array($forms[$i]->name,array('agreement','privacy')) == true) continue;
+				
+				$field = $this->getInputField($forms[$i]);
+				$field->inputHtml = $this->getInputFieldHtml($field,'signup');
+				
+				if ($forms[$i]->label == 0) array_push($defaults,$field);
+				else array_push($extras,$field);
+			}
+			
+			$nextStep = 'complete';
+		}
+		
+		if ($step == 'complete') {
+			
+			$nextStep = false;
+		}
+		
+		/**
+		 * 회원가입폼을 정의한다.
+		 */
+		$header = PHP_EOL.'<form id="ModuleMemberSignUpForm" method="post" action="'.$this->getUrl($nextStep,$label).'">'.PHP_EOL;
+		$header.= '<input type="hidden" name="step" value="'.$step.'">'.PHP_EOL;
+		if ($step != 'start') $header.= '<input type="hidden" name="label" value="'.$label.'">'.PHP_EOL;
+		if ($step == 'register') {
+			foreach ($_POST as $key=>$value) {
+				$header.= '<input type="hidden" name="'.$key.'" value="'.$value.'">'.PHP_EOL;
+			}
+		}
+		$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
+		
+		/**
+		 * 템플릿파일을 호출한다.
+		 */
+		return $this->getTemplet($configs)->getContext('signup',get_defined_vars(),$header,$footer);
+	}
+	
+	/**
 	 * 포인트현황 컨텍스트를 가져온다.
 	 *
-	 * @param object $confgs 사이트맵
+	 * @param object $confgs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
 	 * @return $html 컨텍스트 HTML
 	 */
 	function getPointContext($configs=null) {
@@ -603,15 +755,70 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 소셜계정 연결 컨텍스트를 가져온다.
+	 *
+	 * @param object $confgs 사이트맵
+	 * @return $html 컨텍스트 HTML
+	 */
+	function getConnectContext($configs=null) {
+		/**
+		 * 소셜 로그인 세션을 가져온다.
+		 */
+		$logged = Request('SOCIAL_LOGGED','session');
+		if ($logged == null) {
+			$this->IM->printError('OAUTH_API_ERROR',null,null,true);
+		}
+		
+		if (is_array($logged->midx) == true) {
+			$type = 'select';
+			
+			$members = array();
+			for ($i=0, $loop=count($logged->midx);$i<$loop;$i++) {
+				$members[$i] = $this->getMember($logged->midx[$i]);
+			}
+			
+			$header = PHP_EOL.'<form id="ModuleMemberConnectForm">'.PHP_EOL;
+			$footer = PHP_EOL.'</form>'.PHP_EOL;
+		} else {
+			$type = 'login';
+			$member = $this->getMember($logged->midx);
+			
+			$header = PHP_EOL.'<form id="ModuleMemberConnectForm">'.PHP_EOL;
+			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.connect.init();</script>'.PHP_EOL;
+		}
+		
+		/**
+		 * 템플릿파일을 호출한다.
+		 */
+		return $this->getTemplet($configs)->getContext('connect',get_defined_vars(),$header,$footer);
+	}
+	
+	/**
 	 * 로그인 모달을 가져온다.
 	 * 이벤트를 발생시켜 각 대학모듈에서 처리할 사항이 있으면 처리한다.
 	 */
 	function getLoginModal() {
-		$title = '회원 로그인';
+		$title = $this->getText('text/login');
 		
 		$content = PHP_EOL;
-		$content.= '<div data-role="input"><input type="email" name="email" placeholder="이메일"></div>';
-		$content.= '<div data-role="input"><input type="password" name="password" placeholder="패스워드"></div>';
+		$content.= '<div data-role="input"><input type="email" name="email" placeholder="'.$this->getText('text/email').'"></div>';
+		$content.= '<div data-role="input"><input type="password" name="password" placeholder="'.$this->getText('text/password').'"></div>';
+		
+		$oauths = $this->db()->select($this->table->social_oauth)->orderBy('sort','asc')->get();
+		if (count($oauths) > 0) {
+			$content.= '<ul data-module="member" data-role="social" class="'.(count($oauths) > 3 ? 'icon' : 'button').'">';
+			foreach ($oauths as $oauth) {
+				$content.= '<li class="'.$oauth->site.'"><a href="'.$this->IM->getProcessUrl('member',$oauth->site).'"><i></i><span>'.$this->getText('social/'.$oauth->site).'</span></a></li>';
+			}
+			$content.= '</ul>';
+		}
+		
+		$signup = $this->IM->getContextUrl('member','signup');
+		$help = $this->IM->getContextUrl('member','help');
+		$content.= '<ul data-module="member" data-role="link">';
+		$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$this->IM->getUrl($signup->menu,$signup->page,false).'">'.$signup->title.'</a>').'</li>';
+		$content.= '<li>'.($help == null ? '<button type="button" onclick="Member.helpPopup();">'.$this->getText('text/help').'</button>' : '<a href="'.$this->IM->getUrl($help->menu,$help->page,false).'">'.$help->title.'</a>').'</li>';
+		$content.= '</ul>';
 		
 		$buttons = array();
 		
@@ -669,253 +876,6 @@ class ModuleMember {
 	}
 	
 	/**
-	 * 회원가입 컨텍스트를 가져온다.
-	 *
-	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
-	 * @return string $html 컨텍스트 HTML
-	 */
-	function getSignUpContext($configs) {
-		$label = isset($configs->label) == true ? $configs->label : null;
-		$label = $label == null ? Request('label') : $label;
-		$label = $label == null || is_numeric($label) == false ? 0 : $label;
-		
-		/**
-		 * 선택한 회원라벨의 회원가입이 가능한지 확인한다.
-		 */
-		if ($this->getLabel($label) == null || $this->getLabel($label)->allow_signup == false) return $this->getTemplet($configs)->getError('NOT_ALLOWED_SIGNUP',$this->getLabel($label));
-		
-		/**
-		 * 모듈설정에 정의된 회원가입절차를 가져온다.
-		 */
-		$steps = $this->getModule()->getConfig('signup_step');
-		
-		/**
-		 * iModule 코어의 view 값을 현재 가입단계로 사용한다.
-		 */
-		$step = $this->IM->view;
-		if ($step == null || in_array($step,$steps) == false) $step = $steps[0];
-		
-		$agreements = Request('agreements') == null ? '' : (is_array(Request('agreements')) == true ? implode(',',Request('agreements')) : Request('agreements'));
-		
-		while (count($steps) > 0) {
-			$position = array_search($step,$steps);
-			$prevStep = $position == 0 ? '' : $steps[$position-1];
-			$nextStep = $position == count($steps) - 1 ? '' : $steps[$position+1];
-		
-			/**
-			 * 약관동의
-			 */
-			if ($step == 'agreement') {
-				/**
-				 * 선택 회원라벨의 약관내용을 가져온다. 개인정보보호정책을 가져온다.
-				 */
-				$form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','agreement')->orderBy('label','desc')->getOne();
-				
-				if ($form != null) {
-					$title_languages = json_decode($form->title_languages);
-					$help_languages = json_decode($form->help_languages);
-					$configs = json_decode($form->configs);
-					
-					$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
-					$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
-					
-					$agreement = new stdClass();
-					$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
-					$agreement->content = $configs->content;
-					$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
-					$agreement->value = 'agreement-'.$form->label;
-				} else {
-					$agreement = null;
-				}
-				
-				/**
-				 * 선택 회원라벨의 개인정보보호정책을 가져온다.
-				 */
-				$form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','privacy')->orderBy('label','desc')->getOne();
-				
-				if ($form != null) {
-					$title_languages = json_decode($form->title_languages);
-					$help_languages = json_decode($form->help_languages);
-					$configs = json_decode($form->configs);
-					
-					$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
-					$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
-					
-					$privacy = new stdClass();
-					$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
-					$privacy->content = $configs->content;
-					$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
-					$privacy->value = 'privacy-'.$form->label;
-				} else {
-					$privacy = null;
-				}
-				
-				/**
-				 * 약관과 개인정보보호정책이 모두 없을 경우 약관동의 단계를 생략한다.
-				 */
-				if ($agreement == null && $privacy == null) {
-					array_splice($steps,$position,1);
-					$step = $nextStep;
-					continue;
-				}
-			}
-			
-			/**
-			 * @todo 실명인증단계를 구현한다. 현재는 없기 때문에 실명인증 단계를 생략한다.
-			 */
-			if ($step == 'cert') {
-				if (true) {
-					array_splice($steps,$position,1);
-					$step = $nextStep;
-					continue;
-				}
-			}
-			
-			/**
-			 * 회원라벨 선택
-			 */
-			if ($step == 'label') {
-				$labels = $this->db()->select($this->table->label,'idx')->orderBy('sort','asc')->get();
-				for ($i=0, $loop=count($labels);$i<$loop;$i++) {
-					$labels[$i] = $this->getLabel($labels[$i]->idx);
-				}
-				
-				/**
-				 * 기본라벨 외에 회원라벨이 없으면 라벨선택 단계를 생략한다.
-				 */
-				if (count($labels) == 0) {
-					array_splice($steps,$position,1);
-					$step = $nextStep;
-					continue;
-				}
-				
-				array_unshift($labels,$this->getLabel(0));
-			}
-			
-			/**
-			 * 회원정보입력
-			 */
-			if ($step == 'insert') {
-				/**
-				 * 가입폼을 가져온다.
-				 * 회원약관이나, 개인정보보호정책 중 이미 동의한 항목은 생략한다.
-				 */
-				$agreement = null;
-				$privacy = null;
-				
-				$agreements = explode(',',$agreements);
-				$defaults = $extras = array();
-				$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->orderBy('sort','asc')->get();
-				for ($i=0, $loop=count($forms);$i<$loop;$i++) {
-					if (in_array($forms[$i]->name.'-'.$forms[$i]->label,$agreements) == true) continue;
-					
-					if ($forms[$i]->name == 'agreement') {
-						$title_languages = json_decode($forms[$i]->title_languages);
-						$help_languages = json_decode($forms[$i]->help_languages);
-						$configs = json_decode($forms[$i]->configs);
-						
-						$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $forms[$i]->title;
-						$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $forms[$i]->help;
-						
-						$agreement = new stdClass();
-						$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
-						$agreement->content = $configs->content;
-						$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
-						$agreement->value = 'agreement-'.$forms[$i]->label;
-						
-						continue;
-					}
-					
-					if ($forms[$i]->name == 'privacy') {
-						$title_languages = json_decode($forms[$i]->title_languages);
-						$help_languages = json_decode($forms[$i]->help_languages);
-						$configs = json_decode($forms[$i]->configs);
-						
-						$title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $forms[$i]->title;
-						$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $forms[$i]->help;
-						
-						$privacy = new stdClass();
-						$privacy->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
-						$privacy->content = $configs->content;
-						$privacy->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
-						$privacy->value = 'privacy-'.$forms[$i]->label;
-						
-						continue;
-					}
-					
-					$field = $this->parseInputField($forms[$i]);
-					$field->inputHtml = $this->getInputFieldHtml($field,'signup');
-					
-					if ($forms[$i]->label == 0) array_push($defaults,$field);
-					else array_push($extras,$field);
-				}
-			}
-			
-			/**
-			 * 이메일주소 인증
-			 */
-			if ($step == 'verify') {
-				$fields = array();
-				
-				$field = new stdClass();
-				$field->name = 'email_verification_email';
-				$field->title = $this->getText('signup/form/email_verification_email');
-				$field->help = $this->getText('signup/form/email_verification_email_help');
-				$field->input = 'system';
-				$field->is_required = true;
-				$field->inputHtml = $this->getInputFieldHtml($field,'signup');
-				
-				$fields[] = $field;
-				
-				$field = new stdClass();
-				$field->name = 'email_verification_code';
-				$field->title = $this->getText('signup/form/email_verification_code');
-				$field->help = $this->getText('signup/form/email_verification_code_help');
-				$field->input = 'system';
-				$field->is_required = true;
-				$field->inputHtml = $this->getInputFieldHtml($field,'signup');
-				
-				$fields[] = $field;
-			}
-			
-			break;
-		}
-		
-		$values = get_defined_vars();
-		
-		/**
-		 * 이메일 인증단계나 가입완료단계에서 로그인중이 아니라면, 에러메세지를 출력한다.
-		 * 나머지 단계에서 로그인중이라면 에러 메세지를 출력한다.
-		 */
-		if (in_array($step,array('agreement','label','cert','insert')) == true) {
-			if ($this->isLogged() == true) return $this->getTemplet($configs)->getError('ALREADY_LOGGED');
-		} else {
-			if ($this->isLogged() == false) return $this->getTemplet($configs)->getError('REQUIRED_LOGIN');
-		}
-		
-		/**
-		 * 회원가입폼을 정의한다.
-		 */
-		$header = PHP_EOL.'<form id="ModuleMemberSignUpForm">'.PHP_EOL;
-		$header.= '<input type="text" name="step" value="'.$step.'">'.PHP_EOL;
-		$header.= '<input type="text" name="prev" value="'.$prevStep.'">'.PHP_EOL;
-		$header.= '<input type="text" name="next" value="'.$nextStep.'">'.PHP_EOL;
-		if ($step != 'label') $header.= '<input type="text" name="label" value="'.$label.'">'.PHP_EOL;
-		if ($step != 'agreement' && $step != 'insert') $header.= '<input type="text" name="agreements" value="'.$agreements.'">'.PHP_EOL;
-		if ($step == 'insert') {
-			foreach ($agreements as $agree) $header.= '<input type="text" name="agreements[]" value="'.$agree.'">'.PHP_EOL;
-		}
-		$header.= '<input type="text" name="templet" value="'.$this->getTemplet($configs)->getName().'">'.PHP_EOL;
-		
-		$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
-		
-		/**
-		 * 템플릿파일을 호출한다.
-		 */
-		return $this->getTemplet($configs)->getContext('signup',$values,$header,$footer);
-	}
-	
-	/**
 	 * 회원로그인 세션을 만든다.
 	 * 탈퇴회원이나, 비활성화 계정의 경우 세션을 만들지 않는다.
 	 *
@@ -951,6 +911,136 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 소셜로그인을 통해 로그인을 처리한다.
+	 * 가입되어 있지 않은 회원의 경우 자동으로 가입처리를 한다.
+	 *
+	 * @param string $code 소셜사이트
+	 * @param string $client_id OAuth 클라이언트 아이디
+	 * @param string $name 소셜사이트 유저아이디
+	 * @param string $email 이메일
+	 * @param string $photo 프로필 이미지 주소
+	 * @param string $accessToken
+	 * @param string $refreshToken
+	 * @param string $scope OAuth 인증시 요청된 scope
+	 * @param string $redirecUrl 로그인 후 이동될 주소
+	 */
+	function loginBySocial() {
+		/**
+		 * 소셜 로그인 세션을 가져온다.
+		 */
+		$logged = Request('SOCIAL_LOGGED','session');
+		if ($logged == null) {
+			$this->IM->printError('OAUTH_API_ERROR',null,null,true);
+		}
+		
+		if ($this->isLogged() == true) {
+			$midx = $this->getLogged();
+		} else {
+			/**
+			 * 기존에 해당 소셜계정으로 로그인한 이력이 있는지 확인한다.
+			 */
+			$check = $this->db()->select($this->table->social_token)->where('site',$logged->site->site)->where('id',$logged->user->id)->get();
+			if (count($check) == 0) {
+				/**
+				 * 이메일주소로 기존 회원을 검색한다.
+				 */
+				$check = $this->db()->select($this->table->member)->where('email',$logged->user->email);
+				if ($this->IM->getSite()->member == 'UNIVERSAL') $check->where('domain','*');
+				else $check->where('domain',$this->IM->domain);
+				$check = $check->getOne();
+				
+				/**
+				 * 이메일주소로 등록되어 있는 회원계정이 없다면 회원을 생성한다.
+				 */
+				if ($check == null) {
+					if ($this->getModule()->getConfig('allow_signup') == false) {
+						$this->IM->printError('NOT_ALLOWED_SIGNUP',null,null,true);
+					}
+					
+					$midx = $this->db()->insert($this->table->member,array(
+						'domain'=>$this->IM->getSite()->member == 'UNIVERSAL' ? '*' : $this->IM->domain,
+						'type'=>'MEMBER',
+						'email'=>$logged->user->email,
+						'password'=>'',
+						'name'=>$logged->user->name,
+						'nickname'=>$logged->user->nickname,
+						'exp'=>$this->getModule()->getConfig('exp'),
+						'point'=>$this->getModule()->getConfig('point'),
+						'reg_date'=>time(),
+						'status'=>$this->getModule()->getConfig('approve_signup') == true ? 'WAITING' : 'ACTIVATED'
+					))->execute();
+				} else {
+					$midx = $check->idx;
+				}
+			} elseif (count($check) > 1) {
+				$midx = Request('midx');
+				
+				if ($midx == null) {
+					$logged->midx = array();
+					for ($i=0, $loop=count($check);$i<$loop;$i++) {
+						$logged->midx[$i] = $check[$i]->midx;
+					}
+					
+					$html = $this->getContext('connect');
+					$this->IM->removeTemplet();
+					$html.= PHP_EOL.$this->IM->getFooter();
+					$html = $this->IM->getHeader().PHP_EOL.$html;
+					echo $html;
+					exit;
+				} else {
+					$check = $this->db()->select($this->table->social_token)->where('midx',$midx)->where('site',$logged->site->site)->where('id',$logged->user->id)->getOne();
+					if ($check == null) {
+						$this->IM->printError('FORBIDDEN',null,null,true);
+					}
+				}
+			} else {
+				$midx = $check[0]->midx;
+			}
+			
+			$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
+			if ($member->status != 'ACTIVATED') {
+				$this->IM->printError('NOT_ACTIVATED_ACCOUNT',null,null,true);
+			}
+			
+			/**
+			 * 검색된 회원이 소셜사이트 로그인을 사용한적이 없고, 회원의 패스워드가 존재하는 경우 계정연결 페이지를 띄운다.
+			 */
+			$check = $this->db()->select($this->table->social_token)->where('midx',$member->idx)->where('site',$logged->site->site)->getOne();
+			if ($check == null && strlen($member->password) == 65) {
+				$logged->midx = $member->idx;
+				
+				$html = $this->getContext('connect');
+				$this->IM->removeTemplet();
+				$html.= PHP_EOL.$this->IM->getFooter();
+				$html = $this->IM->getHeader().PHP_EOL.$html;
+				echo $html;
+				exit;
+			}
+		}
+		
+		/**
+		 * 엑세스정보를 갱신한다.
+		 */
+		$this->db()->replace($this->table->social_token,array('midx'=>$midx,'site'=>$logged->site->site,'id'=>$logged->user->id,'scope'=>$logged->site->scope,'access_token'=>$logged->token->access,'refresh_token'=>$logged->token->refresh,'latest_login'=>time()))->execute();
+		
+		/**
+		 * 회원사진이 없다면 갱신한다.
+		 */
+		if (file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == false) {
+			if (SaveFileFromUrl($logged->user->photo,$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg','image') == true) {
+				$this->IM->getModule('attachment')->createThumbnail($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',250,250,false,'jpg');
+			}
+		}
+		
+		if ($this->isLogged() == false) {
+			$this->login($midx);
+		}
+		unset($_SESSION['OAUTH_ACCESS_TOKEN'],$_SESSION['OAUTH_REFRESH_TOKEN'],$_SESSION['SOCIAL_LOGGED']);
+		header('location:'.$logged->redirect);
+		exit;
+	}
+	
+	/**
 	 * 현재 사용자가 로그인중인지 확인한다.
 	 *
 	 * @return boolean $isLogged
@@ -972,10 +1062,10 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Check member email and password
+	 * 회원 이메일 및 패스워드가 유효한지 확인한다.
 	 *
 	 * @param string $email
-	 * @param string $password (not encrypt, plaintext)
+	 * @param string $password
 	 * @return boolean $isValidate
 	 */
 	function isValidate($email,$password) {
@@ -983,7 +1073,7 @@ class ModuleMember {
 		if ($siteType == 'MERGE') $domain = '*';
 		else $domain = $this->IM->getSite()->domain;
 		
-		$check = $this->db()->select($this->table->member)->where('domain',$domain)->where('email',$email)->where('status','ACTIVE')->getOne();
+		$check = $this->db()->select($this->table->member)->where('domain',$domain)->where('email',$email)->where('status','ACTIVATED')->getOne();
 		if ($check == null) return false;
 		$mHash = new Hash();
 		return $mHash->password_validate($password,$check->password) == true ? $check->idx : false;
@@ -1063,9 +1153,9 @@ class ModuleMember {
 	}
 	
 	/**
-	 * Get Logged member idx
+	 * 현재 로그인중인 회원고유번호를 가져온다.
 	 *
-	 * @return int $midx im_member_table idx, if not logged return 0;
+	 * @return int $midx 회원고유번호, 로그인되어 있지 않은 경우 0 반환
 	 */
 	function getLogged() {
 		return $this->logged == null ? 0 : $this->logged->idx;
@@ -1109,6 +1199,7 @@ class ModuleMember {
 				$member->level = $this->getLevel(0);
 				$member->label = array();
 				$member->extras = null;
+				$member->point = 0;
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
@@ -1384,7 +1475,7 @@ class ModuleMember {
 	}
 	
 	/**
-	 * 이메일 인증과정이 있을 경우 이메일 인증메일을 발송한다.
+	 * 이메일 인증을 사용할 경우 인증메일을 발송한다.
 	 *
 	 * @param int $midx 회원고유번호
 	 * @param string $email(옵션) 이메일주소, 없을 경우 회원정보의 이메일주소로 발송한다.
@@ -1418,15 +1509,15 @@ class ModuleMember {
 			$subject = '['.$this->IM->getSiteTitle().'] 이메일주소 확인메일';
 			$content = '회원님이 입력하신 이메일주소가 유효한 이메일주소인지 확인하기 위한 이메일입니다.<br>회원가입하신적이 없거나, 최근에 이메일주소변경신청을 하신적이 없다면 본 메일은 무시하셔도 됩니다.';
 			if ($member->status == 'VERIFYING') {
-				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하시거나, 인증링크를 클릭하여 회원가입을 완료할 수 있습니다.';
+				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하시거나, 링크를 클릭하여 회원가입을 완료할 수 있습니다.';
 			} else {
 				$content.= '<br><br>아래의 인증코드 6자리를 인증번호 확인란에 입력하여 이메일주소변경을 완료할 수 있습니다.';
 			}
 			$content.= '<br><br>인증코드 : <b>'.$code.'</b>';
 			
 			if ($member->verified == 'FALSE') {
-				$link = $this->IM->getModuleUrl('member','verification',urlencode(Encoder(json_encode(array('midx'=>$midx,'email'=>$email,'code'=>$code)))),true);
-				$content.= '<br>인증주소 : <a href="'.$link.'" target="_blank">'.$link.'</a>';
+				$link = $this->IM->getModuleUrl('member','verification',urlencode(Encoder(json_encode(array('midx'=>$midx,'email'=>$email,'code'=>$code)))),false,true);
+				$content.= '<br><br><a href="'.$link.'" target="_blank" style="word-break:break-all;">'.$link.'</a>';
 			}
 			$content.= '<br><br>본 메일은 발신전용메일로 회신되지 않습니다.<br>감사합니다.';
 			
@@ -1446,7 +1537,7 @@ class ModuleMember {
 	 * @param object $rawData $this->table->signup 테이블의 RAW 데이터
 	 * @return object $field
 	 */
-	function parseInputField($rawData) {
+	function getInputField($rawData) {
 		$field = $rawData;
 		
 		$title_languages = json_decode($field->title_languages);
@@ -1465,7 +1556,7 @@ class ModuleMember {
 			$field->is_extra = true;
 		} else {
 			$field->title = $field->title == 'LANGUAGE_SETTING' ? $this->getText('text/'.$field->name) : $field->title;
-			$field->help = $field->help == 'LANGUAGE_SETTING' ? $this->getText('signup/form/'.$field->name.'_help') : $field->help;
+			$field->help = $field->help == 'LANGUAGE_SETTING' ? $this->getText('signup/'.$field->name.'_help') : $field->help;
 			$field->is_extra = false;
 		}
 		
@@ -1518,10 +1609,10 @@ class ModuleMember {
 				array_push($html,
 					'<div data-role="inputset" data-name="password" data-default="'.$field->help.'">',
 						'<div data-role="input">',
-							'<input type="password" name="password" placeholder="'.$this->getText('signup/form/password').'">',
+							'<input type="password" name="password" placeholder="'.$this->getText('signup/password').'">',
 						'</div>',
 						'<div data-role="input">',
-							'<input type="password" name="password_confirm" placeholder="'.$this->getText('signup/form/password_confirm').'" data-error="'.$this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM').'">',
+							'<input type="password" name="password_confirm" placeholder="'.$this->getText('signup/password_confirm').'" data-error="'.$this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM').'">',
 						'</div>',
 					'</div>'
 				);
@@ -1732,7 +1823,7 @@ class ModuleMember {
 	 * @param &array $errors(옵션) 에러처리를 위한 배열 포인터
 	 * @param boolean $isValid 유효한지 여부
 	 */
-	function isValidInsertData($mode,$data,&$insert=null,&$errors=null) {
+	function isValidSignUpData($mode,$data,&$insert=null,&$errors=null) {
 		if (is_array($data) == true) $data = (object)$data;
 		
 		$isSignUp = $mode == 'signup';
@@ -1745,7 +1836,7 @@ class ModuleMember {
 		$forms = $this->db()->select($this->table->signup)->where('label',array(0,$label),'IN')->get();
 		for ($i=0, $loop=count($forms);$i<$loop;$i++) {
 			if ($forms[$i]->name == 'agreement' || $forms[$i]->name == 'privacy') continue;
-			$field = $this->parseInputField($forms[$i]);
+			$field = $this->getInputField($forms[$i]);
 			
 			$field->value = null;
 			$field->error = null;
@@ -2081,7 +2172,7 @@ class ModuleMember {
 		if ($insert !== null) {
 			if (isset($insert['name']) == false && isset($insert['nickname']) == true) $insert['name'] = $insert['nickname'];
 			if (isset($insert['nickname']) == false && isset($insert['name']) == true) $insert['nickname'] = $insert['name'];
-			$insert['extras'] = count($insert['extras']) > 0 ? json_encode($insert['extras'],JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
+			$insert['extras'] = isset($insert['extras']) == true && count($insert['extras']) > 0 ? json_encode($insert['extras'],JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		}
 		
 		return $success;
