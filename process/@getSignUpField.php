@@ -4,13 +4,11 @@
  * 
  * 회원가입폼 필드를 가져온다.
  *
- * @file /modules/member/process/@getSignUpForm.php
+ * @file /modules/member/process/@getSignUpField.php
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
- * @version 3.0.0.160923
- *
- * @post int $label 회원라벨
- * @return object $results
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
 if (defined('__IM__') == false) exit;
 

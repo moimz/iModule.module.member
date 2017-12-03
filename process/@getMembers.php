@@ -26,6 +26,9 @@ $keyword = Request('keyword');
 $lists = $this->db()->select($this->table->member);
 $total = $lists->copy()->count();
 $lists = $lists->orderBy($sort,$dir)->limit($start,$limit)->get();
+for ($i=0, $loop=count($lists);$i<$loop;$i++) {
+	$lists[$i]->photo = $this->IM->getModuleUrl('member','photo',$lists[$i]->idx).'/profile.jpg';
+}
 
 $results->success = true;
 $results->lists = $lists;

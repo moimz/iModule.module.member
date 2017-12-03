@@ -37,7 +37,7 @@ if ($name == 'email' || $name == 'email_verification_email') {
 			$results->message = $this->getErrorText('DUPLICATED');
 		} else {
 			$results->success = true;
-			$results->message = $this->getText('signup/form/email_success');
+			$results->message = $this->getText('signup/email_success');
 		}
 	} else {
 		$results->success = false;
@@ -67,7 +67,7 @@ if ($name == 'nickname') {
 			$results->message =  $this->getErrorText('DUPLICATED');
 		} else {
 			$results->success = true;
-			$results->message = $this->getText('signup/form/nickname_success');
+			$results->message = $this->getText('signup/nickname_success');
 		}
 	} else {
 		$results->success = false;

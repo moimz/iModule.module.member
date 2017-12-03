@@ -4,12 +4,11 @@
  * 
  * 회원가입폼의 필드순서를 저장한다.
  *
- * @file /modules/member/process/@saveSignUpFormSort.php
+ * @file /modules/member/process/@saveSignUpFieldSort.php
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
- * @version 3.0.0.160923
- *
- * @return object $results
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
 if (defined('__IM__') == false) exit;
 

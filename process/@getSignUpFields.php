@@ -2,15 +2,13 @@
 /**
  * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
  * 
- * 회원가입폼 양식을 가져온다.
+ * 회원가입 필드목록을 가져온다.
  *
- * @file /modules/member/process/@getSignUpForms.php
+ * @file /modules/member/process/@getSignUpFields.php
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
- * @version 3.0.0.160923
- *
- * @post int $label 회원라벨
- * @return object $results
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
 if (defined('__IM__') == false) exit;
 
@@ -20,7 +18,7 @@ $agreements = $this->db()->select($this->table->signup)->where('label',$label)->
 
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
 	$lists[$i]->title = $lists[$i]->title == 'LANGUAGE_SETTING' ? $this->getText('text/'.$lists[$i]->type) : $lists[$i]->title;
-	$lists[$i]->help = $lists[$i]->help == 'LANGUAGE_SETTING' ? $this->getText('signup/form/'.$lists[$i]->type.'_help') : $lists[$i]->help;
+	$lists[$i]->help = $lists[$i]->help == 'LANGUAGE_SETTING' ? $this->getText('signup/'.$lists[$i]->type.'_help') : $lists[$i]->help;
 	$lists[$i]->is_required = $lists[$i]->is_required == 'TRUE';
 	
 	if ($lists[$i]->name == 'agreement' && $lists[$i]->sort != -2) {

@@ -1,13 +1,14 @@
 <?php
 /**
- * 이 파일은 iModule 코스모스연동모듈의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
  *
  * 모달창을 가져온다.
  * 
  * @file /modules/member/progress/getModal.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160910
+ * @version 3.0.0
+ * @modified 2017. 11. 29.
  */
 if (defined('__IM__') == false) exit;
 

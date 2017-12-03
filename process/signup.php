@@ -7,15 +7,14 @@
  * @file /modules/member/process/signup.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.161001
- *
- * @return object $results
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
 if (defined('__IM__') == false) exit;
 
 $site = $this->IM->getSite();
 $label = Request('label') ? Request('label') : 0;
-$steps = $this->Module->getConfig('signup_step');
+$steps = $this->getModule()->getConfig('signup_step');
 
 /**
  * 사용자가 선택한 회원라벨이 회원가입 허용인지 아닌지 파악한다.
@@ -27,42 +26,19 @@ if ($this->getLabel($label)->allow_signup === false) {
 	$insert = array();
 	$errors = array();
 	
-	$agreements = Request('agreements') != null ? Request('agreements') : array();
-	$agreements = is_array($agreements) == false ? array($agreements) : $agreements;
-	
-	$agreement = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','agreement')->orderBy('label','desc')->getOne();
-	if ($agreement != null && in_array('agreement-'.$agreement->label,$agreements) == false) {
-		if (isset($errors['agreements']) == true && is_object($errors['agreements']) == true) {
-			$errors['agreements']->{'agreement-'.$agreement->label} = $this->getErrorText('REQUIRED');
-		} else {
-			$errors['agreements'] = new stdClass();
-			$errors['agreements']->{'agreement-'.$agreement->label} = $this->getErrorText('REQUIRED');
-		}
-	}
-	
-	$privacy = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','privacy')->orderBy('label','desc')->getOne();
-	if ($privacy != null && in_array('privacy-'.$privacy->label,$agreements) == false) {
-		if (isset($errors['agreements']) == true && is_object($errors['agreements']) == true) {
-			$errors['agreements']->{'privacy-'.$privacy->label} = $this->getErrorText('REQUIRED');
-		} else {
-			$errors['agreements'] = new stdClass();
-			$errors['agreements']->{'privacy-'.$privacy->label} = $this->getErrorText('REQUIRED');
-		}
-	}
-
-	$isValid = $this->isValidInsertData('signup',$_POST,$insert,$errors);
+	$isValid = $this->isValidSignUpData('signup',$_POST,$insert,$errors);
 	
 	if ($isValid && count($errors) == 0) {
 		if ($site->member == 'UNIVERSAL') $insert['domain'] = '*';
 		else $insert['domain'] = $this->IM->getSite()->domain;
 		$insert['type'] = 'MEMBER';
 		
-		$insert['point'] = $this->Module->getConfig('point');
-		$insert['exp'] = $this->Module->getConfig('exp');
+		$insert['point'] = $this->getModule()->getConfig('point');
+		$insert['exp'] = $this->getModule()->getConfig('exp');
 		$insert['reg_date'] = time();
 		
-		if (in_array('verify',$steps) == true) $insert['verified'] = 'FALSE';
-		else $insert['verified'] = 'NONE';
+		$insert['verified'] = $this->getModule()->getConfig('verified_email') == true ? 'FALSE' : 'NONE';
+		
 		if ($this->getLabel($label)->approve_signup == true) $insert['status'] = 'WAITING';
 		else $insert['status'] = 'ACTIVATED';
 		
@@ -72,7 +48,7 @@ if ($this->getLabel($label)->allow_signup === false) {
 		}
 		$this->login($idx);
 		
-		if (in_array('verify',$steps) == true) $this->sendVerificationEmail($idx);
+		if ($this->getModule()->getConfig('verified_email') == true) $this->sendVerificationEmail($idx);
 		
 		$results->success = true;
 	} else {
