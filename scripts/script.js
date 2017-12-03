@@ -1,21 +1,21 @@
 /**
  * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
  *
- * 회원모듈 기본템플릿 스타일정의
+ * 회원모듈 UI/UX를 처리한다.
  *
- * @file /modules/member/templets/default/styles/style.css
+ * @file /modules/member/scripts/script.js
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160922
+ * @version 3.0.0
+ * @modified 2017. 11. 29.
  */
-
 var Member = {
 	/**
 	 * 회원로그인
 	 *
 	 * @param object $form 로그인폼
 	 */
-	login:function($form) {
+	login:function($form,callback) {
 		$form.send(ENV.getProcessUrl("member","login"),function(result) {
 			/**
 			 * 이벤트를 발생시킨다.
@@ -23,16 +23,20 @@ var Member = {
 			if ($(document).triggerHandler("Member.login",[$form,result]) === false) return false;
 			
 			if (result.success == true) {
-				location.href = location.href;
+				if (typeof callback == "function") callback();
+				else location.href = location.href.split("#").shift();
 			}
 		});
 	},
 	/**
 	 * 로그인모달
 	 */
-	loginModal:function() {
+	loginModal:function(callback) {
 		iModule.modal.get(ENV.getProcessUrl("member","getModal"),{modal:"login"},function($modal,$form) {
-			$form.inits(Member.login);
+			$form.on("submit",function() {
+				Member.login($form,callback);
+				return false;
+			});
 			return false;
 		});
 	},
@@ -58,6 +62,12 @@ var Member = {
 				}
 			}
 		});
+	},
+	/**
+	 * 회원가입 팝업
+	 */
+	signupPopup:function() {
+		iModule.openPopup(ENV.getModuleUrl("member","signup"),500,500,0,"signup");
 	},
 	/**
 	 * 다른 도메인간 통합로그인을 위한 로그인 세션 동기화
@@ -116,49 +126,17 @@ var Member = {
 		init:function() {
 			var $form = $("#ModuleMemberSignUpForm");
 			var step = $("input[name=step]",$form).val();
-			var next = $("input[name=next]",$form).val();
 			
 			if (step == "agreement") {
 				$("button[type=submit]",$form).disable();
 				$("input[type=checkbox]",$form).on("change",function() {
 					$("button[type=submit]",$form).setDisabled($("input[type=checkbox]",$form).length != $("input[type=checkbox]:checked",$form).length);
 				});
-				
-				$form.on("submit",function() {
-					$("input[name=agreement]",$form).disable();
-				});
 			}
 			
-			if (step == "insert" || step == "cert" || step == "verify") {
+			if (step == "register") {
+				Member.signup.check();
 				$form.inits(Member.signup.submit);
-				
-				if (step == "insert") {
-					Member.signup.check();
-					
-					if ($("input[type=checkbox][name='agreements[]']",$form).length > 0) {
-						$("button[type=submit]",$form).disable();
-					}
-					
-					$("input[type=checkbox][name='agreements[]']",$form).on("change",function() {
-						$("button[type=submit]",$form).setDisabled($("input[type=checkbox][name='agreements[]']",$form).length != $("input[type=checkbox][name='agreements[]']:checked",$form).length);
-					});
-				}
-				
-				if (step == "verify") {
-					Member.signup.check();
-				}
-			} else if (next) {
-				$form.attr("method","post");
-				$form.attr("action",ENV.getUrl(null,null,next,false));
-				$("input[name=step]",$form).disable();
-				$("input[name=prev]",$form).disable();
-				$("input[name=next]",$form).disable();
-				$("input[name=templet]",$form).disable();
-			} else {
-				$form.on("submit",function() {
-					location.href = ENV.getUrl(false);
-					return false;
-				});
 			}
 		},
 		/**
@@ -167,12 +145,13 @@ var Member = {
 		check:function() {
 			var $form = $("#ModuleMemberSignUpForm");
 			
-			$("input[name=email], input[name=name], input[name=nickname], input[name=email_verification_email]",$form).on("blur",function() {
+			$("input[name=email], input[name=name], input[name=nickname]",$form).on("blur",function() {
 				var $field = $(this);
 				if ($field.val().length > 0 && $field.data("lastValue") != $field.val()) {
-					$.send(ENV.getProcessUrl("member","liveCheckValue"),{name:$field.attr("name"),value:$field.val(),mode:"signup"},function(result) {
+					$.send(ENV.getProcessUrl("member","checkSignUpValue"),{name:$field.attr("name"),value:$field.val(),mode:"signup"},function(result) {
 						$field.status(result.success == true ? "success" : "error",result.message ? result.message : "");
 						$field.data("submitValue",$field.val());
+						return false;
 					});
 				}
 			});
@@ -194,32 +173,15 @@ var Member = {
 			});
 		},
 		submit:function($form) {
-			var step = $("input[name=step]",$form).val();
-			var next = $("input[name=next]",$form).val();
-			
-			if (step == "insert") {
-				$form.send(ENV.getProcessUrl("member","signup"),function(result) {
-					if (result.success == true) {
-						$form.status("success");
-						location.href = ENV.getUrl(null,null,next,false);
-					} else {
-						$form.status("error",result.errors);
-						if (result.message) iModule.alert.show("error",result.message);
-					}
-				});
-			}
-			
-			if (step == "verify") {
-				$form.send(ENV.getProcessUrl("member","verifyEmail"),function(result) {
-					if (result.success == true) {
-						$form.status("success");
-						location.href = ENV.getUrl(null,null,next,false);
-					} else {
-						$form.status("error",result.errors);
-						if (result.message) iModule.alert.show("error",result.message);
-					}
-				});
-			}
+			$form.send(ENV.getProcessUrl("member","signup"),function(result) {
+				if (result.success == true) {
+					$form.status("success");
+//						location.href = ENV.getUrl(null,null,"complete",false);
+				} else {
+					$form.status("error",result.errors);
+					if (result.message) iModule.alert.show("error",result.message);
+				}
+			});
 		}/*,
 		check:function($input) {
 			if ($input.attr("name") == "password" || $input.attr("name") == "password_confirm") {
@@ -519,6 +481,17 @@ var Member = {
 					location.href = ENV.getUrl(null,null,$(this).val(),1);
 				});
 			}
+		}
+	},
+	/**
+	 * 소셜계정연동
+	 */
+	connect:{
+		init:function() {
+			var $form = $("#ModuleMemberConnectForm");
+			
+			$("input[name=password]",$form).focus();
+			$form.inits(Member.login);
 		}
 	},
 	photoEdit:{
