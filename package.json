@@ -50,6 +50,10 @@
 			"type":"boolean",
 			"default":true
 		},
+		"verified_email":{
+			"type":"boolean",
+			"default":false
+		},
 		"label":{
 			"type":"int",
 			"default":0
@@ -73,10 +77,6 @@
 		"universal_login":{
 			"type":"boolean",
 			"default":true
-		},
-		"signup_step":{
-			"type":"array",
-			"default":["agreement","insert","complete"]
 		}
 	},
 	"databases":{
@@ -405,11 +405,7 @@
 		},
 		"member_social_oauth_table":{
 			"columns":{
-				"domain":{
-					"type":"varchar",
-					"length":100
-				},
-				"code":{
+				"site":{
 					"type":"varchar",
 					"length":20
 				},
@@ -420,10 +416,20 @@
 				"client_secret":{
 					"type":"varchar",
 					"length":100
+				},
+				"scope":{
+					"type":"varchar",
+					"length":255,
+					"is_null":true
+				},
+				"sort":{
+					"type":"int",
+					"length":11,
+					"default":0
 				}
 			},
 			"indexes":{
-				"domain,code":"primary_key"
+				"site":"primary_key"
 			}
 		},
 		"member_social_token_table":{
@@ -432,19 +438,11 @@
 					"type":"int",
 					"length":11
 				},
-				"code":{
+				"site":{
 					"type":"varchar",
 					"length":20
 				},
-				"client_id":{
-					"type":"varchar",
-					"length":100
-				},
-				"user_id":{
-					"type":"varchar",
-					"length":50
-				},
-				"email":{
+				"id":{
 					"type":"varchar",
 					"length":100
 				},
@@ -460,13 +458,14 @@
 					"length":255,
 					"is_null":true
 				},
-				"request_scope":{
-					"type":"text",
-					"is_null":true
+				"latest_login":{
+					"type":"int",
+					"length":11,
+					"default":0
 				}
 			},
 			"indexes":{
-				"midx,code,client_id":"primary_key"
+				"midx,site":"primary_key"
 			}
 		},
 		"member_table":{
