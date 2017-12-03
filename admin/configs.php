@@ -26,10 +26,11 @@ new Ext.form.Panel({
 			]
 		}),
 		new Ext.form.FieldSet({
-			title:"보안설정",
+			title:Member.getText("admin/configs/form/private"),
 			items:[
 				new Ext.form.Checkbox({
-					boxLabel:"로그인을 하지 않은 경우 모든 회원들의 사진을 기본사진으로 보이게 설정합니다.",
+					fieldLabel:Member.getText("admin/configs/form/private_photo"),
+					boxLabel:Member.getText("admin/configs/form/private_photo_help"),
 					name:"photo_privacy",
 					uncheckedValue:""
 				})
@@ -49,6 +50,13 @@ new Ext.form.Panel({
 					fieldLabel:Member.getText("admin/configs/form/approve_signup"),
 					boxLabel:Member.getText("admin/configs/form/approve_signup_help"),
 					name:"approve_signup",
+					uncheckedValue:"",
+					checked:true
+				}),
+				new Ext.form.Checkbox({
+					fieldLabel:Member.getText("admin/configs/form/verified_email"),
+					boxLabel:Member.getText("admin/configs/form/verified_email_help"),
+					name:"verified_email",
 					uncheckedValue:"",
 					checked:true
 				}),
@@ -97,147 +105,6 @@ new Ext.form.Panel({
 					name:"universal_login",
 					uncheckedValue:"",
 					checked:true
-				}),
-				new Ext.form.FieldContainer({
-					fieldLabel:Member.getText("admin/configs/form/signup_step"),
-					layout:"hbox",
-					items:[
-						new Ext.form.Hidden({
-							name:"signup_step",
-							listeners:{
-								change:function(form,value) {
-									if (Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount() == 0) {
-										var step = value.split(",");
-										for (var i=0, loop=step.length;i<loop;i++) {
-											Ext.getCmp("ModuleMemberSignupStepAvailable").getStore().removeAt(Ext.getCmp("ModuleMemberSignupStepAvailable").getStore().findExact("step",step[i]));
-											Ext.getCmp("ModuleMemberSignupStepUsed").getStore().add({step:step[i],title:Member.getText("text/signup_step/"+step[i]),sort:i});
-										}
-									}
-								}
-							}
-						}),
-						new Ext.grid.Panel({
-							id:"ModuleMemberSignupStepAvailable",
-							title:Member.getText("admin/configs/form/signup_step_available"),
-							border:true,
-							hideHeaders:true,
-							tbar:[
-								new Ext.Button({
-									iconCls:"fa fa-check-square-o",
-									handler:function() {
-										Ext.getCmp("ModuleMemberSignupStepAvailable").getSelectionModel().selectAll();
-									}
-								}),
-								"->",
-								new Ext.Button({
-									text:Member.getText("admin/configs/form/add_signup_step"),
-									iconCls:"fa fa-arrow-right",
-									iconAlign:"right",
-									handler:function() {
-										var checked = Ext.getCmp("ModuleMemberSignupStepAvailable").getSelectionModel().getSelection();
-										for (var i=0, loop=checked.length;i<loop;i++) {
-											checked[i].set("sort",Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount());
-											Ext.getCmp("ModuleMemberSignupStepUsed").getStore().add(checked[i]);
-										}
-										Ext.getCmp("ModuleMemberSignupStepAvailable").getStore().remove(checked);
-										
-										Member.checkSignupStep();
-										
-										var step = [];
-										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
-											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
-										}
-										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
-									}
-								})
-							],
-							store:new Ext.data.ArrayStore({
-								fields:["step","title","sort"],
-								sorters:[{property:"sort",direction:"ASC"}],
-								data:[["agreement",Member.getText("text/signup_step/agreement"),0],["label",Member.getText("text/signup_step/label"),1],["cert",Member.getText("text/signup_step/cert"),2],["insert",Member.getText("text/signup_step/insert"),3],["verify",Member.getText("text/signup_step/verify"),4],["complete",Member.getText("text/signup_step/complete"),5]]
-							}),
-							flex:1,
-							height:300,
-							columns:[{
-								flex:1,
-								dataIndex:"title"
-							}],
-							selModel:new Ext.selection.CheckboxModel()
-						}),
-						new Ext.grid.Panel({
-							id:"ModuleMemberSignupStepUsed",
-							title:Member.getText("admin/configs/form/signup_step_used"),
-							border:true,
-							hideHeaders:true,
-							margin:"0 0 0 5",
-							tbar:[
-								new Ext.Button({
-									text:Member.getText("admin/configs/form/delete_signup_step"),
-									iconCls:"fa fa-arrow-left",
-									handler:function() {
-										var sort = ["agreement","label","cert","insert","verify","complete"];
-										var checked = Ext.getCmp("ModuleMemberSignupStepUsed").getSelectionModel().getSelection();
-										for (var i=0, loop=checked.length;i<loop;i++) {
-											if (checked[i].get("step") == "insert") {
-												Ext.getCmp("ModuleMemberSignupStepUsed").getSelectionModel().deselect(checked[i]);
-											} else {
-												checked[i].set("sort",$.inArray(checked[i].get("sort"),sort));
-												Ext.getCmp("ModuleMemberSignupStepAvailable").getStore().add(checked[i]);
-											}
-										}
-										checked = Ext.getCmp("ModuleMemberSignupStepUsed").getSelectionModel().getSelection();
-										Ext.getCmp("ModuleMemberSignupStepUsed").getStore().remove(checked);
-										
-										Member.checkSignupStep();
-										
-										var step = [];
-										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
-											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
-										}
-										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
-									}
-								}),
-								"-",
-								new Ext.Button({
-									iconCls:"fa fa-caret-up",
-									handler:function() {
-										Admin.gridSort(Ext.getCmp("ModuleMemberSignupStepUsed"),"sort","up");
-										Member.checkSignupStep();
-										var step = [];
-										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
-											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
-										}
-										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
-									}
-								}),
-								new Ext.Button({
-									iconCls:"fa fa-caret-down",
-									handler:function() {
-										Admin.gridSort(Ext.getCmp("ModuleMemberSignupStepUsed"),"sort","down");
-										Member.checkSignupStep();
-										var step = [];
-										for (var i=0, loop=Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getCount();i<loop;i++) {
-											step.push(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().getAt(i).get("step"));
-										}
-										
-										Ext.getCmp("ModuleConfigForm").getForm().findField("signup_step").setValue(step.join(","));
-									}
-								})
-							],
-							store:new Ext.data.ArrayStore({
-								fields:["step","title","sort"],
-								sorters:[{property:"sort",direction:"ASC"}],
-								data:[]
-							}),
-							flex:1,
-							height:300,
-							columns:[{
-								flex:1,
-								dataIndex:"title"
-							}],
-							selModel:new Ext.selection.CheckboxModel()
-						})
-					]
 				})
 			]
 		})
