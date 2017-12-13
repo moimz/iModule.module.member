@@ -46,6 +46,10 @@
 			"type":"boolean",
 			"default":true
 		},
+		"allow_reset_password":{
+			"type":"boolean",
+			"default":true
+		},
 		"approve_signup":{
 			"type":"boolean",
 			"default":true

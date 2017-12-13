@@ -202,6 +202,8 @@
 				"private":"개인정보보호 설정",
 				"private_photo":"회원사진보호",
 				"private_photo_help":"로그인을 하지 않은 경우 모든 회원들의 사진을 기본사진으로 보이게 설정합니다.",
+				"allow_reset_password":"패스워드초기화",
+				"allow_reset_password_help":"패스워드찾기 기능을 이용하여 패스워드를 초기화할 수 있도록 설정합니다.",
 				"point":"기본포인트",
 				"exp":"기본경험치",
 				"label":"기본라벨",

@@ -33,6 +33,12 @@ new Ext.form.Panel({
 					boxLabel:Member.getText("admin/configs/form/private_photo_help"),
 					name:"photo_privacy",
 					uncheckedValue:""
+				}),
+				new Ext.form.Checkbox({
+					fieldLabel:Member.getText("admin/configs/form/allow_reset_password"),
+					boxLabel:Member.getText("admin/configs/form/allow_reset_password_help"),
+					name:"allow_reset_password",
+					uncheckedValue:""
 				})
 			]
 		}),
