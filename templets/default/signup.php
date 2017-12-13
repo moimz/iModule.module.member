@@ -77,22 +77,3 @@ if (defined('__IM__') == false) exit;
 		</div>
 	</div>
 </section>
-
-<?php if (defined('__IM_CONTAINER__') == true) { ?>
-<script>
-$(document).ready(function() {
-	if (opener) {
-		var lastHeight = 0;
-		var popupResize = function() {
-			if (lastHeight != $("section.box").outerHeight()) {
-				iModule.resizeWindow(null,$("section.box").outerHeight());
-				lastHeight = $("section.box").outerHeight();
-			}
-			setTimeout(popupResize,500);
-		};
-		iModule.resizeWindow(null,$("section.box").outerHeight(),true);
-		setTimeout(popupResize,500);
-	}
-});
-</script>
-<?php } ?>

@@ -12,4 +12,15 @@
  */
 if (defined('__IM__') == false) exit;
 if (defined('__IM_CONTAINER__') == true) $IM->addHeadResource('style',$me->getTemplet()->getDir().'/styles/container.css');
+if (defined('__IM_CONTAINER_POPUP__') == true) {
+	$container = explode('/',$IM->container);
 ?>
+<header>
+	<div class="container">
+		<h1><?php echo $me->getContextTitle(end($container)); ?></h1>
+		<button type="button" onclick="self.close();"><i class="mi mi-close"></i></button>
+	</div>
+</header>
+
+<div class="container">
+<?php } ?>
