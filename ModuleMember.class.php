@@ -527,7 +527,6 @@ class ModuleMember {
 				exit;
 		}
 		
-		$this->IM->removeTemplet();
 		$footer = $this->IM->getFooter();
 		$header = $this->IM->getHeader();
 		
@@ -813,12 +812,19 @@ class ModuleMember {
 			$content.= '</ul>';
 		}
 		
-		$signup = $this->IM->getContextUrl('member','signup');
-		$help = $this->IM->getContextUrl('member','help');
-		$content.= '<ul data-module="member" data-role="link">';
-		$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$this->IM->getUrl($signup->menu,$signup->page,false).'">'.$signup->title.'</a>').'</li>';
-		$content.= '<li>'.($help == null ? '<button type="button" onclick="Member.helpPopup();">'.$this->getText('text/help').'</button>' : '<a href="'.$this->IM->getUrl($help->menu,$help->page,false).'">'.$help->title.'</a>').'</li>';
-		$content.= '</ul>';
+		if ($this->getModule()->getConfig('allow_signup') == true || $this->getModule()->getConfig('allow_reset_password') == true) {
+			$content.= '<ul data-module="member" data-role="link">';
+			if ($this->getModule()->getConfig('allow_signup') == true) {
+				$signup = $this->IM->getContextUrl('member','signup');
+				$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$this->IM->getUrl($signup->menu,$signup->page,false).'">'.$signup->title.'</a>').'</li>';
+			}
+			
+			if ($this->getModule()->getConfig('allow_signup') == true) {
+				$help = $this->IM->getContextUrl('member','help');
+				$content.= '<li>'.($help == null ? '<button type="button" onclick="Member.helpPopup();">'.$this->getText('text/help').'</button>' : '<a href="'.$this->IM->getUrl($help->menu,$help->page,false).'">'.$help->title.'</a>').'</li>';
+			}
+			$content.= '</ul>';
+		}
 		
 		$buttons = array();
 		
@@ -945,7 +951,7 @@ class ModuleMember {
 				 * 이메일주소로 기존 회원을 검색한다.
 				 */
 				$check = $this->db()->select($this->table->member)->where('email',$logged->user->email);
-				if ($this->IM->getSite()->member == 'UNIVERSAL') $check->where('domain','*');
+				if ($this->IM->getSite(false)->member == 'UNIVERSAL') $check->where('domain','*');
 				else $check->where('domain',$this->IM->domain);
 				$check = $check->getOne();
 				
@@ -958,7 +964,7 @@ class ModuleMember {
 					}
 					
 					$midx = $this->db()->insert($this->table->member,array(
-						'domain'=>$this->IM->getSite()->member == 'UNIVERSAL' ? '*' : $this->IM->domain,
+						'domain'=>$this->IM->getSite(false)->member == 'UNIVERSAL' ? '*' : $this->IM->domain,
 						'type'=>'MEMBER',
 						'email'=>$logged->user->email,
 						'password'=>'',
@@ -1069,7 +1075,7 @@ class ModuleMember {
 	 * @return boolean $isValidate
 	 */
 	function isValidate($email,$password) {
-		$siteType = $this->IM->getSite()->member;
+		$siteType = $this->IM->getSite(false)->member;
 		if ($siteType == 'MERGE') $domain = '*';
 		else $domain = $this->IM->getSite()->domain;
 		
@@ -1827,7 +1833,7 @@ class ModuleMember {
 		if (is_array($data) == true) $data = (object)$data;
 		
 		$isSignUp = $mode == 'signup';
-		$siteType = $this->IM->getSite()->member;
+		$siteType = $this->IM->getSite(false)->member;
 		$label = isset($data->label) == true ? $data->label : 0;
 		
 		if ($insert != null) $insert['extras'] = array();
