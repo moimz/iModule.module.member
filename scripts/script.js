@@ -67,7 +67,7 @@ var Member = {
 	 * 회원가입 팝업
 	 */
 	signupPopup:function() {
-		iModule.openPopup(ENV.getModuleUrl("member","signup"),500,500,0,"signup");
+		iModule.openPopup(ENV.getModuleUrl("member","@signup"),500,500,0,"signup");
 	},
 	/**
 	 * 다른 도메인간 통합로그인을 위한 로그인 세션 동기화
