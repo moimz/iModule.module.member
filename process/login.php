@@ -24,7 +24,7 @@ if ($LOGGED_FAIL['time'] > time()) {
 	$results->errors['email'] = $this->getErrorText('DISABLED_LOGIN',$LOGGED_FAIL['time'] - time());
 	$results->message = $this->getErrorText('DISABLED_LOGIN',$LOGGED_FAIL['time'] - time());
 } else {
-	$siteType = $this->IM->getSite()->member;
+	$siteType = $this->IM->getSite(false)->member;
 	
 	if ($siteType == 'UNIVERSAL') {
 		$check = $this->db()->select($this->table->member)->where('email',$email)->where('domain','*')->getOne();

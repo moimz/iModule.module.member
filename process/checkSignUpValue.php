@@ -18,7 +18,7 @@ if (defined('__IM__') == false) exit;
 $name = Request('name');
 $value = Request('value');
 $isSignUp = Request('mode') == 'signup';
-$siteType = $this->IM->getSite()->member;
+$siteType = $this->IM->getSite(false)->member;
 
 if ($name == 'email' || $name == 'email_verification_email') {
 	if (CheckEmail($value) == true) {
