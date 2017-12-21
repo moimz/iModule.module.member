@@ -476,105 +476,127 @@
 			"columns":{
 				"idx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"고유값"
 				},
 				"domain":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"도메인"
 				},
 				"type":{
 					"type":"enum",
 					"length":"'ADMINISTRATOR','SITEMANAGER','MODERATOR','MEMBER'",
-					"default":"MEMBER"
+					"default":"MEMBER",
+					"comment":"회원권한"
 				},
 				"email":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"이메일"
 				},
 				"password":{
 					"type":"varchar",
 					"length":65,
-					"is_null":true
+					"is_null":true,
+					"comment":"비밀번호"
 				},
 				"code":{
 					"type":"varchar",
 					"length":50,
-					"is_null":true
+					"is_null":true,
+					"comment":"LMS고유값"
 				},
 				"name":{
 					"type":"varchar",
-					"length":30
+					"length":30,
+					"comment":"이름"
 				},
 				"nickname":{
 					"type":"varchar",
-					"length":30
+					"length":30,
+					"comment":"닉네임"
 				},
 				"homepage":{
 					"type":"varchar",
 					"length":100,
-					"is_null":true
+					"is_null":true,
+					"comment":"홈페이지"
 				},
 				"telephone":{
 					"type":"varchar",
 					"length":20,
-					"is_null":true
+					"is_null":true,
+					"comment":"전화번호"
 				},
 				"cellphone":{
 					"type":"varchar",
 					"length":20,
-					"is_null":true
+					"is_null":true,
+					"comment":"휴대전화번호"
 				},
 				"gender":{
 					"type":"enum",
 					"length":"'NONE','MALE','FEMALE'",
-					"default":"NONE"
+					"default":"NONE",
+					"comment":"성별"
 				},
 				"birthday":{
 					"type":"varchar",
 					"length":10,
-					"is_null":true
+					"is_null":true,
+					"comment":"생년월일"
 				},
 				"address":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"주소"
 				},
 				"extras":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"추가정보"
 				},
 				"exp":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"경험치"
 				},
 				"point":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"포인트"
 				},
 				"reg_date":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"등록일"
 				},
 				"latest_login":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"최종로그인일"
 				},
 				"leave_date":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"탈퇴일"
 				},
 				"verified":{
 					"type":"enum",
 					"length":"'NONE','TRUE','FALSE'",
-					"default":"NONE"
+					"default":"NONE",
+					"comment":"인증여부"
 				},
 				"status":{
 					"type":"enum",
 					"length":"'ACTIVATED','WAITING','LEAVE','DEACTIVATED'",
-					"default":"ACTIVATED"
+					"default":"ACTIVATED",
+					"comment":"회원상태"
 				}
 			},
 			"indexes":{
@@ -587,7 +609,8 @@
 				"reg_date":"index",
 				"latest_login":"index"
 			},
-			"auto_increment":"idx"
+			"auto_increment":"idx",
+			"comment":"회원관리"
 		}
 	}
 }
