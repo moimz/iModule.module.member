@@ -31,12 +31,8 @@
 	],
 	"configs":{
 		"templet":{
-			"type":"string",
+			"type":"templet",
 			"default":"default"
-		},
-		"templet_configs":{
-			"type":"object",
-			"default":{}
 		},
 		"photo_privacy":{
 			"type":"boolean",
