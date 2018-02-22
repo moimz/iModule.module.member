@@ -1,5 +1,7 @@
 {
 	"text":{
+		"name":"실명",
+		"photo":"회원사진",
 		"login":"로그인",
 		"signup":"회원가입",
 		"modify":"회원정보수정",
@@ -16,8 +18,9 @@
 	"context":{
 		"signup":"회원가입",
 		"modify":"회원정보수정",
-		"help":"패스워드 찾기",
-		"point":"포인트 내역"
+		"verification":"이메일주소 인증",
+		"point":"포인트 내역",
+		"password":"패스워드 초기화"
 	},
 	"social":{
 		"facebook":"페이스북 아이디로 로그인",
@@ -38,7 +41,9 @@
 		"password":"패스워드",
 		"password_confirm":"패스워드확인",
 		"password_help":"패스워드를 6글자 이상으로 입력하여 주십시오.",
-		"nickname_help":"사이트에서 사용할 닉네임을 입력하여 주십시오.(2 ~ 14글자)",
+		"nickname_help":"사이트에서 사용할 닉네임을 입력하여 주십시오.(2 ~ 10글자)",
+		"new_password":"변경할 패스워드",
+		"password_change":"패스워드변경",
 		"nickname_success":"사용하실 수 있는 닉네임입니다.",
 		"email_verification_email":"이메일",
 		"email_verification_email_help":"입력하신 이메일주소가 올바르지 않다면 수정 후 인증메일 재발송 버튼을 클릭하여 주십시오.",
@@ -46,7 +51,9 @@
 		"email_verification_code_help":"입력한 이메일주소로 인증코드를 발송하였습니다. 이메일에 포함되어 있는 6자리의 인증코드를 입력하여 주십시오."
 	},
 	"button":{
-		"resend_email_verification_code":"인증메일 재발송"
+		"edit":"편집",
+		"resend_email_verification_code":"인증메일 재발송",
+		"verified_email":"이메일 인증하기"
 	},
 	"error":{
 		"ALREADY_LOGGED":"이미 로그인중입니다.",
@@ -60,7 +67,9 @@
 		"TOO_SHORT_PASSWORD":"패스워드는 최소 6글자 이상 입력하여 주십시오.",
 		"NOT_MATCHED_PASSWORD_CONFIRM":"패스워드와 패스워드 확인이 서로 일치하지 않습니다.",
 		"INVALID_GENDER":"성별 선택값이 유효하지 않습니다.",
-		"RESEND_EMAIL_VERIFICATION_CODE":"인증코드를 발송한 기록이 없습니다. 인증메일재전송을 먼저 하여 주시기 바랍니다.",
+		"WAIT_VERIFIED_EMAIL":"최근에 인증이메일을 발송하였습니다. 5분후 다시 시도하여 주시기 바랍니다.",
+		"RESEND_EMAIL_VERIFICATION_CODE":"이메일을 성공적으로 발송하였습니다.",
+		"INVALID_EMAIL_VERIFICATION_TOKEN":"이메일 인증정보를 찾을 수 없습니다.",
 		"INCORRECT_EMAIL_VERIFICATION_CODE":"인증코드가 일치하지 않습니다."
 	},
 	"admin":{

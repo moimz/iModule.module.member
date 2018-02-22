@@ -11,9 +11,11 @@
  * @modified 2017. 11. 30.
  */
 if (defined('__IM__') == false) exit;
-if (defined('__IM_CONTAINER__') == true) $IM->addHeadResource('style',$me->getTemplet()->getDir().'/styles/container.css');
-if (defined('__IM_CONTAINER_POPUP__') == true) {
+if (defined('__IM_CONTAINER__') == true) {
+	$IM->addHeadResource('style',$me->getTemplet()->getDir().'/styles/container.css');
 	$container = explode('/',$IM->container);
+	
+	if (defined('__IM_CONTAINER_POPUP__') == true) {
 ?>
 <header>
 	<div class="container">
@@ -21,6 +23,7 @@ if (defined('__IM_CONTAINER_POPUP__') == true) {
 		<button type="button" onclick="self.close();"><i class="mi mi-close"></i></button>
 	</div>
 </header>
+<?php } ?>
 
-<div class="container">
+<div class="<?php echo defined('__IM_CONTAINER_POPUP__') == true ? 'container' : 'center'; ?>">
 <?php } ?>

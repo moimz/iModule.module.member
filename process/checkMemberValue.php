@@ -7,11 +7,8 @@
  * @file /modules/member/process/liveCheckValue.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160923
- *
- * @post string $name 입력값 종류
- * @post string $value 사용자 입력값
- * @return object $results
+ * @version 3.0.0
+ * @modified 2018. 2. 10.
  */
 if (defined('__IM__') == false) exit;
 

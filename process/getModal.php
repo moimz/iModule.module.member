@@ -18,4 +18,14 @@ if ($modal == 'login') {
 	$results->success = true;
 	$results->modalHtml = $this->getLoginModal();
 }
+
+if ($modal == 'photo') {
+	$results->success = true;
+	$results->modalHtml = $this->getPhotoModal();
+}
+
+if ($modal == 'password') {
+	$results->success = true;
+	$results->modalHtml = $this->getPasswordModal();
+}
 ?>

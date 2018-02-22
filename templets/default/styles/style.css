@@ -13,15 +13,103 @@
 div[data-module=member] {}
 
 /**
+ * 박스형태(회원가입 또는 이메일인증 등) 컨텍스트
+ */
+div[data-module=member] section.box > div > div {display:block; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; width:100%; box-sizing:border-box; text-align:left;}
+div[data-module=member] section.box > div > div > h4 {font-size:16px; height:24px; line-height:24px; margin-bottom:10px;}
+div[data-module=member] section.box > div > div > *[data-role] + h4 {margin-top:40px;}
+div[data-module=member] section.box > div > div > div[data-role=button] {margin-top:20px;}
+div[data-module=member] section.box > div > div > div[data-role=text] {line-height:1.6;}
+
+@media (max-width:420px) {
+	div[data-module=member] section.box > div > div > div[data-role=button] {padding:0;}
+	div[data-module=member] section.box > div > div > div[data-role=button] > * {display:block; margin:5px 0px; width:100%;}
+}
+
+/**
  * 회원가입 컨텍스트
  */
-div[data-module=member][data-context=signup] section.box > div > div {display:block; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; width:100%; box-sizing:border-box; text-align:left;}
-
-div[data-module=member][data-context=signup] section.box > div > div > h4 {font-size:16px; height:24px; line-height:24px; margin-bottom:10px;}
+div[data-module=member][data-context=signup] div.center section.box > div > div {max-width:600px; margin:50px auto;}
 div[data-module=member][data-context=signup] section.box > div > div > article {border:1px solid #ccc; background:#fff; font-size:12px; line-height:1.6; padding:15px; overflow-y:auto; height:200px; -webkit-overflow-scrolling:touch;}
+div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] {list-style:none; display:block;}
+div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li {display:block; margin:10px 0px;}
+div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a {display:block; border:1px solid #e5e5e5; font-size:16px; padding:15px 20px; color:#222; text-decoration:none;}
+div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a > b {display:block;}
+div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a > small {display:block; margin-top:10px; color:#666; font-size:14px;}
+div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a:hover {background:#f4f4f4;}
 
-div[data-module=member][data-context=signup] section.box > div > div > *[data-role] + h4 {margin-top:40px;}
-div[data-module=member][data-context=signup] section.box > div > div > div[data-role=button] {margin-top:20px;}
+/**
+ * 정보수정 컨텍스트
+ */
+div[data-module=member][data-context=modify] div.center section.box > div > div {max-width:600px; margin:50px auto;}
+
+div[data-module=member][data-context=modify] section.box.password > div {padding:100px 0px;}
+div[data-module=member][data-context=modify] section.box.password > div > div {width:360px; padding:20px; margin:0 auto;}
+div[data-module=member][data-context=modify] section.box.password > div > div > i.photo {width:100px; height:100px; display:block; margin:10px auto; border:1px solid #ccc; border-radius:50%; background-size:cover; background-position:50% 50%;}
+div[data-module=member][data-context=modify] section.box.password > div > div > h4 {font-size:20px; display:block; text-align:center; margin:10px;}
+div[data-module=member][data-context=modify] section.box.password > div > div > small {font-size:14px; color:#666; display:block; text-align:center; padding-bottom:20px; border-bottom:1px solid #e5e5e5; margin-bottom:20px;}
+div[data-module=member][data-context=modify] section.box.password > div > div > div[data-role=button] {padding-left:0; margin-top:10px;}
+div[data-module=member][data-context=modify] section.box.password > div > div > div[data-role=button] > button {width:100%; margin-left:0;}
+
+div[data-module=member][data-context=modify] div[data-role=photo] > div.preview {width:80px; height:80px; border-radius:50%; position:relative; background-size:cover; background-position:50% 50%; overflow:hidden; border:1px solid #ccc;}
+div[data-module=member][data-context=modify] div[data-role=photo] > div.preview > button {width:80px; height:80px; padding-top:50px; line-height:30px; position:absolute; left:0; bottom:0; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,rgba(0,0,0,0) 60%,rgba(0,0,0,0.8) 100%); color:#fff; border:0;}
+div[data-module=member][data-context=modify] div[data-role=photo] > textarea {display:none;}
+
+/**
+ * 회원사진 수정 모달
+ */
+div[data-role=modal] div[data-role=photo-editor] input[type=file] {display:none;}
+
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-preview-container {width:250px; height:250px; margin:10px auto; margin-bottom:30px;}
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-preview {background-color:#f8f8f8; background-size:cover; border:1px solid #ccc; border-radius:50%; width:250px; height:250px; cursor:move;}
+
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-background {opacity:0.3; cursor:auto;}
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-zoom-container {height:20px; width:250px; margin:0 auto; font-size:0px; text-align:center;}
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-zoom-container span {width:20px; height:17px; display:inline-block; vertical-align:middle; line-height:17px; margin-top:3px;}
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-zoom-container span.cropit-image-zoom-out i {font-size:10px; margin-top:2px;}
+div[data-role=modal] div[data-role=photo-editor] .cropit-image-zoom-container span.cropit-image-zoom-in i {font-size:14px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input {-webkit-appearance:none; border:1px solid white; width:140px; position:relative; z-index:10; vertical-align:middle; margin:0px 10px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-webkit-slider-runnable-track {width:100%; height:5px; background:#ddd; border:none; border-radius:3px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-webkit-slider-thumb {-webkit-appearance:none; border:none; height:16px; width:16px; border-radius:50%; background:#e4232c; margin-top:-5px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input:focus {outline:none;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input:focus::-webkit-slider-runnable-track {background:#ccc;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-moz-range-track {width:100%; height:5px; background:#ddd; border:none; border-radius:3px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-moz-range-thumb {border:none; height:16px; width:16px; border-radius:50%; background:#e4232c;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input:-moz-focusring{outline:1px solid white; outline-offset:-1px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-ms-track {width:300px; height:5px; background:transparent; border-color:transparent; border-width:6px 0; color:transparent;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-ms-fill-lower {background:#777; border-radius:10px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-ms-fill-upper {background:#ddd; border-radius:10px;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input::-ms-thumb {border:none; height:16px; width:16px; border-radius:50%; background:#e4232c;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input:focus::-ms-fill-lower {background:#888;}
+div[data-role=modal] div[data-role=photo-editor] input.cropit-image-zoom-input:focus::-ms-fill-upper {background:#ccc;}
+
+/**
+ * 이메일인증 컨텍스트
+ */
+div[data-module=member][data-context=verification] div.center section.box > div > div {max-width:400px; margin:50px auto;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=input] {margin-top:10px;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=text].line {margin-top:20px; border-top:1px solid #c8caca; padding-top:20px;}
+
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=button].block {padding-left:0;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=button].block > button {width:100%;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=button].half {padding-left:0; font-size:0;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=button].half > button {width:50%; box-sizing:border-box;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=button].half > button:last-child {width:calc(50% - 5px); margin-right:0;}
+div[data-module=member][data-context=verification] section.box > div > div > div[data-role=input] + div[data-role=button] {margin-top:5px;}
+
+
+/**
+ * 패스워드 초기화 컨텍스트
+ */
+div[data-module=member][data-context=password] div.center section.box > div > div {max-width:400px; margin:50px auto;}
+
+div[data-module=member][data-context=password] section.box > div > div > div[data-role=text] {margin-bottom:10px;}
+
+div[data-module=member][data-context=password] section.box > div > div > div[data-role=button] {padding-left:0;}
+div[data-module=member][data-context=password] section.box > div > div > div[data-role=button] > button {width:100%;}
+div[data-module=member][data-context=password] section.box > div > div > div[data-role=button] > button + button {margin-top:5px;}
+div[data-module=member][data-context=password] section.box > div > div > div[data-role=input] + div[data-role=button] {margin-top:5px;}
+div[data-module=member][data-context=password] section.box > div > div > div[data-role=inputset] + div[data-role=button] {margin-top:5px;}
 
 /**
  * 소셜계정연결 컨텍스트
@@ -30,7 +118,7 @@ div[data-module=member][data-context=connect] {width:100%; height:100%; backgrou
 div[data-module=member][data-context=connect] > form {width:100%; height:100%;}
 div[data-module=member][data-context=connect] section.box {width:100%; height:100%; display:table;}
 div[data-module=member][data-context=connect] section.box > div {display:table-cell; width:100%; height:100%; vertical-align:middle; text-align:center;}
-div[data-module=member][data-context=connect] section.box > div > div {display:block; margin:50px auto; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; width:90%; max-width:360px; box-sizing:border-box; text-align:left;}
+div[data-module=member][data-context=connect] section.box > div > div {margin:50px auto; max-width:360px;}
 
 div[data-module=member][data-context=connect] section.box > div > div > ul.connect {list-style:none; width:200px; height:80px; display:block; margin:20px auto; font-size:0;}
 div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li {height:80px; display:inline-block; vertical-align:middle;}

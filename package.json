@@ -29,6 +29,11 @@
 	"attachments":[
 		"member"
 	],
+	"targets":{
+		"core":{
+			"afterDoLayout":"*"
+		}
+	},
 	"configs":{
 		"templet":{
 			"type":"templet",
@@ -157,6 +162,11 @@
 				"title":{
 					"type":"varchar",
 					"length":20
+				},
+				"description":{
+					"type":"varchar",
+					"length":255,
+					"is_null":true
 				},
 				"languages":{
 					"type":"text",
@@ -300,6 +310,31 @@
 				"idx":"index"
 			}
 		},
+		"member_password_table":{
+			"columns":{
+				"token":{
+					"type":"char",
+					"length":40
+				},
+				"midx":{
+					"type":"int",
+					"length":11
+				},
+				"reg_date":{
+					"type":"int",
+					"length":11
+				},
+				"status":{
+					"type":"enum",
+					"length":"'SENDING','RESET'",
+					"default":"SENDING"
+				}
+			},
+			"indexes":{
+				"token":"primary_key",
+				"midx,status":"index"
+			}
+		},
 		"member_point_table":{
 			"columns":{
 				"idx":{
@@ -400,7 +435,7 @@
 			"datas":[
 				{"label":0,"name":"email","type":"email","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":0},
 				{"label":0,"name":"password","type":"password","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":1},
-				{"label":0,"name":"nickname","input":"nickname","type":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":2}
+				{"label":0,"name":"nickname","type":"nickname","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":2}
 			]
 		},
 		"member_social_oauth_table":{

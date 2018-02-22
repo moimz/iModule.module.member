@@ -11,21 +11,26 @@
  * @modified 2017. 11. 30.
  */
 if (defined('__IM__') == false) exit;
-if (defined('__IM_CONTAINER_POPUP__') == true) {
+
+if (defined('__IM_CONTAINER__') == true) {
 ?>
 </div>
 
+<?php if (defined('__IM_CONTAINER_POPUP__') == true) { ?>
 <script>
 $(document).on("init",function() {
+	var $container = $("div[data-module=member]");
 	var lastHeight = 0;
 	var popupResize = function(is_center) {
-		if (lastHeight != $("div[data-module=member]").outerHeight()) {
-			iModule.resizeWindow(null,$("div[data-module=member]").outerHeight(),is_center === true);
-			lastHeight = $("div[data-module=member]").outerHeight();
+		var height = $("header",$container).outerHeight(true) + $("section.box",$container).outerHeight(true) + 20;
+		
+		if (screen.height - 100 > height && lastHeight != height) {
+			iModule.resizeWindow(null,height,is_center === true);
+			lastHeight = height;
 		}
 		setTimeout(popupResize,500);
 	};
 	popupResize(true);
 });
 </script>
-<?php } ?>
+<?php }} ?>

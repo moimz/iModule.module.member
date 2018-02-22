@@ -26,7 +26,7 @@ if ($this->getLabel($label)->allow_signup === false) {
 	$insert = array();
 	$errors = array();
 	
-	$isValid = $this->isValidSignUpData('signup',$_POST,$insert,$errors);
+	$isValid = $this->isValidMemberData('signup',$_POST,$insert,$errors);
 	
 	if ($isValid && count($errors) == 0) {
 		if ($site->member == 'UNIVERSAL') $insert['domain'] = '*';
