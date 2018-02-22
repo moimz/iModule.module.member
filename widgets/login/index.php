@@ -7,14 +7,10 @@
  * @file /modules/member/widgets/login/index.php
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
- * @version 3.0.0.161001
+ * @version 3.0.0
+ * @modified 2018. 2. 14.
  */
-
 if (defined('__IM__') == false) exit;
-
-/**
- * 템플릿파일이 없을 경우 에러메세지를 출력한다.
- */
 
 $forceLogin = $Widget->getValue('force_login') === true ? true : false;
 
@@ -24,12 +20,21 @@ if ($forceLogin == true || $me->isLogged() == false) {
 	$footer = PHP_EOL.'</section>'.PHP_EOL;
 	$footer.= '</form>'.PHP_EOL.'<script>$("#'.$Widget->getRandomId().'").inits(Member.login);</script>'.PHP_EOL;
 	
+	$oauths = $me->db()->select($me->getTable('social_oauth'))->orderBy('sort','asc')->get();
+	
+	$allow_signup = $me->getModule()->getConfig('allow_signup') == true;
+	$allow_reset_password = $me->getModule()->getConfig('allow_reset_password') == true;
+	$signup = $IM->getContextUrl('member','signup');
+	$help = $IM->getContextUrl('member','password');
+	
 	return $Templet->getContext('login',get_defined_vars(),$header,$footer);
 } else {
 	$member = $me->getMember();
 
 	$header = '<section class="logged">'.PHP_EOL;
 	$footer = PHP_EOL.'</section>'.PHP_EOL;
+	
+	$modify = $IM->getContextUrl('member','modify');
 	
 	return $Templet->getContext('logged',get_defined_vars(),$header,$footer);
 }
