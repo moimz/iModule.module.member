@@ -19,7 +19,7 @@ if ($token !== false) {
 	$session = json_decode($token);
 	
 	if ($session->idx == 0) {
-		unset($_SESSION['MEMBER_LOGGED']);
+		unset($_SESSION['IM_MEMBER_LOGGED']);
 		
 		$results->success = true;
 		$results->success = null;
@@ -34,7 +34,7 @@ if ($token !== false) {
 			$logged->time = time();
 			$logged->ip = $_SERVER['REMOTE_ADDR'];
 			
-			$_SESSION['MEMBER_LOGGED'] = Encoder(json_encode($logged));
+			$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));
 			
 			$results->success = true;
 			$results->logged = $logged;

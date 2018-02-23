@@ -4,17 +4,15 @@
  *
  * 회원 로그아웃을 처리한다.
  *
- * @file /modules/member/templets/default/logout.php
+ * @file /modules/member/process/logout.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160922
- *
- * @return object $results
+ * @version 3.0.0
+ * @modified 2018. 2. 23.
  */
-
 if (defined('__IM__') == false) exit;
 
-unset($_SESSION['MEMBER_LOGGED']);
+unset($_SESSION['IM_MEMBER_LOGGED']);
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) == true) {
 	$results->success = true;
 	$results->universal_login = $this->getModule()->getConfig('universal_login');
