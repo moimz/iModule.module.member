@@ -24,7 +24,7 @@ var Member = {
 			
 			if (result.success == true) {
 				if (typeof callback == "function") callback();
-				else location.href = location.href.split("#").shift();
+				else location.replace(location.href.split("#").shift());
 			}
 		});
 	},
@@ -56,11 +56,11 @@ var Member = {
 				if (result.universal_login === true) {
 					Member.syncSession(function() {
 						if (typeof callback == "function") callback();
-						else location.href = location.href.split("#").shift();
+						else location.replace(location.href.split("#").shift());
 					});
 				} else {
 					if (typeof callback == "function") callback();
-					else location.href = location.href.split("#").shift();
+					else location.replace(location.href.split("#").shift());
 				}
 			}
 		});
@@ -153,10 +153,10 @@ var Member = {
 				
 				if (action == "main") {
 					if (ENV.IS_CONTAINER_POPUP == true) {
-						if (opener) opener.location.href = ENV.getUrl(false);
+						if (opener) opener.location.replace(ENV.getUrl(false));
 						window.close();
 					} else {
-						location.href = ENV.getUrl(false);
+						location.replace(ENV.getUrl(false));
 					}
 				}
 			});
@@ -202,7 +202,7 @@ var Member = {
 		submit:function($form) {
 			$form.send(ENV.getProcessUrl("member","signup"),function(result) {
 				if (result.success == true) {
-					location.href = ENV.getUrl(null,null,"complete",false);
+					location.replace(ENV.getUrl(null,null,"complete",false));
 				}
 			});
 		}
@@ -223,10 +223,10 @@ var Member = {
 				
 				if (action == "main") {
 					if (ENV.IS_CONTAINER_POPUP == true) {
-						if (opener) opener.location.href = ENV.getUrl(false);
+						if (opener) opener.location.replace(ENV.getUrl(false));
 						window.close();
 					} else {
-						location.href = ENV.getUrl(false);
+						location.replace(ENV.getUrl(false));
 					}
 				}
 				
@@ -331,7 +331,6 @@ var Member = {
 					$form.attr("action",location.href);
 					$form.attr("method","post");
 					$form.submit();
-//					location.href = ENV.getUrl(null,null,"complete",false);
 				}
 			});
 		},
@@ -340,10 +339,10 @@ var Member = {
 				if (result.success == true) {
 					iModule.modal.alert(iModule.getText("text/confirm"),result.message,function() {
 						if (ENV.IS_CONTAINER_POPUP == true) {
-							if (opener) opener.location.href = opener.location.href;
+							if (opener) opener.location.replace(opener.location.href);
 							window.close();
 						} else {
-							location.href = ENV.getUrl(false);
+							location.replace(ENV.getUrl(false));
 						}
 					});
 				}
@@ -366,10 +365,10 @@ var Member = {
 				if (action == "logout") {
 					Member.logout(this,function() {
 						if (ENV.IS_CONTAINER_POPUP == true) {
-							if (opener) opener.location.href = ENV.getUrl(false);
+							if (opener) opener.location.replace(ENV.getUrl(false));
 							window.close();
 						} else {
-							location.href = ENV.getUrl(false);
+							location.replace(ENV.getUrl(false));
 						}
 					});
 				}
@@ -392,10 +391,10 @@ var Member = {
 				
 				if (action == "main") {
 					if (ENV.IS_CONTAINER_POPUP == true) {
-						if (opener) opener.location.href = ENV.getUrl(false);
+						if (opener) opener.location.replace(ENV.getUrl(false));
 						window.close();
 					} else {
-						location.href = ENV.getUrl(false);
+						location.replace(ENV.getUrl(false));
 					}
 				}
 			});
@@ -406,10 +405,10 @@ var Member = {
 			$form.send(ENV.getProcessUrl("member","verifyEmail"),function(result) {
 				if (result.success == true) {
 					if (ENV.IS_CONTAINER_POPUP == true) {
-						if (opener) opener.location.href = ENV.getUrl(false);
+						if (opener) opener.location.replace(ENV.getUrl(false));
 						window.close();
 					} else {
-						location.href = ENV.getUrl(false);
+						location.replace(ENV.getUrl(false));
 					}
 				}
 			});
@@ -427,10 +426,10 @@ var Member = {
 				
 				if (action == "main") {
 					if (ENV.IS_CONTAINER_POPUP == true) {
-						if (opener) opener.location.href = ENV.getUrl(false);
+						if (opener) opener.location.replace(ENV.getUrl(false));
 						window.close();
 					} else {
-						location.href = ENV.getUrl(false);
+						location.replace(ENV.getUrl(false));
 					}
 				}
 			});
@@ -442,10 +441,10 @@ var Member = {
 				if (result.success == true) {
 					iModule.modal.alert(iModule.getText("text/confirm"),result.message,function() {
 						if (ENV.IS_CONTAINER_POPUP == true) {
-							if (opener) opener.location.href = opener.location.href;
+							if (opener) opener.location.replace(opener.location.href);
 							window.close();
 						} else {
-							location.href = ENV.getUrl(false);
+							location.replace(ENV.getUrl(false));
 						}
 					});
 					
@@ -654,7 +653,7 @@ var Member = {
 			dataType:"json",
 			success:function(result) {
 				if (result.success == true) {
-					location.href = redirectUrl ? redirectUrl : location.href.split("#").shift();
+					location.replace(redirectUrl ? redirectUrl : location.href.split("#").shift());
 				} else {
 					iModule.alertMessage.show("error",result.message,5);
 				}
