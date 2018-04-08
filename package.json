@@ -440,6 +440,11 @@
 		},
 		"member_social_oauth_table":{
 			"columns":{
+				"domain":{
+					"type":"varchar",
+					"length":100,
+					"default":"*"
+				},
 				"site":{
 					"type":"varchar",
 					"length":20
@@ -457,6 +462,22 @@
 					"length":255,
 					"is_null":true
 				},
+				"callback_domain":{
+					"type":"varchar",
+					"length":100,
+					"default":"*"
+				}
+			},
+			"indexes":{
+				"domain,site":"primary_key"
+			}
+		},
+		"member_social_sort_table":{
+			"columns":{
+				"site":{
+					"type":"varchar",
+					"length":20
+				},
 				"sort":{
 					"type":"int",
 					"length":11,
@@ -465,13 +486,26 @@
 			},
 			"indexes":{
 				"site":"primary_key"
-			}
+			},
+			"datas":[
+				{"site":"google","sort":0},
+				{"site":"facebook","sort":1},
+				{"site":"twitter","sort":2},
+				{"site":"kakao","sort":3},
+				{"site":"naver","sort":4},
+				{"site":"github","sort":5}
+			]
 		},
 		"member_social_token_table":{
 			"columns":{
 				"midx":{
 					"type":"int",
 					"length":11
+				},
+				"domain":{
+					"type":"varchar",
+					"length":100,
+					"default":"*"
 				},
 				"site":{
 					"type":"varchar",

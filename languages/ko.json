@@ -23,10 +23,15 @@
 		"password":"패스워드 초기화"
 	},
 	"social":{
-		"facebook":"페이스북 아이디로 로그인",
-		"google":"구글 아이디로 로그인",
-		"naver":"네이버 아이디로 로그인",
-		"kakao":"카카오 아이디로 로그인"
+		"login":"{SITE}계정으로 로그인",
+		"connect":"{SITE}계정 연결하기",
+		"disconnect":"{SITE}계정 연결끊기",
+		"facebook":"페이스북",
+		"twitter":"트위터",
+		"google":"구글",
+		"naver":"네이버",
+		"kakao":"카카오",
+		"github":"깃허브"
 	},
 	"status":{
 		"ACTIVATED":"활성",

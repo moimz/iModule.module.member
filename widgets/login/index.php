@@ -6,9 +6,9 @@
  *
  * @file /modules/member/widgets/login/index.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
+ * @license MIT License
  * @version 3.0.0
- * @modified 2018. 2. 14.
+ * @modified 2018. 4. 5.
  */
 if (defined('__IM__') == false) exit;
 
@@ -20,7 +20,10 @@ if ($forceLogin == true || $me->isLogged() == false) {
 	$footer = PHP_EOL.'</section>'.PHP_EOL;
 	$footer.= '</form>'.PHP_EOL.'<script>$("#'.$Widget->getRandomId().'").inits(Member.login);</script>'.PHP_EOL;
 	
-	$oauths = $me->db()->select($me->getTable('social_oauth'))->orderBy('sort','asc')->get();
+	$oauths = $me->db()->select($me->getTable('social_oauth').' o','o.site')->join($me->getTable('social_sort').' s','s.site=o.site','LEFT')->where('o.domain',array('*',$IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
+	for ($i=0, $loop=count($oauths);$i<$loop;$i++) {
+		$oauths[$i]->link = $me->getSocialLoginUrl($oauths[$i]->site);
+	}
 	
 	$allow_signup = $me->getModule()->getConfig('allow_signup') == true;
 	$allow_reset_password = $me->getModule()->getConfig('allow_reset_password') == true;

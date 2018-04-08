@@ -37,6 +37,7 @@ div[data-module=member][data-context=signup] section.box > div > div > ul[data-r
 div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a > b {display:block;}
 div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a > small {display:block; margin-top:10px; color:#666; font-size:14px;}
 div[data-module=member][data-context=signup] section.box > div > div > ul[data-role=labels] > li > a:hover {background:#f4f4f4;}
+div[data-module=member][data-context=signup] ul[data-role=form] > li > label {width:130px;}
 
 /**
  * 정보수정 컨텍스트
@@ -51,9 +52,30 @@ div[data-module=member][data-context=modify] section.box.password > div > div > 
 div[data-module=member][data-context=modify] section.box.password > div > div > div[data-role=button] {padding-left:0; margin-top:10px;}
 div[data-module=member][data-context=modify] section.box.password > div > div > div[data-role=button] > button {width:100%; margin-left:0;}
 
+div[data-module=member][data-context=modify] ul[data-role=form] > li > label {width:130px;}
 div[data-module=member][data-context=modify] div[data-role=photo] > div.preview {width:80px; height:80px; border-radius:50%; position:relative; background-size:cover; background-position:50% 50%; overflow:hidden; border:1px solid #ccc;}
 div[data-module=member][data-context=modify] div[data-role=photo] > div.preview > button {width:80px; height:80px; padding-top:50px; line-height:30px; position:absolute; left:0; bottom:0; cursor:pointer; font-size:12px; background:linear-gradient(to bottom,rgba(0,0,0,0) 60%,rgba(0,0,0,0.8) 100%); color:#fff; border:0;}
 div[data-module=member][data-context=modify] div[data-role=photo] > textarea {display:none;}
+
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] {display:inline-block; width:100%; max-width:240px; height:40px; border:0; background:transparent; cursor:pointer; box-sizing:border-box; text-align:left; text-decoration:none; line-height:40px; font-size:14px; padding:0px 3px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] > i {font-family:moimz; font-style:normal; display:inline-block; width:40px; height:40px; text-align:center; float:left; font-size:20px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] > i.connect {float:right; font-size:14px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] > i.disconnect {float:right; font-size:14px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] > i.connect:before {content:"\ec25";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] > i.disconnect:before {content:"\ec26";}
+
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=google] {background:#da483f; color:#fff;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=google] > i.site:before {content:"\ef01";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=facebook] {background:#4367b0; color:#fff;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=facebook] > i.site:before {content:"\ef02";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=twitter] {background:#25a0ef; color:#fff;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=twitter] > i.site:before {content:"\ef03";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=naver] {background:#15c642; color:#fff;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=naver] > i.site:before {content:"\ef04";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=github] {background:#555; color:#fff;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=github] > i.site:before {content:"\ef05"; font-size:24px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=kakao] {background:#fddc2f; color:#3b1f1f;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=kakao] > i.site:before {content:"\ef06"; font-size:24px;}
 
 /**
  * 회원사진 수정 모달

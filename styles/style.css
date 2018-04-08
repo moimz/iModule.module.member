@@ -15,6 +15,7 @@ span[data-module=member][data-role=name] {display:inline-block; text-overflow:el
 span[data-module=member][data-role=name][data-idx] {font-weight:bold; cursor:pointer;}
 
 ul[data-module=member][data-role=social] {list-style:none; font-size:0;}
+ul[data-module=member][data-role=social] > li {vertical-align:middle;}
 ul[data-module=member][data-role=social].button > li {width:100%; margin-top:5px; display:block;}
 ul[data-module=member][data-role=social].icon {display:table; width:100%; height:40px; table-layout:fixed;}
 ul[data-module=member][data-role=social].icon > li {display:table-cell; padding:0px 2px 0px 2px;}
@@ -23,26 +24,32 @@ ul[data-module=member][data-role=social].icon > li:last-child {padding-right:0px
 
 ul[data-module=member][data-role=social] {margin-top:5px;}
 ul[data-module=member][data-role=social] > li > a {display:block; width:100%; height:40px; text-decoration:none; color:#fff;}
-ul[data-module=member][data-role=social] > li > a > i {width:40px; height:40px; line-height:40px; font-size:20px; text-align:center; display:inline-block; font-family:XEIcon; speak:none; font-style:normal; font-weight:400; font-variant:normal; text-transform:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; color:#fff; vertical-align:middle;}
+ul[data-module=member][data-role=social] > li > a > i {width:40px; height:40px; line-height:40px; font-size:20px; text-align:center; display:inline-block; font-family:moimz; speak:none; font-style:normal; font-weight:400; font-variant:normal; text-transform:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; color:#fff; vertical-align:middle;}
 ul[data-module=member][data-role=social] > li > a > span {display:inline-block; width:calc(100% - 40px); height:30px; line-height:30px; margin:5px 0px; font-size:14px; padding:0px 20px 0px 10px; text-align:center; box-sizing:border-box; vertical-align:middle; border-left:1px solid rgba(255,255,255,0.2);}
 
 ul[data-module=member][data-role=social].icon > li > a > i {width:100%; font-size:24px;}
 ul[data-module=member][data-role=social].icon > li > a > span {display:none;}
 
-ul[data-module=member][data-role=social] > li.facebook > a {background:#4367b0;}
-ul[data-module=member][data-role=social] > li.facebook > a > i:before {content:"\e819";}
-
 ul[data-module=member][data-role=social] > li.google > a {background:#da483f;}
-ul[data-module=member][data-role=social] > li.google > a > i:before {content:"\e81a";}
+ul[data-module=member][data-role=social] > li.google > a > i {font-size:28px;}
+ul[data-module=member][data-role=social] > li.google > a > i:before {content:"\ef01";}
+
+ul[data-module=member][data-role=social] > li.facebook > a {background:#4367b0;}
+ul[data-module=member][data-role=social] > li.facebook > a > i:before {content:"\ef02";}
+
+ul[data-module=member][data-role=social] > li.twitter > a {background:#25a0ef;}
+ul[data-module=member][data-role=social] > li.twitter > a > i:before {content:"\ef03";}
 
 ul[data-module=member][data-role=social] > li.naver > a {background:#15c642;}
-ul[data-module=member][data-role=social] > li.naver > a > i:before {content:"\e820";}
+ul[data-module=member][data-role=social] > li.naver > a > i:before {content:"\ef04";}
+
+ul[data-module=member][data-role=social] > li.github > a {background:#555;}
+ul[data-module=member][data-role=social] > li.github > a > i {font-size:28px;}
+ul[data-module=member][data-role=social] > li.github > a > i:before {content:"\ef05"; color:#fff;}
 
 ul[data-module=member][data-role=social] > li.kakao > a {background:#fddc2f; color:#3b1f1f;}
-ul[data-module=member][data-role=social] > li.kakao > a > i:before {content:"\e899"; color:#3b1f1f;}
-
-ul[data-module=member][data-role=social] > li.github > a {background:#444;}
-ul[data-module=member][data-role=social] > li.github > a > i:before {content:"\e82e";}
+ul[data-module=member][data-role=social] > li.kakao > a > i {font-size:28px;}
+ul[data-module=member][data-role=social] > li.kakao > a > i:before {content:"\ef06"; color:#3b1f1f;}
 
 ul[data-module=member][data-role=link] {margin-top:15px; list-style:none; text-align:center; display:block;}
 ul[data-module=member][data-role=link] > li {display:inline-block; padding:0px 5px; border-right:1px solid #ccc; height:12px;}

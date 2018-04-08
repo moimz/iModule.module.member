@@ -56,6 +56,25 @@ if (defined('__IM__') == false) exit;
 					<?php } ?>
 				</ul>
 				<?php } ?>
+				
+				<?php if (count($oauths) > 0) { ?>
+				<h4>로그인 연동</h4>
+				
+				<ul data-role="form" class="inner black social">
+					<?php foreach ($oauths as $oauth) { ?>
+					<li>
+						<label><?php echo $me->getText('social/'.$oauth->site->site); ?></label>
+						<div>
+							<?php if ($oauth->token == null) { ?>
+							<a href="<?php echo $me->getSocialLoginUrl($oauth->site->site); ?>" data-social="<?php echo $oauth->site->site; ?>"><i class="site"></i><span><?php echo str_replace('{SITE}',$me->getText('social/'.$oauth->site->site),$me->getText('social/connect')); ?></span><i class="connect"></i></a>
+							<?php } else { ?>
+							<button type="button" data-social="<?php echo $oauth->site->site; ?>"><i class="site"></i><span><?php echo str_replace('{SITE}',$me->getText('social/'.$oauth->site->site),$me->getText('social/disconnect')); ?></span><i class="disconnect"></i></button>
+							<?php } ?>
+						</div>
+					</li>
+					<?php } ?>
+				</ul>
+				<?php } ?>
 			
 				<div data-role="button">
 					<button type="submit"><?php echo $me->getText('button/confirm'); ?></button>

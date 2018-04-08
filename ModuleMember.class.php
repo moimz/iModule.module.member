@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 2. 10.
+ * @modified 2018. 4. 2.
  */
 class ModuleMember {
 	/**
@@ -75,6 +75,7 @@ class ModuleMember {
 		$this->table->password = 'member_password_table';
 		$this->table->point = 'member_point_table';
 		$this->table->social_oauth = 'member_social_oauth_table';
+		$this->table->social_sort = 'member_social_sort_table';
 		$this->table->social_token = 'member_social_token_table';
 		$this->table->label = 'member_label_table';
 		$this->table->member_label = 'member_member_label_table';
@@ -88,11 +89,13 @@ class ModuleMember {
 		if (defined('__IM_ADMIN__') == false) {
 			$this->IM->addHeadResource('style',$this->getModule()->getDir().'/styles/style.css');
 			$this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/script.js');
-			
-			if ($this->db()->select($this->table->social_oauth)->count() > 0) {
-				$this->IM->loadWebFont('XEIcon');
-			}
 		}
+		
+		/**
+		 * 세션토큰이 있을 경우 로그인처리를 한다.
+		 */
+		$session = Request('session');
+		if ($session !== null) $this->loginBySessionToken($session);
 		
 		/**
 		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
@@ -754,13 +757,14 @@ class ModuleMember {
 		$member = $this->getMember();
 		
 		$password = Request('password');
-		if ($password == null) {
+		if (strlen($member->password) == 65 && $password == null) {
 			$step = 'password';
 		} else {
-			$mHash = new Hash();
-			$password = Decoder($password);
-			if ($password === false || $mHash->password_validate($password,$member->password) == false) return $this->getError('INCORRECT_PASSWORD');
-			
+			if (strlen($member->password) == 65) {
+				$mHash = new Hash();
+				$password = $password === null ? false : Decoder($password);
+				if ($password === false || $mHash->password_validate($password,$member->password) == false) return $this->getError('INCORRECT_PASSWORD');
+			}
 			$step = 'insert';
 			
 			$this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/jquery.cropit.min.js');
@@ -795,6 +799,19 @@ class ModuleMember {
 				
 				array_push($fields,$forms[$i]->name);
 			}
+			
+			/**
+			 * 소셜계정연결을 가져온다.
+			 */
+			$oauths = $this->db()->select($this->table->social_oauth.' o','o.site')->join($this->table->social_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
+			for ($i=0, $loop=count($oauths);$i<$loop;$i++) {
+				$site = $this->db()->select($this->table->social_oauth)->where('domain',array('*',$this->IM->domain),'IN')->where('site',$oauths[$i]->site)->getOne();
+				$token = $this->db()->select($this->table->social_token)->where('midx',$this->getLogged())->where('domain',$site->domain)->where('site',$site->site)->getOne();
+				
+				$oauths[$i] = new stdClass();
+				$oauths[$i]->site = $site;
+				$oauths[$i]->token = $token;
+			}
 		}
 		
 		/**
@@ -828,10 +845,10 @@ class ModuleMember {
 			$mode = 'token';
 			
 			$check = Decoder($token,null,'hex') !== false ? json_decode(Decoder($token,null,'hex')) : null;
-			if ($check == null) return $this->IM->printError('INVALID_EMAIL_VERIFICATION_TOKEN');
+			if ($check == null) return $this->printError('INVALID_EMAIL_VERIFICATION_TOKEN');
 			
 			$code = $this->db()->select($this->table->email)->where('midx',$check[0])->where('email',$check[1])->getOne();
-			if ($code == null) return $this->IM->printError('INVALID_EMAIL_VERIFICATION_TOKEN');
+			if ($code == null) return $this->printError('INVALID_EMAIL_VERIFICATION_TOKEN');
 			
 			$member = $this->getMember($code->midx);
 		}
@@ -845,7 +862,7 @@ class ModuleMember {
 			$member = $this->getMember();
 		}
 		
-		if ($mode == null) return $this->IM->printError('INVALID_EMAIL_VERIFICATION_TOKEN');
+		if ($mode == null) return $this->printError('INVALID_EMAIL_VERIFICATION_TOKEN');
 		
 		$header = PHP_EOL.'<form id="ModuleMemberVerificationForm">'.PHP_EOL;
 		$header.= '<input type="hidden" name="mode" value="'.$mode.'">'.PHP_EOL;
@@ -950,9 +967,9 @@ class ModuleMember {
 		/**
 		 * 소셜 로그인 세션을 가져온다.
 		 */
-		$logged = Request('SOCIAL_LOGGED','session');
+		$logged = Request('IM_SOCIAL_LOGGED','session');
 		if ($logged == null) {
-			$this->IM->printError('OAUTH_API_ERROR',null,null,true);
+			$this->printError('OAUTH_API_ERROR',null,null,true);
 		}
 		
 		if (is_array($logged->midx) == true) {
@@ -991,11 +1008,11 @@ class ModuleMember {
 		$content.= '<div data-role="input"><input type="email" name="email" placeholder="'.$this->getText('text/email').'"></div>';
 		$content.= '<div data-role="input"><input type="password" name="password" placeholder="'.$this->getText('text/password').'"></div>';
 		
-		$oauths = $this->db()->select($this->table->social_oauth)->orderBy('sort','asc')->get();
+		$oauths = $this->db()->select($this->table->social_oauth.' o','o.site')->join($this->table->social_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
 		if (count($oauths) > 0) {
 			$content.= '<ul data-module="member" data-role="social" class="'.(count($oauths) > 3 ? 'icon' : 'button').'">';
 			foreach ($oauths as $oauth) {
-				$content.= '<li class="'.$oauth->site.'"><a href="'.$this->IM->getProcessUrl('member',$oauth->site).'"><i></i><span>'.$this->getText('social/'.$oauth->site).'</span></a></li>';
+				$content.= '<li class="'.$oauth->site.'"><a href="'.$this->getSocialLoginUrl($oauth->site).'"><i></i><span>'.str_replace('{SITE}',$this->getText('social/'.$oauth->site),$this->getText('social/login')).'</span></a></li>';
 			}
 			$content.= '</ul>';
 		}
@@ -1174,6 +1191,41 @@ class ModuleMember {
 	}
 	
 	/**
+	 * GET 으로 전달받은 세션토큰으로 로그인을 처리한다.
+	 *
+	 * @param string $session 세션토큰
+	 */
+	function loginBySessionToken($session) {
+		$token = Decoder($session);
+		$session = $token !== false ? json_decode($token) : null;
+		
+		if ($session != null) {
+			if ($session->idx == 0) {
+				unset($_SESSION['IM_MEMBER_LOGGED']);
+				
+				$results->success = true;
+				$results->success = null;
+			} else {
+				$member = $this->db()->select($this->table->member)->where('idx',$session->idx)->getOne();
+				if ($member->idx > 0 && in_array($member->status,array('LEAVE','DEACTIVATED')) == false) {
+					$logged = new stdClass();
+					$logged->idx = $session->idx;
+					$logged->time = time();
+					$logged->ip = $_SERVER['REMOTE_ADDR'];
+					
+					$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));
+				}
+			}
+		}
+		
+		$redirect = $_SERVER['REDIRECT_URL'];
+		$queryString = $this->IM->getQueryString(array('session'=>''));
+		$redirect.= $queryString ? '?'.$queryString : '';
+		header("location:".$redirect);
+		exit;
+	}
+	
+	/**
 	 * 소셜로그인을 통해 로그인을 처리한다.
 	 * 가입되어 있지 않은 회원의 경우 자동으로 가입처리를 한다.
 	 *
@@ -1191,9 +1243,9 @@ class ModuleMember {
 		/**
 		 * 소셜 로그인 세션을 가져온다.
 		 */
-		$logged = Request('SOCIAL_LOGGED','session');
+		$logged = Request('IM_SOCIAL_LOGGED','session');
 		if ($logged == null) {
-			$this->IM->printError('OAUTH_API_ERROR',null,null,true);
+			$this->printError('OAUTH_API_ERROR',null,null,true);
 		}
 		
 		if ($this->isLogged() == true) {
@@ -1202,7 +1254,7 @@ class ModuleMember {
 			/**
 			 * 기존에 해당 소셜계정으로 로그인한 이력이 있는지 확인한다.
 			 */
-			$check = $this->db()->select($this->table->social_token)->where('site',$logged->site->site)->where('id',$logged->user->id)->get();
+			$check = $this->db()->select($this->table->social_token)->where('domain',$logged->site->domain)->where('site',$logged->site->site)->where('id',$logged->user->id)->get();
 			if (count($check) == 0) {
 				/**
 				 * 이메일주소로 기존 회원을 검색한다.
@@ -1217,7 +1269,7 @@ class ModuleMember {
 				 */
 				if ($check == null) {
 					if ($this->getModule()->getConfig('allow_signup') == false) {
-						$this->IM->printError('NOT_ALLOWED_SIGNUP',null,null,true);
+						$this->printError('NOT_ALLOWED_SIGNUP',null,null,true);
 					}
 					
 					$midx = $this->db()->insert($this->table->member,array(
@@ -1253,7 +1305,7 @@ class ModuleMember {
 				} else {
 					$check = $this->db()->select($this->table->social_token)->where('midx',$midx)->where('site',$logged->site->site)->where('id',$logged->user->id)->getOne();
 					if ($check == null) {
-						$this->IM->printError('FORBIDDEN',null,null,true);
+						$this->printError('FORBIDDEN',null,null,true);
 					}
 				}
 			} else {
@@ -1261,8 +1313,8 @@ class ModuleMember {
 			}
 			
 			$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
-			if ($member->status != 'ACTIVATED') {
-				$this->IM->printError('NOT_ACTIVATED_ACCOUNT',null,null,true);
+			if ($member == null || $member->status != 'ACTIVATED') {
+				$this->printError('NOT_ACTIVATED_ACCOUNT',null,null,true);
 			}
 			
 			/**
@@ -1284,7 +1336,7 @@ class ModuleMember {
 		/**
 		 * 엑세스정보를 갱신한다.
 		 */
-		$this->db()->replace($this->table->social_token,array('midx'=>$midx,'site'=>$logged->site->site,'id'=>$logged->user->id,'scope'=>$logged->site->scope,'access_token'=>$logged->token->access,'refresh_token'=>$logged->token->refresh,'latest_login'=>time()))->execute();
+		$this->db()->replace($this->table->social_token,array('midx'=>$midx,'domain'=>$logged->site->domain,'site'=>$logged->site->site,'id'=>$logged->user->id,'scope'=>$logged->site->scope,'access_token'=>$logged->token->access,'refresh_token'=>$logged->token->refresh,'latest_login'=>time()))->execute();
 		
 		/**
 		 * 회원사진이 없다면 갱신한다.
@@ -1298,8 +1350,17 @@ class ModuleMember {
 		if ($this->isLogged() == false) {
 			$this->login($midx);
 		}
-		unset($_SESSION['OAUTH_ACCESS_TOKEN'],$_SESSION['OAUTH_REFRESH_TOKEN'],$_SESSION['SOCIAL_LOGGED']);
-		header('location:'.$logged->redirect);
+		unset($_SESSION['OAUTH_ACCESS_TOKEN'],$_SESSION['OAUTH_REFRESH_TOKEN'],$_SESSION['IM_SOCIAL_LOGGED']);
+		
+		/**
+		 * 로그인 콜백 도메인과, 이동할 도메인이 다를 경우 로그인토큰을 생성한 뒤 리다이렉트 한다.
+		 */
+		$parseUrl = parse_url($logged->redirect);
+		if ($parseUrl['host'] != $this->IM->domain) {
+			header('location:'.$logged->redirect.(strpos($logged->redirect,'?') === false ? '?' : '&').'session='.$this->makeSessionToken());
+		} else {
+			header('location:'.$logged->redirect);
+		}
 		exit;
 	}
 	
@@ -1784,7 +1845,7 @@ class ModuleMember {
 			}
 			$content.= '<br><br>본 메일은 발신전용메일로 회신되지 않습니다.<br>감사합니다.';
 			
-			$result = $this->IM->getModule('email')->addTo($email,$member->name)->setSubject($subject)->setContent($content)->send();
+			$result = $this->IM->getModule('email')->addTo($email,$member->nickname)->setSubject($subject)->setContent($content)->send();
 			if ($result == false) return 'SEND_FAILED_VERIFIED_EMAIL';
 		}
 		
@@ -1828,7 +1889,7 @@ class ModuleMember {
 		$sendLink = $this->IM->getModuleUrl('member','password',false,false,true);
 		$content.= '<br><br>위의 링크는 앞으로 약 6시간동안만 유효하며, 링크가 만료되었을 경우 <a href="'.$sendLink.'" target="_blank" style="word-break:break-all;">'.$sendLink.'</a> 에서 다시 발송가능합니다.<br><br>본 메일은 발신전용메일로 회신되지 않습니다.<br>감사합니다.';
 		
-		$result = $this->IM->getModule('email')->addTo($member->email,$member->name)->setSubject($subject)->setContent($content)->send();
+		$result = $this->IM->getModule('email')->addTo($member->email,$member->nickname)->setSubject($subject)->setContent($content)->send();
 		if ($result == true) {
 			$this->db()->replace($this->table->password,array('token'=>$token,'midx'=>$midx,'reg_date'=>time()))->execute();
 		}
@@ -2536,6 +2597,33 @@ class ModuleMember {
 		}
 		
 		return $success;
+	}
+	
+	/**
+	 * 소셜사이트 로그인을 위한 주소를 가져온다.
+	 *
+	 * @param string $site 소셜사이트명 (google, facebook, twitter, kakao, naver, github)
+	 * @return string $url
+	 */
+	function getSocialLoginUrl($site) {
+		$site = $this->db()->select($this->table->social_oauth)->where('site',$site)->where('domain',array('*',$this->IM->domain),'IN')->orderBy('domain','desc')->getOne();
+		if ($site == null) return '#';
+		
+		return $site->callback_domain == '*' || $site->callback_domain == $this->IM->domain ? __IM_DIR__.'/oauth/'.$site->site : $this->IM->getUrl(false,false,false,false,true,$site->callback_domain,false).'/oauth/'.$site->site;
+	}
+	
+	/**
+	 * 회원정보처리 관련된 에러메세지를 띄운다.
+	 *
+	 * @param string $code 에러코드
+	 */
+	function printError($code,$path=null) {
+		$error = new stdClass();
+		$error->message = $this->getErrorText($code);
+		$error->description = $path;
+		$error->type = 'back';
+		
+		$this->IM->printError($error,null,null,true);
 	}
 	
 	/**

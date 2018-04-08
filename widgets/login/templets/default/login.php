@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 2. 14.
+ * @modified 2018. 4. 5.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -23,7 +23,7 @@ if (defined('__IM__') == false) exit;
 <?php if (count($oauths) > 0) { ?>
 <ul data-module="member" data-role="social" class="<?php echo count($oauths) > 3 ? 'icon' : 'button'; ?>">
 	<?php foreach ($oauths as $oauth) { ?>
-	<li class="<?php echo $oauth->site; ?>"><a href="<?php echo $this->IM->getProcessUrl('member',$oauth->site); ?>"><i></i><span><?php echo $me->getText('social/'.$oauth->site); ?></span></a></li>
+	<li class="<?php echo $oauth->site; ?>"><a href="<?php echo $oauth->link; ?>"><i></i><span><?php echo str_replace('{SITE}',$me->getText('social/'.$oauth->site),$me->getText('social/login')); ?></span></a></li>
 	<?php } ?>
 </ul>
 <?php } ?>
