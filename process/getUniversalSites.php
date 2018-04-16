@@ -4,7 +4,7 @@
  * 
  * 통합로그인을 사용하는 사이트를 가져온다.
  *
- * @file /modules/member/process/liveCheckValue.php
+ * @file /modules/member/process/getUniversalSites.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0.160923

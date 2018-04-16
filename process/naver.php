@@ -4,7 +4,7 @@
  *
  * 네이버 계정을 이용하여 로그인한다.
  * 
- * @file /modules/member/progress/naver.php
+ * @file /modules/member/process/naver.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0

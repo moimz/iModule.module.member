@@ -706,7 +706,7 @@ class ModuleMember {
 				if (in_array($forms[$i]->name,$fields) == true) continue;
 				
 				$field = $this->getInputField($forms[$i]);
-				$field->inputHtml = $this->getInputFieldHtml($field,'signup');
+				$field->inputHtml = $this->getInputFieldHtml($field);
 				
 				if ($forms[$i]->label == 0) array_push($defaults,$field);
 				else array_push($extras,$field);
@@ -783,7 +783,7 @@ class ModuleMember {
 			$defaults = $extras = array();
 			
 			$photo = $this->getInputField('photo');
-			$photo->inputHtml = $this->getInputFieldHtml($photo,'modify');
+			$photo->inputHtml = $this->getInputFieldHtml($photo,$member);
 			array_push($defaults,$photo);
 			
 			$forms = $this->db()->select($this->table->signup)->where('label',$labels,'IN')->orderBy('sort','asc')->get();
@@ -792,7 +792,7 @@ class ModuleMember {
 				if (in_array($forms[$i]->name,$fields) == true) continue;
 				
 				$field = $this->getInputField($forms[$i]);
-				$field->inputHtml = $this->getInputFieldHtml($field,'modify');
+				$field->inputHtml = $this->getInputFieldHtml($field,$member);
 				
 				if ($forms[$i]->label == 0) array_push($defaults,$field);
 				else array_push($extras,$field);
@@ -1524,6 +1524,7 @@ class ModuleMember {
 				$member->label = array();
 				$member->extras = null;
 				$member->point = 0;
+				$member->address = null;
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
@@ -1534,6 +1535,7 @@ class ModuleMember {
 				$member->birthday = count($temp) == 3 ? $temp[2].'-'.$temp[0].'-'.$temp[1] : '';
 				$member->label = $this->getMemberLabel($midx);
 				$member->extras = json_decode($member->extras);
+				$member->address = json_decode($member->address);
 				
 				/**
 				 * 추가정보를 $member 객체에 추가한다.
@@ -1959,16 +1961,11 @@ class ModuleMember {
 	 * 회원가입 / 회원수정 필드를 출력하기 위한 함수
 	 *
 	 * @param object $field 입력폼 데이터
-	 * @param boolean $isModify 정보수정 필드인지 여부
+	 * @param boolean $member 회원정보
 	 * @param string $html
 	 */
-	function getInputFieldHtml($field,$mode) {
+	function getInputFieldHtml($field,$member=null) {
 		$html = array();
-		
-		$isSignUp = $mode == 'signup';
-		
-		if ($isSignUp == true || $this->isLogged() == false) $value = null;
-		else $value = $this->getMember();
 		
 		if ($field->input == 'system') {
 			/**
@@ -1977,7 +1974,7 @@ class ModuleMember {
 			if ($field->name == 'email' || $field->name == 'email_verification_email') {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<input type="email" name="'.$field->name.'"'.($value !== null && isset($value->email) == true ? ' value="'.GetString($value->email,'input').'"' : '').'>',
+						'<input type="email" name="'.$field->name.'"'.($member !== null && isset($member->email) == true ? ' value="'.GetString($member->email,'input').'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -1986,7 +1983,7 @@ class ModuleMember {
 			 * 패스워드
 			 */
 			if ($field->name == 'password') {
-				if ($isSignUp == true) {
+				if ($member == null) {
 					array_push($html,
 						'<div data-role="inputset" data-name="password" data-default="'.$field->help.'">',
 							'<div data-role="input">',
@@ -2012,7 +2009,7 @@ class ModuleMember {
 			if ($field->name == 'name' || $field->name == 'nickname') {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<input type="text" name="'.$field->name.'"'.($value !== null && isset($value->{$field->name}) == true ? ' value="'.GetString($value->{$field->name},'input').'"' : '').'>',
+						'<input type="text" name="'.$field->name.'"'.($member !== null && isset($member->{$field->name}) == true ? ' value="'.GetString($member->{$field->name},'input').'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -2023,7 +2020,7 @@ class ModuleMember {
 			if ($field->name == 'birthday') {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<input type="date" name="'.$field->name.'"'.($value !== null && isset($value->{$field->name}) == true ? ' value="'.$value->{$field->name}.'"' : '').'>',
+						'<input type="date" name="'.$field->name.'"'.($member !== null && isset($member->{$field->name}) == true ? ' value="'.$member->{$field->name}.'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -2034,7 +2031,7 @@ class ModuleMember {
 			if ($field->name == 'telephone' || $field->name == 'cellphone') {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<input type="tel" name="'.$field->name.'"'.($value !== null && isset($value->{$field->name}) == true ? ' value="'.$value->{$field->name}.'"' : '').'>',
+						'<input type="tel" name="'.$field->name.'"'.($member !== null && isset($member->{$field->name}) == true ? ' value="'.$member->{$field->name}.'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -2045,7 +2042,7 @@ class ModuleMember {
 			if ($field->name == 'homepage') {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<input type="url" name="'.$field->name.'"'.($value !== null && isset($value->{$field->name}) == true ? ' value="'.$value->{$field->name}.'"' : '').'>',
+						'<input type="url" name="'.$field->name.'"'.($member !== null && isset($member->{$field->name}) == true ? ' value="'.$member->{$field->name}.'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -2057,10 +2054,10 @@ class ModuleMember {
 				array_push($html,
 					'<div data-role="inputset" class="inline" data-name="'.$field->name.'" data-default="'.$field->help.'">',
 						'<div data-role="input">',
-							'<label><input type="radio" name="'.$field->name.'" value="MALE"'.($value !== null && isset($value->{$field->name}) == true && $value->{$field->name} == 'MALE' ? ' checked="checked"' : '').'>'.$this->getText('text/male').'</label>',
+							'<label><input type="radio" name="'.$field->name.'" value="MALE"'.($member !== null && isset($member->{$field->name}) == true && $member->{$field->name} == 'MALE' ? ' checked="checked"' : '').'>'.$this->getText('text/male').'</label>',
 						'</div>',
 						'<div data-role="input">',
-							'<label><input type="radio" name="'.$field->name.'" value="FEMALE"'.($value !== null && isset($value->{$field->name}) == true && $value->{$field->name} == 'FEMALE' ? ' checked="checked"' : '').'>'.$this->getText('text/female').'</label>',
+							'<label><input type="radio" name="'.$field->name.'" value="FEMALE"'.($member !== null && isset($member->{$field->name}) == true && $member->{$field->name} == 'FEMALE' ? ' checked="checked"' : '').'>'.$this->getText('text/female').'</label>',
 						'</div>',
 					'</div>'
 				);
@@ -2072,20 +2069,25 @@ class ModuleMember {
 			if ($field->name == 'address') {
 				array_push($html,
 					'<div data-role="inputset" class="block" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_zipcode" placeholder="'.$this->getText('text/zipcode').'">',
+						'<div data-role="inputset" class="flex">',
+							'<div data-role="input">',
+								'<input type="text" name="'.$field->name.'_zipcode" placeholder="'.$this->getText('signup/zipcode').'" value="'.($member !== null && $member->address !== null && isset($member->address->zipcode) == true ? $member->address->zipcode : '').'">',
+							'</div>',
+							'<div data-role="text">('.$this->getText('signup/zipcode').')</div>',
 						'</div>',
 						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_address1" placeholder="'.$this->getText('text/address1').'">',
+							'<input type="text" name="'.$field->name.'_address1" placeholder="'.$this->getText('signup/address1').'" value="'.($member !== null && $member->address !== null && isset($member->address->address1) == true ? $member->address->address1 : '').'">',
 						'</div>',
 						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_address2" placeholder="'.$this->getText('text/address2').'">',
+							'<input type="text" name="'.$field->name.'_address2" placeholder="'.$this->getText('signup/address2').'" value="'.($member !== null && $member->address !== null && isset($member->address->address2) == true ? $member->address->address2 : '').'">',
 						'</div>',
-						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_city" placeholder="'.$this->getText('text/city').'">',
-						'</div>',
-						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_state" placeholder="'.$this->getText('text/state').'">',
+						'<div data-role="inputset" class="flex">',
+							'<div data-role="input">',
+								'<input type="text" name="'.$field->name.'_city" placeholder="'.$this->getText('signup/city').'" value="'.($member !== null && $member->address !== null && isset($member->address->city) == true ? $member->address->city : '').'">',
+							'</div>',
+							'<div data-role="input">',
+								'<input type="text" name="'.$field->name.'_state" placeholder="'.$this->getText('signup/state').'" value="'.($member !== null && $member->address !== null && isset($member->address->state) == true ? $member->address->state : '').'">',
+							'</div>',
 						'</div>',
 					'</div>'
 				);
@@ -2098,7 +2100,7 @@ class ModuleMember {
 				array_push($html,
 					'<div data-role="photo">',
 						'<textarea name="'.$field->name.'"></textarea>',
-						'<div class="preview" style="background-image:url('.($value != null ? $value->photo : $this->getModule()->getDir().'/images/nophoto.png').');">',
+						'<div class="preview" style="background-image:url('.($member != null ? $member->photo : $this->getModule()->getDir().'/images/nophoto.png').');">',
 							'<button type="button" data-action="photo">'.$this->getText('button/edit').'</button>',
 						'</div>',
 					'</div>'
@@ -2128,7 +2130,7 @@ class ModuleMember {
 				$html[] = '<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">';
 				$html[] = '<select name="'.$field->name.'">';
 				foreach ($field->options as $val=>$text) {
-					$html[] = '<option value="'.$val.'"'.($value !== null && isset($value->extras->{$field->name}) == true && $value->extras->{$field->name} == $val ? ' selected="selected"' : '').'>'.$text.'</option>';
+					$html[] = '<option value="'.$val.'"'.($member !== null && isset($member->extras->{$field->name}) == true && $member->extras->{$field->name} == $val ? ' selected="selected"' : '').'>'.$text.'</option>';
 				}
 				$html[] = '</select>';
 				$html[] = '</div>';
@@ -2143,7 +2145,7 @@ class ModuleMember {
 				foreach ($field->options as $val=>$text) {
 					array_push($html,
 						'<div data-role="input">',
-							'<label><input type="checkbox" name="'.$field->name.'[]" value="'.$val.'"'.($value !== null && isset($value->extras->{$field->name}) == true && $value->extras->{$field->name} == $val ? ' checked="checked"' : '').'>'.$text.'</label>',
+							'<label><input type="checkbox" name="'.$field->name.'[]" value="'.$val.'"'.($member !== null && isset($member->extras->{$field->name}) == true && is_array($member->extras->{$field->name}) == true && in_array($val,$member->extras->{$field->name}) == true ? ' checked="checked"' : '').'>'.$text.'</label>',
 						'</div>'
 					);
 				}
@@ -2158,7 +2160,7 @@ class ModuleMember {
 				foreach ($field->options as $val=>$text) {
 					array_push($html,
 						'<div data-role="input">',
-							'<label><input type="radio" name="'.$field->name.'" value="'.$val.'"'.($value !== null && isset($value->extras->{$field->name}) == true && $value->extras->{$field->name} == $val ? ' checked="checked"' : '').'>'.$text.'</label>',
+							'<label><input type="radio" name="'.$field->name.'" value="'.$val.'"'.($member !== null && isset($member->extras->{$field->name}) == true && $member->extras->{$field->name} == $val ? ' checked="checked"' : '').'>'.$text.'</label>',
 						'</div>'
 					);
 				}
@@ -2171,7 +2173,7 @@ class ModuleMember {
 			if (in_array($field->input,array('text','password','email','date','tel')) == true) {
 				array_push($html,
 					'<div data-role="input" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<input type="'.$field->input.'" name="'.$field->name.'"'.($value !== null && isset($value->extras->{$field->name}) == true ? ' value="'.GetString($value->extras->{$field->name},'input').'"' : '').'>',
+						'<input type="'.$field->input.'" name="'.$field->name.'"'.($member !== null && isset($member->extras->{$field->name}) == true ? ' value="'.GetString($member->extras->{$field->name},'input').'"' : '').'>',
 					'</div>'
 				);
 			}
@@ -2182,20 +2184,25 @@ class ModuleMember {
 			if ($field->input == 'address') {
 				array_push($html,
 					'<div data-role="inputset" class="block" data-name="'.$field->name.'" data-default="'.$field->help.'">',
-						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_zipcode" placeholder="'.$this->getText('text/zipcode').'">',
+						'<div data-role="inputset" class="flex">',
+							'<div data-role="input">',
+								'<input type="text" name="'.$field->name.'_zipcode" placeholder="'.$this->getText('signup/zipcode').'" value="'.($member !== null && isset($member->extras->{$field->name}) == true && isset($member->extras->{$field->name}->zipcode) == true ? $member->extras->{$field->name}->zipcode : '').'">',
+							'</div>',
+							'<div data-role="text">('.$this->getText('signup/zipcode').')</div>',
 						'</div>',
 						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_address1" placeholder="'.$this->getText('text/address1').'">',
+							'<input type="text" name="'.$field->name.'_address1" placeholder="'.$this->getText('signup/address1').'" value="'.($member !== null && isset($member->extras->{$field->name}) == true && isset($member->extras->{$field->name}->address1) == true ? $member->extras->{$field->name}->address1 : '').'">',
 						'</div>',
 						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_address2" placeholder="'.$this->getText('text/address2').'">',
+							'<input type="text" name="'.$field->name.'_address2" placeholder="'.$this->getText('signup/address2').'" value="'.($member !== null && isset($member->extras->{$field->name}) == true && isset($member->extras->{$field->name}->address2) == true ? $member->extras->{$field->name}->address2 : '').'">',
 						'</div>',
-						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_city" placeholder="'.$this->getText('text/city').'">',
-						'</div>',
-						'<div data-role="input">',
-							'<input type="text" name="'.$field->name.'_state" placeholder="'.$this->getText('text/state').'">',
+						'<div data-role="inputset" class="flex">',
+							'<div data-role="input">',
+								'<input type="text" name="'.$field->name.'_city" placeholder="'.$this->getText('signup/city').'" value="'.($member !== null && isset($member->extras->{$field->name}) == true && isset($member->extras->{$field->name}->city) == true ? $member->extras->{$field->name}->city : '').'">',
+							'</div>',
+							'<div data-role="input">',
+								'<input type="text" name="'.$field->name.'_state" placeholder="'.$this->getText('signup/state').'" value="'.($member !== null && isset($member->extras->{$field->name}) == true && isset($member->extras->{$field->name}->state) == true ? $member->extras->{$field->name}->state : '').'">',
+							'</div>',
 						'</div>',
 					'</div>'
 				);
@@ -2207,7 +2214,7 @@ class ModuleMember {
 			if ($field->input == 'textarea') {
 				array_push($html,
 					'<div data-role="input" data-default="'.$field->help.'">',
-						'<textarea name="'.$field->name.'">'.($value !== null && isset($value->extras->{$field->name}) == true ? $value->extras->{$field->name} : '').'</textarea>',
+						'<textarea name="'.$field->name.'">'.($member !== null && isset($member->extras->{$field->name}) == true ? $member->extras->{$field->name} : '').'</textarea>',
 					'</div>'
 				);
 			}
@@ -2219,22 +2226,23 @@ class ModuleMember {
 	/**
 	 * 회원가입 / 정보수정의 데이터가 유효한지 파악하여, DB처리를 위한 배열 및 에러처리를 위한 배열을 만든다.
 	 *
-	 * @param string $mode 회원가입(signup) 또는 정보수정(modify)
+	 * @param int/int[] $idx 회원고유번호 또는 회원라벨
 	 * @param object/array $data 사용자가 입력한 데이터
 	 * @param &array $insert(옵션) DB처리를 위한 배열 포인터
 	 * @param &array $errors(옵션) 에러처리를 위한 배열 포인터
 	 * @param boolean $isValid 유효한지 여부
 	 */
-	function isValidMemberData($mode,$data,&$insert=null,&$errors=null) {
+	function isValidMemberData($idx,$data,&$insert=null,&$errors=null,$isAdmin=false) {
 		if (is_array($data) == true) $data = (object)$data;
 		
-		$isSignUp = $mode == 'signup';
 		$siteType = $this->IM->getSite(false)->member;
 		
-		if ($isSignUp == true) {
-			$labels = isset($data->label) == true ? array(0,$data->label) : array(0);
+		if (is_array($idx) == true) {
+			$labels = $idx;
+			$member = null;
 		} else {
-			$member = $this->getMember();
+			$member = $this->getMember($idx);
+			if ($member->idx == 0) return false;
 			$labels = array(0);
 			foreach ($member->label as $label) {
 				$labels[] = $label->idx;
@@ -2244,7 +2252,7 @@ class ModuleMember {
 		if ($insert != null) $insert['extras'] = array();
 		
 		$success = true;
-		$forms = $this->db()->select($this->table->signup)->where('label',$labels,'IN')->get();
+		$forms = $this->db()->select($this->table->signup)->where('label',$labels,'IN')->orderBy('sort','asc')->get();
 		for ($i=0, $loop=count($forms);$i<$loop;$i++) {
 			if ($forms[$i]->name == 'agreement' || $forms[$i]->name == 'privacy') continue;
 			$field = $this->getInputField($forms[$i]);
@@ -2265,7 +2273,7 @@ class ModuleMember {
 							
 							if (CheckEmail($field->value) == true) {
 								$check = $this->db()->select($this->table->member)->where('email',$field->value);
-								if ($isSignUp == false && $this->isLogged() == true) $check->where('idx',$this->getLogged(),'!=');
+								if ($member != null) $check->where('idx',$member->idx,'!=');
 								
 								$checkAdmin = $check->copy();
 								
@@ -2311,7 +2319,7 @@ class ModuleMember {
 							
 							if (CheckNickname($field->value) == true) {
 								$check = $this->db()->select($this->table->member)->where('nickname',$field->value);
-								if ($isSignUp == false && $this->isLogged() == true) $check->where('idx',$this->getLogged(),'!=');
+								if ($member != null) $check->where('idx',$member->idx,'!=');
 								
 								$checkAdmin = $check->copy();
 								
@@ -2333,10 +2341,12 @@ class ModuleMember {
 					case 'password' :
 						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
 						
-						if ($field->value !== null) {
+						if ($member != null && $isAdmin == true) {
+							$field->value = $member->password;
+						} elseif ($field->value !== null) {
 							$mHash = new Hash();
 							
-							if ($isSignUp == true) {
+							if ($member == null) {
 								if (is_string($field->value) == false) {
 									$field->error = $this->getErrorText('STRING_TYPE_ONLY');
 									break;
@@ -2345,7 +2355,7 @@ class ModuleMember {
 								if (strlen($field->value) < 6) {
 									$field->error = $this->getErrorText('TOO_SHORT_PASSWORD');
 								} elseif (isset($data->password_confirm) == true && $field->value != $data->password_confirm) {
-									$field->error = $this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM');
+									$field->error = $this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM').$field->value.'/'.$data->password_confirm;
 								} else {
 									$field->value = $mHash->password_hash($field->value);
 								}
@@ -2431,7 +2441,7 @@ class ModuleMember {
 								break;
 							}
 							
-							if (in_array($field->value,array('MALE','FEMALE')) == false) {
+							if (in_array($field->value,array('NONE','MALE','FEMALE')) == false) {
 								$field->error = $this->getErrorText('INVALID_GENDER');
 							}
 						}
@@ -2563,6 +2573,46 @@ class ModuleMember {
 						
 						break;
 						
+					case 'address' :
+						if (isset($data->{$field->name.'_zipcode'}) == true && $data->{$field->name.'_zipcode'} && isset($data->{$field->name.'_address1'}) == true && $data->{$field->name.'_address1'} && isset($data->{$field->name.'_address2'}) == true && $data->{$field->name.'_address2'}) {
+							if (is_string($data->{$field->name.'_zipcode'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (is_string($data->{$field->name.'_address1'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (is_string($data->{$field->name.'_address2'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (isset($data->{$field->name.'_state'}) == true && is_string($data->{$field->name.'_state'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							if (isset($data->{$field->name.'_city'}) == true && is_string($data->{$field->name.'_city'}) == false) {
+								$field->error = $this->getErrorText('STRING_TYPE_ONLY');
+								break;
+							}
+							
+							$field->value = array(
+								'zipcode'=>$data->{$field->name.'_zipcode'},
+								'address1'=>$data->{$field->name.'_address1'},
+								'address2'=>$data->{$field->name.'_address2'},
+								'state'=>isset($data->{$field->name.'_state'}) == true ? $data->{$field->name.'_state'} : '',
+								'city'=>isset($data->{$field->name.'_city'}) == true ? $data->{$field->name.'_city'} : ''
+							);
+						} else {
+							$field->value = null;
+						}
+						
+						break;
+						
 					default :
 						$field->value = isset($data->{$field->name}) == true && $data->{$field->name} ? $data->{$field->name} : null;
 						
@@ -2624,6 +2674,23 @@ class ModuleMember {
 		$error->type = 'back';
 		
 		$this->IM->printError($error,null,null,true);
+	}
+	
+	/**
+	 * 회원모듈과 동기화한다.
+	 *
+	 * @param string $action 동기화작업
+	 * @param any[] $data 정보
+	 */
+	function syncMember($action,$data) {
+		if ($action == 'point_history') {
+			switch ($data->code) {
+				case 'ADMIN' :
+					return '관리자 적립 ('.$data->content->content.')';
+			}
+			
+			return json_encode($data);
+		}
 	}
 	
 	/**

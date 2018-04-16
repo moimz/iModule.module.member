@@ -6,7 +6,7 @@
  *
  * @file /modules/member/process/@deleteSignUpField.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
+ * @license MIT License
  * @version 3.0.0
  * @modified 2017. 11. 30.
  */

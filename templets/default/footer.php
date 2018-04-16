@@ -24,9 +24,14 @@ $(document).on("init",function() {
 	var popupResize = function(is_center) {
 		var height = $("header",$container).outerHeight(true) + $("section.box",$container).outerHeight(true) + 20;
 		
-		if (screen.height - 100 > height && lastHeight != height) {
-			iModule.resizeWindow(null,height,is_center === true);
-			lastHeight = height;
+		if (lastHeight != height) {
+			if (screen.height - 100 > height && height < 800) {
+				iModule.resizeWindow(null,height,is_center === true);
+				lastHeight = height;
+			} else {
+				iModule.resizeWindow(null,Math.min(screen.height - 100,800),is_center === true);
+				lastHeight = Math.min(screen.height - 100,800);
+			}
 		}
 		setTimeout(popupResize,500);
 	};

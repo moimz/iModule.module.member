@@ -6,9 +6,9 @@
  *
  * @file /modules/member/process/@saveSignUpField.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
+ * @license MIT License
  * @version 3.0.0
- * @modified 2017. 11. 30.
+ * @modified 2018. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 
@@ -102,7 +102,7 @@ if (count($errors) == 0) {
 		} elseif ($name == 'privacy') {
 			$insert['sort'] = -1;
 		} else {
-			$sort = $this->db()->select($this->table->signup,'MAX(sort) as sort')->where('label',$label)->count();
+			$sort = $this->db()->select($this->table->signup,'MAX(sort) as sort')->where('label',$label)->getOne();
 			$insert['sort'] = isset($sort->sort) == true ? $sort->sort + 1 : 0;
 		}
 		$this->db()->insert($this->table->signup,$insert)->execute();

@@ -5,11 +5,375 @@
  * 
  * @file /modules/member/admin/scripts/script.js
  * @author Arzz (arzz@arzz.com)
- * @license MIT License
+ * @license GPLv3
  * @version 3.0.0
- * @modified 2017. 11. 29.
+ * @modified 2018. 4. 9.
  */
 var Member = {
+	/**
+	 * 회원관리
+	 */
+	list:{
+		/**
+		 * 회원추가
+		 */
+		add:function(idx,fields) {
+			new Ext.Window({
+				id:"ModuleMemberAddWindow",
+				title:(idx ? "회원정보수정" : "회원추가"),
+				width:600,
+				modal:true,
+				autoScroll:true,
+				border:false,
+				items:[
+					new Ext.form.Panel({
+						id:"ModuleMemberAddForm",
+						border:false,
+						bodyPadding:"10 10 5 10",
+						fieldDefaults:{labelAlign:"right",labelWidth:100,anchor:"100%",allowBlank:false},
+						items:[
+							new Ext.form.Hidden({
+								name:"idx"
+							}),
+							new Ext.form.FieldSet({
+								title:"기본정보",
+								items:(function(fields) {
+									var items = [];
+									
+									for (var i=0, loop=fields.length;i<loop;i++) {
+										items.push(Member.field.get(fields[i]));
+									}
+									
+									return items;
+								})(fields.defaults)
+							}),
+							(function(fields) {
+								if (fields.length == 0) return null;
+								
+								return new Ext.form.FieldSet({
+									title:"부가정보",
+									items:(function(fields) {
+										var items = [];
+										
+										for (var i=0, loop=fields.length;i<loop;i++) {
+											items.push(Member.field.get(fields[i]));
+										}
+										
+										return items;
+									})(fields)
+								})
+							})(fields.extras)
+						]
+					})
+				],
+				buttons:[
+					new Ext.Button({
+						text:Admin.getText("button/confirm"),
+						handler:function() {
+							Ext.getCmp("ModuleMemberAddForm").getForm().submit({
+								url:ENV.getProcessUrl("member","@saveMember"),
+								submitEmptyText:false,
+								waitTitle:Admin.getText("action/wait"),
+								waitMsg:Admin.getText("action/saving"),
+								success:function(form,action) {
+									Ext.Msg.show({title:Admin.getText("alert/info"),msg:Admin.getText("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function() {
+										Ext.getCmp("ModuleMemberList").getStore().reload();
+										Ext.getCmp("ModuleMemberAddWindow").close();
+									}});
+								},
+								failure:function(form,action) {
+									if (action.result) {
+										if (action.result.message) {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										} else {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_SAVE_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										}
+									} else {
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("INVALID_FORM_DATA"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									}
+								}
+							});
+						}
+					}),
+					new Ext.Button({
+						text:Admin.getText("button/cancel"),
+						handler:function() {
+							Ext.getCmp("ModuleMemberAddWindow").close();
+						}
+					})
+				],
+				listeners:{
+					show:function() {
+						if (idx !== undefined) {
+							Ext.getCmp("ModuleMemberAddForm").getForm().load({
+								url:ENV.getProcessUrl("member","@getMember"),
+								params:{idx:idx},
+								waitTitle:Admin.getText("action/wait"),
+								waitMsg:Admin.getText("action/loading"),
+								success:function(form,action) {
+									var data = action.result.data;
+									var fields = action.result.fields;
+									for (var i=0, loop=fields.length;i<loop;i++) {
+										if (data[fields[i].name] === undefined) continue;
+										
+										if (fields[i].type == "address" || fields[i].input == "address") {
+											if (data[fields[i].name]) {
+												form.findField(fields[i].name+"_zipcode").setValue(data[fields[i].name].zipcode);
+												form.findField(fields[i].name+"_address1").setValue(data[fields[i].name].address1);
+												form.findField(fields[i].name+"_address2").setValue(data[fields[i].name].address2);
+												form.findField(fields[i].name+"_city").setValue(data[fields[i].name].city);
+												form.findField(fields[i].name+"_state").setValue(data[fields[i].name].state);
+											}
+										}
+										
+										if (fields[i].input == "checkbox" && typeof data[fields[i].name] == "object") {
+											var checkboxes = form.findField(fields[i].name+"[]").ownerCt.items.items;
+											for (var checkbox in checkboxes) {
+												if (data[fields[i].name] && $.inArray(checkboxes[checkbox].inputValue,data[fields[i].name]) > -1 || $.inArray(parseInt(checkboxes[checkbox].inputValue,10),data[fields[i].name]) > -1) {
+													checkboxes[checkbox].setValue(true);
+												}
+											}
+										}
+									}
+								},
+								failure:function(form,action) {
+									if (action.result && action.result.message) {
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									} else {
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									}
+									Ext.getCmp("ModuleMemberAddWindow").close();
+								}
+							});
+						}
+					}
+				}
+			}).show();
+		},
+		/**
+		 * 회원정보보기
+		 */
+		show:function(idx) {
+			Ext.Msg.wait(Admin.getText("action/working"),Admin.getText("action/wait"));
+			$.send(ENV.getProcessUrl("member","@getMemberFields"),{midx:idx},function(result) {
+				if (result.success == true) {
+					Member.list.add(idx,result.fields);
+					Ext.Msg.close();
+				}
+			});
+		}
+	},
+	/**
+	 * 포인트내역
+	 */
+	point:{
+		add:function(idx) {
+			new Ext.Window({
+				id:"ModuleMemberPointAddWindow",
+				title:Member.getText("admin/point/add"),
+				width:500,
+				modal:true,
+				border:false,
+				layout:"fit",
+				items:[
+					new Ext.form.Panel({
+						id:"ModuleMemberPointAddForm",
+						border:false,
+						bodyPadding:"10 10 0 10",
+						fieldDefaults:{labelAlign:"right",labelWidth:90,anchor:"100%",allowBlank:true},
+						items:[
+							new Ext.form.Hidden({
+								name:"idx",
+								value:idx
+							}),
+							new Ext.form.DisplayField({
+								fieldLabel:Member.getText("text/name"),
+								name:"name",
+								value:""
+							}),
+							new Ext.form.DisplayField({
+								fieldLabel:Member.getText("text/point"),
+								name:"current",
+								value:""
+							}),
+							new Ext.form.FieldContainer({
+								fieldLabel:Member.getText("admin/point/point"),
+								layout:"hbox",
+								items:[
+									new Ext.form.NumberField({
+										name:"point",
+										value:0,
+										step:1,
+										width:100
+									}),
+									new Ext.form.DisplayField({
+										value:"마이너스 숫자입력시 기존적립내역에서 차감할 수 있습니다.",
+										flex:1,
+										fieldStyle:{textAlign:"right",color:"#666",fontSize:"11px"}
+									})
+								]
+							}),
+							new Ext.form.TextField({
+								fieldLabel:"적립사유",
+								name:"content"
+							})
+						]
+					})
+				],
+				buttons:[
+					new Ext.Button({
+						text:Admin.getText("button/confirm"),
+						handler:function() {
+							Ext.getCmp("ModuleMemberPointAddForm").getForm().submit({
+								url:ENV.getProcessUrl("member","@savePoint"),
+								submitEmptyText:false,
+								waitTitle:Admin.getText("action/wait"),
+								waitMsg:Admin.getText("action/saving"),
+								success:function(form,action) {
+									Ext.Msg.show({title:Admin.getText("alert/info"),msg:Admin.getText("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function(button) {
+										Ext.getCmp("ModuleMemberList").getStore().reload();
+										if (Ext.getCmp("ModuleMemberPointHistoryList")) Ext.getCmp("ModuleMemberPointHistoryList").getStore().loadPage(1);
+										Ext.getCmp("ModuleMemberPointAddWindow").close();
+									}});
+								},
+								failure:function(form,action) {
+									if (action.result) {
+										if (action.result.message) {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:action.result.message,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										} else {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_SAVE_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										}
+									} else {
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("INVALID_FORM_DATA"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									}
+								}
+							});
+						}
+					}),
+					new Ext.Button({
+						text:Admin.getText("button/cancel"),
+						handler:function() {
+							Ext.getCmp("ModuleMemberPointAddWindow").close();
+						}
+					})
+				],
+				listeners:{
+					show:function() {
+						Ext.getCmp("ModuleMemberPointAddForm").getForm().load({
+							url:ENV.getProcessUrl("member","@getMember"),
+							params:{idx:idx},
+							waitTitle:Admin.getText("action/wait"),
+							waitMsg:Admin.getText("action/loading"),
+							success:function(form,action) {
+								form.findField("current").setValue(Ext.util.Format.number(action.result.data.point,"0,000"));
+								form.findField("point").setValue(0);
+							},
+							failure:function(form,action) {
+								Ext.getCmp("ModuleMemberPointAddWindow").close();
+							}
+						});
+					}
+				}
+			}).show();
+		},
+		history:function(idx) {
+			new Ext.Window({
+				id:"ModuleMemberPointHistoryWindow",
+				title:Member.getText("admin/point/history"),
+				width:700,
+				height:500,
+				modal:true,
+				border:false,
+				layout:"fit",
+				items:[
+					new Ext.grid.Panel({
+						id:"ModuleMemberPointHistoryList",
+						border:false,
+						tbar:[
+							new Ext.Button({
+								iconCls:"xi xi-piggy-bank",
+								text:Member.getText("admin/point/add"),
+								handler:function() {
+									Member.point.add(idx);
+								}
+							})
+						],
+						store:new Ext.data.JsonStore({
+							proxy:{
+								type:"ajax",
+								url:ENV.getProcessUrl("member","@getPoints"),
+								extraParams:{idx:idx},
+								reader:{type:"json"}
+							},
+							remoteSort:true,
+							sorters:[{property:"idx",direction:"ASC"}],
+							autoLoad:true,
+							pageSize:50,
+							fields:["idx","point","reg_date"],
+							listeners:{
+								load:function(store,records,success,e) {
+									if (success == false) {
+										if (e.getError()) {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+										} else {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR})
+										}
+									}
+								}
+							}
+						}),
+						columns:[{
+							text:"적립일시",
+							dataIndex:"reg_date",
+							width:160,
+							sortable:true,
+							renderer:function(value) {
+								return moment(value * 1000).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
+							}
+						},{
+							text:"적립사유",
+							dataIndex:"content",
+							minWidth:200,
+							flex:1
+						},{
+							text:Member.getText("admin/point/point"),
+							width:100,
+							dataIndex:"point",
+							align:"right",
+							renderer:function(value) {
+								return Ext.util.Format.number(value,"0,000");
+							}
+						},{
+							text:Member.getText("admin/point/accumulation"),
+							width:100,
+							dataIndex:"accumulation",
+							align:"right",
+							renderer:function(value) {
+								return Ext.util.Format.number(value,"0,000");
+							}
+						}],
+						bbar:new Ext.PagingToolbar({
+							store:null,
+							displayInfo:false,
+							listeners:{
+								beforerender:function(tool) {
+									tool.bindStore(Ext.getCmp("ModuleMemberPointHistoryList").getStore());
+								}
+							}
+						})
+					})
+				],
+				buttons:[
+					new Ext.Button({
+						text:Admin.getText("button/close"),
+						handler:function() {
+							Ext.getCmp("ModuleMemberPointHistoryWindow").close();
+						}
+					})
+				]
+			}).show();
+		}
+	},
 	/**
 	 * 회원라벨관리
 	 */
@@ -105,9 +469,7 @@ var Member = {
 								success:function(form,action) {
 									Ext.Msg.show({title:Admin.getText("alert/info"),msg:Admin.getText("action/saved"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function(button) {
 										Ext.getCmp("ModuleMemberAddLabelWindow").close();
-										Ext.getCmp("ModuleMemberLabelList").getStore().load(function() {
-											console.log("reload");
-										});
+										Ext.getCmp("ModuleMemberLabelList").getStore().load();
 									}});
 								},
 								failure:function(form,action) {
@@ -190,6 +552,204 @@ var Member = {
 	 * 회원가입필드 처리
 	 */
 	field:{
+		get:function(field) {
+			if (field.input == "system") {
+				if (field.name == "birthday") {
+					return new Ext.form.DateField({
+						name:field.name,
+						fieldLabel:field.title,
+						format:"Y-m-d",
+						allowBlank:field.is_required === false
+					});
+				} else if (field.name == "gender") {
+					return new Ext.form.ComboBox({
+						name:field.name,
+						fieldLabel:field.title,
+						store:new Ext.data.ArrayStore({
+							fields:["display","value"],
+							data:[["선택안함","NONE"],["남성","MALE"],["여성","FEMALE"]]
+						}),
+						displayField:"display",
+						valueField:"value",
+						value:"NONE",
+						allowBlank:field.is_required === false
+					});
+				} else if (field.name == "address") {
+					return new Ext.form.FieldContainer({
+						fieldLabel:field.title,
+						layout:{type:"vbox",align:"stretch"},
+						items:[
+							new Ext.form.FieldContainer({
+								layout:"hbox",
+								items:[
+									new Ext.form.TextField({
+										name:field.name+"_zipcode",
+										width:100,
+										emptyText:"(우편번호)",
+										allowBlank:field.is_required === false
+									}),
+									new Ext.form.TextField({
+										name:field.name+"_address1",
+										style:{marginLeft:"5px"},
+										flex:1,
+										emptyText:"(주소)",
+										allowBlank:field.is_required === false
+									})
+								]
+							}),
+							new Ext.form.TextField({
+								name:field.name+"_address2",
+								emptyText:"(상세주소)",
+								allowBlank:true
+							}),
+							new Ext.form.FieldContainer({
+								layout:"hbox",
+								items:[
+									new Ext.form.TextField({
+										name:field.name+"_city",
+										emptyText:"(도/시)",
+										flex:1,
+										allowBlank:true
+									}),
+									new Ext.form.TextField({
+										name:field.name+"_state",
+										style:{marginLeft:"5px"},
+										emptyText:"(구/군)",
+										flex:1,
+										allowBlank:true
+									})
+								]
+							})
+						]
+					});
+				} else {
+					return new Ext.form.TextField({
+						name:field.name,
+						fieldLabel:field.title,
+						allowBlank:field.is_required === false
+					});
+				}
+			} else {
+				if (field.input == "radio") {
+					return new Ext.form.RadioGroup({
+						fieldLabel:field.title,
+						columns:1,
+						allowBlank:field.is_required === false,
+						items:(function(options) {
+							var items = [];
+							for (var value in options) {
+								items.push(new Ext.form.Radio({
+									boxLabel:options[value],
+									name:field.name,
+									inputValue:value
+								}));
+							}
+							
+							return items;
+						})(field.options)
+					});
+				} else if (field.input == "checkbox") {
+					return new Ext.form.CheckboxGroup({
+						fieldLabel:field.title,
+						columns:1,
+						allowBlank:field.is_required === false,
+						items:(function(options) {
+							var items = [];
+							for (var value in options) {
+								items.push(new Ext.form.Checkbox({
+									boxLabel:options[value],
+									name:field.name+"[]",
+									inputValue:value
+								}));
+							}
+							
+							return items;
+						})(field.options)
+					});
+				} else if (field.input == "select") {
+					return new Ext.form.ComboBox({
+						name:field.name,
+						fieldLabel:field.title,
+						store:new Ext.data.ArrayStore({
+							fields:["display","value"],
+							data:(function(options) {
+								var datas = [];
+								for (var value in options) {
+									datas.push([options[value],value]);
+								}
+								return datas;
+							})(field.options)
+						}),
+						displayField:"display",
+						valueField:"value",
+						allowBlank:field.is_required === false
+					});
+				} else if (field.input == "address") {
+					return new Ext.form.FieldContainer({
+						fieldLabel:field.title,
+						layout:{type:"vbox",align:"stretch"},
+						items:[
+							new Ext.form.FieldContainer({
+								layout:"hbox",
+								items:[
+									new Ext.form.TextField({
+										name:field.name+"_zipcode",
+										width:100,
+										emptyText:"(우편번호)",
+										allowBlank:field.is_required === false
+									}),
+									new Ext.form.TextField({
+										name:field.name+"_address1",
+										style:{marginLeft:"5px"},
+										flex:1,
+										emptyText:"(주소)",
+										allowBlank:field.is_required === false
+									})
+								]
+							}),
+							new Ext.form.TextField({
+								name:field.name+"_address2",
+								emptyText:"(상세주소)",
+								allowBlank:true
+							}),
+							new Ext.form.FieldContainer({
+								layout:"hbox",
+								items:[
+									new Ext.form.TextField({
+										name:field.name+"_city",
+										emptyText:"(도/시)",
+										flex:1,
+										allowBlank:true
+									}),
+									new Ext.form.TextField({
+										name:field.name+"_state",
+										style:{marginLeft:"5px"},
+										emptyText:"(구/군)",
+										flex:1,
+										allowBlank:true
+									})
+								]
+							})
+						]
+					});
+				} else if (field.input == "textarea") {
+					return new Ext.form.TextArea({
+						name:field.name,
+						fieldLabel:field.title,
+						height:80,
+						allowBlank:field.is_required === false
+					});
+				} else {
+					return new Ext.form.TextField({
+						name:field.name,
+						fieldLabel:field.title,
+						allowBlank:field.is_required === false
+					});
+				}
+			}
+			
+			return null;
+		},
 		add:function(oName) {
 			var label = Ext.getCmp("ModuleMemberSignUpFieldList").getStore().getProxy().extraParams.label;
 			
@@ -316,14 +876,16 @@ var Member = {
 											Ext.getCmp("ModuleMemberAddFieldOptions").enable().show();
 											
 											if (value == "checkbox") {
-												form.findField("max").enable();
+												Ext.getCmp("ModuleMemberAddFieldOptionsMax").enable();
+												Ext.getCmp("ModuleMemberAddFieldOptionsMax").show();
 											} else {
-												form.findField("max").disable();
+												Ext.getCmp("ModuleMemberAddFieldOptionsMax").disable();
+												Ext.getCmp("ModuleMemberAddFieldOptionsMax").hide();
 											}
 										}
 										
 										if (value == "system") {
-											setTimeout(function(form) { form.findField("input").setRawValue(Member.getText("admin/field/input/system")) },100,form);
+											setTimeout(function(form) { form.findField("input").setRawValue(Member.getText("admin/field/input/system")); },100,form);
 										}
 									}
 								}
@@ -368,6 +930,7 @@ var Member = {
 								hidden:true,
 								items:[
 									new Ext.form.FieldContainer({
+										id:"ModuleMemberAddFieldOptionsMax",
 										layout:"hbox",
 										items:[
 											new Ext.form.NumberField({
@@ -376,7 +939,7 @@ var Member = {
 												width:80
 											}),
 											new Ext.form.DisplayField({
-												value:"("+Member.getText("admin/label/form/max")+")",
+												value:Member.getText("admin/field/form/max"),
 												margin:"0 5 0 5",
 												flex:1
 											})
@@ -519,8 +1082,8 @@ var Member = {
 											for (var i=0, loop=options.length;i<loop;i++) {
 												if (i == 0) {
 													Ext.getCmp("ModuleMemberAddFieldOptionItems").items.items[1].items.items[0].setValue(JSON.stringify(options[i]));
-													Ext.getCmp("ModuleMemberAddFieldOptionItems").items.items[1].items.items[1].setValue(options[i].display);
-													Ext.getCmp("ModuleMemberAddFieldOptionItems").items.items[1].items.items[2].setValue(options[i].value);
+													Ext.getCmp("ModuleMemberAddFieldOptionItems").items.items[1].items.items[1].setValue(options[i].value);
+													Ext.getCmp("ModuleMemberAddFieldOptionItems").items.items[1].items.items[2].setValue(options[i].display);
 												} else {
 													Ext.getCmp("ModuleMemberAddFieldOptionItems").add(
 														new Ext.form.FieldContainer({
@@ -558,7 +1121,7 @@ var Member = {
 																new Ext.Button({
 																	iconCls:"mi mi-minus",
 																	handler:function(button) {
-																		button.ownerCt.remove();
+																		button.ownerCt.ownerCt.remove(button.ownerCt);
 																	}
 																})
 															]
@@ -682,7 +1245,7 @@ var Member = {
 												new Ext.Button({
 													iconCls:"mi mi-minus",
 													handler:function(button) {
-														button.ownerCt.remove();
+														button.ownerCt.ownerCt.remove(button.ownerCt);
 													}
 												})
 											]

@@ -6,8 +6,9 @@
  * 
  * @file /modules/member/admin/index.php
  * @author Arzz (arzz@arzz.com)
- * @license MIT License
- * @version 3.0.0.160910
+ * @license GPLv3
+ * @version 3.0.0
+ * @modified 2018. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -126,7 +127,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					flex:1,
 					dataIndex:"email",
 					renderer:function(value) {
-						return '<a href="mailto:'+value+'">'+value+'</a>';
+						if (value) return '<a href="mailto:'+value+'">'+value+'</a>';
 					}
 				},{
 					text:Member.getText("admin/list/columns/name"),
@@ -142,7 +143,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 				},{
 					text:Member.getText("admin/list/columns/cellphone"),
 					dataIndex:"cellphone",
-					width:150,
+					width:130,
 					renderer:function(value) {
 						return value;
 					}
@@ -173,7 +174,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						return moment(value * 1000).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
 					}
 				},{
-					text:Member.getText("admin/list/columns/last_login"),
+					text:Member.getText("admin/list/columns/latest_login"),
 					width:150,
 					dataIndex:"latest_login",
 					sortable:true,
@@ -187,14 +188,53 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					displayInfo:false,
 					items:[
 						"->",
-						{xtype:"tbtext",text:Member.getText("admin/grid_help")}
+						{xtype:"tbtext",text:Admin.getText("text/grid_help")}
 					],
 					listeners:{
 						beforerender:function(tool) {
 							tool.bindStore(Ext.getCmp("ModuleMemberList").getStore());
 						}
 					}
-				})
+				}),
+				listeners:{
+					itemdblclick:function(grid,record) {
+						Member.list.show(record.data.idx);
+					},
+					itemcontextmenu:function(grid,record,item,index,e) {
+						var menu = new Ext.menu.Menu();
+						
+						menu.add('<div class="x-menu-title">'+record.data.name+'</div>');
+						
+						menu.add({
+							iconCls:"xi xi-form",
+							text:"회원정보수정",
+							handler:function() {
+								Member.list.show(record.data.idx);
+							}
+						});
+						
+						menu.add("-");
+						
+						menu.add({
+							iconCls:"xi xi-wallet",
+							text:Member.getText("admin/point/history"),
+							handler:function() {
+								Member.point.history(record.data.idx);
+							}
+						});
+						
+						menu.add({
+							iconCls:"xi xi-piggy-bank",
+							text:Member.getText("admin/point/add"),
+							handler:function() {
+								Member.point.add(record.data.idx);
+							}
+						});
+						
+						e.stopEvent();
+						menu.showAt(e.getXY());
+					}
+				}
 			}),
 			new Ext.Panel({
 				id:"ModuleMemberLabel",

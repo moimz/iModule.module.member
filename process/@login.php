@@ -6,10 +6,9 @@
  *
  * @file /modules/member/process/@login.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
- * @version 3.0.0.160923
- *
- * @return object $results
+ * @license MIT License
+ * @version 3.0.0
+ * @modified 2018. 4. 9.
  */
  
 $idx = Request('idx');

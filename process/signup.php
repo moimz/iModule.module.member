@@ -13,7 +13,9 @@
 if (defined('__IM__') == false) exit;
 
 $site = $this->IM->getSite();
-$label = Request('label') ? Request('label') : 0;
+$labels = array(0);
+$label = Request('label') ? Request('label') : null;
+if ($label != null) $labels[] = $label;
 $steps = $this->getModule()->getConfig('signup_step');
 
 /**
@@ -26,7 +28,7 @@ if ($this->getLabel($label)->allow_signup === false) {
 	$insert = array();
 	$errors = array();
 	
-	$isValid = $this->isValidMemberData('signup',$_POST,$insert,$errors);
+	$isValid = $this->isValidMemberData($labels,$_POST,$insert,$errors);
 	
 	if ($isValid && count($errors) == 0) {
 		if ($site->member == 'UNIVERSAL') $insert['domain'] = '*';

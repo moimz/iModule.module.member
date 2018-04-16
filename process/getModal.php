@@ -4,7 +4,7 @@
  *
  * 모달창을 가져온다.
  * 
- * @file /modules/member/progress/getModal.php
+ * @file /modules/member/process/getModal.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0

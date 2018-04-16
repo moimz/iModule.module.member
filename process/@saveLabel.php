@@ -6,15 +6,9 @@
  *
  * @file /modules/member/process/@getLabels.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
- * @version 3.0.0.160923
- *
- * @post string $title 라벨명
- * @post string $allow_signup 회원가입 가능여부
- * @post string $approve_signup 가입승인여부
- * @post string $is_change 라벨 변경 가능여부
- * @post string $is_unique 단독라벨여부
- * @return object $results
+ * @license MIT License
+ * @version 3.0.0
+ * @modified 2018. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 

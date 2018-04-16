@@ -6,11 +6,9 @@
  *
  * @file /modules/member/process/@getLabel.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
- * @version 3.0.0.160923
- *
- * @post int $idx 라벨 고유값
- * @return object $results
+ * @license MIT License
+ * @version 3.0.0
+ * @modified 2018. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 

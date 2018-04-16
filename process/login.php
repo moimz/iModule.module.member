@@ -1,16 +1,15 @@
 <?php
 /**
-* 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
-* 
-* 회원로그인을 처리한다.
-*
-* @file /modules/member/process/signup.php
-* @author Arzz (arzz@arzz.com)
-* @license MIT License
-* @version 3.0.0.161001
-*
-* @return object $results
-*/
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ * 
+ * 회원로그인을 처리한다.
+ *
+ * @file /modules/member/process/login.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0
+ * @modified 2018. 4. 6.
+ */
 if (defined('__IM__') == false) exit;
 
 $mHash = new Hash();

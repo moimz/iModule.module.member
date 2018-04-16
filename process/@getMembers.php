@@ -6,12 +6,9 @@
  *
  * @file /modules/member/process/@getMembers.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
- * @version 3.0.0.160923
- *
- * @post int $label 회원라벨 검색
- * @post string $keyword 검색어
- * @return object $results
+ * @license MIT License
+ * @version 3.0.0
+ * @modified 2018. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 
@@ -23,9 +20,11 @@ $dir = Request('dir') ? Request('dir') : 'DESC';
 $label = Request('label') ? Request('label') : 0;
 $keyword = Request('keyword');
 
-$lists = $this->db()->select($this->table->member);
+$lists = $this->db()->select($this->table->member.' m');
+if ($label) $lists->join($this->table->member_label.' l','l.idx=m.idx','LEFT')->where('l.label',$label);
+if ($keyword) $lists->where('(m.email like ? or m.name like ? or m.nickname like ?)',array('%'.$keyword.'%','%'.$keyword.'%','%'.$keyword.'%'));
 $total = $lists->copy()->count();
-$lists = $lists->orderBy($sort,$dir)->limit($start,$limit)->get();
+$lists = $lists->orderBy('m.'.$sort,$dir)->limit($start,$limit)->get();
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
 	$lists[$i]->photo = $this->IM->getModuleUrl('member','photo',$lists[$i]->idx).'/profile.jpg';
 }

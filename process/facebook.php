@@ -4,7 +4,7 @@
  *
  * 페이스북 계정을 이용하여 로그인한다.
  * 
- * @file /modules/member/progress/facebook.php
+ * @file /modules/member/process/facebook.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0

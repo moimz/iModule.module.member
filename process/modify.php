@@ -28,7 +28,7 @@ if ($this->isLogged() == false) {
 	$errors = array();
 	
 	$member = $this->getMember();
-	$isValid = $this->isValidMemberData('modify',$_POST,$insert,$errors);
+	$isValid = $this->isValidMemberData($member->idx,$_POST,$insert,$errors);
 	
 	if ($isValid && count($errors) == 0) {
 		if ($insert['email'] == $member->email) {

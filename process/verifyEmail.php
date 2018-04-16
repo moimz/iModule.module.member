@@ -4,7 +4,7 @@
  *
  * 이메일 인증을 처리한다.
  *
- * @file /modules/member/templets/default/verifyEmail.php
+ * @file /modules/member/process/verifyEmail.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0

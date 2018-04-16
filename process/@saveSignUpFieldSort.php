@@ -6,9 +6,9 @@
  *
  * @file /modules/member/process/@saveSignUpFieldSort.php
  * @author Arzz (arzz@arzz.com)
- * @license GPLv3
+ * @license MIT License
  * @version 3.0.0
- * @modified 2017. 11. 30.
+ * @modified 2018. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 

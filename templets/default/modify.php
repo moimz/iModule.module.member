@@ -39,7 +39,9 @@ if (defined('__IM__') == false) exit;
 					<?php foreach ($defaults as $field) { ?>
 					<li>
 						<label<?php echo $field->name != 'password' && $field->is_required == true ? ' class="required"' : ''; ?>><?php echo $field->title; ?></label>
-						<?php echo $field->inputHtml; ?>
+						<div>
+							<?php echo $field->inputHtml; ?>
+						</div>
 					</li>
 					<?php } ?>
 				</ul>
@@ -51,7 +53,9 @@ if (defined('__IM__') == false) exit;
 					<?php foreach ($extras as $field) { ?>
 					<li>
 						<label<?php echo $field->is_required == true ? ' class="required"' : ''; ?>><?php echo $field->title; ?></label>
-						<?php echo $field->inputHtml; ?>
+						<div>
+							<?php echo $field->inputHtml; ?>
+						</div>
 					</li>
 					<?php } ?>
 				</ul>

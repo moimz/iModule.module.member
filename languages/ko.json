@@ -2,6 +2,7 @@
 	"text":{
 		"name":"실명",
 		"photo":"회원사진",
+		"point":"포인트",
 		"login":"로그인",
 		"signup":"회원가입",
 		"modify":"회원정보수정",
@@ -53,7 +54,12 @@
 		"email_verification_email":"이메일",
 		"email_verification_email_help":"입력하신 이메일주소가 올바르지 않다면 수정 후 인증메일 재발송 버튼을 클릭하여 주십시오.",
 		"email_verification_code":"인증코드",
-		"email_verification_code_help":"입력한 이메일주소로 인증코드를 발송하였습니다. 이메일에 포함되어 있는 6자리의 인증코드를 입력하여 주십시오."
+		"email_verification_code_help":"입력한 이메일주소로 인증코드를 발송하였습니다. 이메일에 포함되어 있는 6자리의 인증코드를 입력하여 주십시오.",
+		"zipcode":"우편번호",
+		"address1":"기본주소",
+		"address2":"상세주소",
+		"city":"시/도",
+		"state":"구/군"
 	},
 	"button":{
 		"edit":"편집",
@@ -90,8 +96,14 @@
 				"exp":"경험치",
 				"point":"포인트",
 				"reg_date":"가입일",
-				"last_login":"최종접속일"
+				"latest_login":"최종접속일"
 			}
+		},
+		"point":{
+			"history":"포인트 내역",
+			"add":"포인트 적립",
+			"point":"적립 포인트",
+			"accumulation":"누적 포인트"
 		},
 		"label":{
 			"add":"라벨추가",

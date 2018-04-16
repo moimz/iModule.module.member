@@ -69,19 +69,19 @@ var Member = {
 	 * 회원가입 팝업
 	 */
 	signupPopup:function() {
-		iModule.openPopup(ENV.getModuleUrl("member","@signup"),600,500,0,"signup");
+		iModule.openPopup(ENV.getModuleUrl("member","@signup"),600,500,1,"signup");
 	},
 	/**
 	 * 정보수정 팝업
 	 */
 	modifyPopup:function() {
-		iModule.openPopup(ENV.getModuleUrl("member","@modify"),600,500,0,"modify");
+		iModule.openPopup(ENV.getModuleUrl("member","@modify"),600,500,1,"modify");
 	},
 	/**
 	 * 정보수정 팝업
 	 */
 	helpPopup:function() {
-		iModule.openPopup(ENV.getModuleUrl("member","@password"),400,200,0,"password");
+		iModule.openPopup(ENV.getModuleUrl("member","@password"),400,200,1,"password");
 	},
 	/**
 	 * 다른 도메인간 통합로그인을 위한 로그인 세션 동기화
@@ -345,6 +345,7 @@ var Member = {
 							location.replace(ENV.getUrl(false));
 						}
 					});
+					return false;
 				}
 			});
 		}
