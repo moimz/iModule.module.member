@@ -1529,7 +1529,7 @@ class ModuleMember {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
 				$member->photo = $this->IM->getModuleUrl('member','photo',$member->idx).'/profile.jpg';
-				$member->nickcon = is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/member/'.$midx.'.gif' : null;
+				$member->nickcon = is_file($this->IM->getAttachmentPath().'/nickcon/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/nickcon/'.$midx.'.gif' : null;
 				$member->level = $this->getLevel($member->exp);
 				$temp = explode('-',$member->birthday);
 				$member->birthday = count($temp) == 3 ? $temp[2].'-'.$temp[0].'-'.$temp[1] : '';
@@ -1552,6 +1552,31 @@ class ModuleMember {
 		
 		$this->IM->fireEvent('afterGetData',$this->getModule()->getName(),'member',$this->members[$midx]);
 		return $this->members[$midx];
+	}
+	
+	/**
+	 * 실명 또는 닉네임을 검색하여 회원번호를 가져온다.
+	 *
+	 * @param string $keyword 검색어
+	 * @param string $mode 검색모드 (NAME : 실명검색 / NICKNAME : 닉네임검색 / BOTH : 실명 및 닉네임검색)
+	 * @param boolean $is_exact 완전일치여부
+	 * @return int[] $midxes 검색된 회원번호
+	 */
+	function getSearchResults($keyword,$mode='NICKNAME',$is_exact=false) {
+		$midxes = $this->db()->select($this->table->member,'idx');
+		
+		if ($is_exact == true) {
+			if ($mode == 'NAME') $midxes->where('name',$keyword);
+			elseif ($mode == 'NICKNAME') $midxes->where('nickname',$keyword);
+			elseif ($mode == 'NAME') $midxes->where('(name = ? or nickname = ?)',array($keyword,$keyword));
+		} else {
+			$keyword = '%'.$keyword.'%';
+			if ($mode == 'NAME') $midxes->where('name',$keyword,'LIKE');
+			elseif ($mode == 'NICKNAME') $midxes->where('nickname',$keyword,'LIKE');
+			elseif ($mode == 'NAME') $midxes->where('(name like ? or nickname like ?)',array($keyword,$keyword));
+		}
+		
+		return $midxes->get('idx');
 	}
 	
 	/**
@@ -1585,7 +1610,7 @@ class ModuleMember {
 			$name = $member->idx == 0 ? $replacement : $member->name;
 		}
 		
-		return '<span data-module="member" data-role="name"'.($midx ? ' data-idx="'.$midx.'"' : '').'>'.$name.'</span>';
+		return '<span data-module="member" data-role="name" data-type="name"'.($midx ? ' data-idx="'.$midx.'"' : '').'>'.$name.'</span>';
 	}
 	
 	/**
@@ -1596,7 +1621,7 @@ class ModuleMember {
 	 * @param boolean $nickcon 닉이미지 사용여부 (기본값 : true)
 	 * @return string $nickname
 	 */
-	function getMemberNickname($midx=null,$nickcon=true,$replacement='') {
+	function getMemberNickname($midx=null,$replacement='',$nickcon=true) {
 		if ($midx === 0) {
 			$nickname = $replacement;
 		} else {
@@ -1605,7 +1630,11 @@ class ModuleMember {
 			$nickname = $member->idx == 0 ? $replacement : $member->nickname;
 		}
 		
-		return '<span data-module="member" data-role="name"'.($midx ? ' data-idx="'.$midx.'"' : '').'>'.$nickname.'</span>';
+		if ($nickcon == true && $midx > 0 && is_file($this->IM->getAttachmentPath().'/nickcon/'.$midx.'.gif') == true) {
+			return '<span data-module="member" data-role="name" data-type="nickcon" data-idx="'.$midx.'" style="background-image:url('.$this->IM->getAttachmentDir().'/nickcon/'.$midx.'.gif);" title="'.$nickname.'">'.$nickname.'</span>';
+		} else {
+			return '<span data-module="member" data-role="name" data-type="nickname"'.($midx ? ' data-idx="'.$midx.'"' : '').'>'.$nickname.'</span>';
+		}
 	}
 	
 	/**

@@ -13,6 +13,7 @@ i[data-module=member][data-role=photo][data-idx] {cursor:pointer;}
 
 span[data-module=member][data-role=name] {display:inline-block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; vertical-align:middle;}
 span[data-module=member][data-role=name][data-idx] {font-weight:bold; cursor:pointer;}
+span[data-module=member][data-role=name][data-type=nickcon] {font-size:0 !important; min-width:100px; background-size:contain; background-repeat:no-repeat; background-position:0 50%;}
 
 ul[data-module=member][data-role=social] {list-style:none; font-size:0;}
 ul[data-module=member][data-role=social] > li {vertical-align:middle;}
