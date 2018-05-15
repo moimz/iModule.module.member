@@ -8,31 +8,43 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 4. 9.
+ * @modified 2018. 5. 11.
  */
 if (defined('__IM__') == false) exit;
 
+$is_default = Request('is_default') == 'true';
+$is_extra = Request('is_extra') == 'true';
 $label = Request('label');
-$lists = $this->db()->select($this->table->signup)->where('label',$label)->orderBy('sort','asc')->get();
+if ($is_default == true) $labels = array(0,$label);
+else $labels = array($label);
+$lists = $this->db()->select($this->table->signup)->where('label',$labels,'IN')->orderBy('sort','asc')->get();
 $agreements = $this->db()->select($this->table->signup)->where('label',$label)->where('name',array('agreement','privacy'),'IN')->count();
 
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
+	if ($is_extra === true && $lists[$i]->type == 'etc') $lists[$i]->name = 'extra.'.$lists[$i]->name;
+	
 	$lists[$i]->title = $lists[$i]->title == 'LANGUAGE_SETTING' ? $this->getText('text/'.$lists[$i]->type) : $lists[$i]->title;
 	$lists[$i]->help = $lists[$i]->help == 'LANGUAGE_SETTING' ? $this->getText('signup/'.$lists[$i]->type.'_help') : $lists[$i]->help;
 	$lists[$i]->is_required = $lists[$i]->is_required == 'TRUE';
 	
 	if ($lists[$i]->name == 'agreement' && $lists[$i]->sort != -2) {
-		$this->db()->update($this->table->signup,array('sort'=>-2))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		if ($is_default == false) {
+			$this->db()->update($this->table->signup,array('sort'=>-2))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		}
 		$lists[$i]->sort = -2;
 	}
 	
 	if ($lists[$i]->name == 'privacy' && $lists[$i]->sort != -1) {
-		$this->db()->update($this->table->signup,array('sort'=>-1))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		if ($is_default == false) {
+			$this->db()->update($this->table->signup,array('sort'=>-1))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		}
 		$lists[$i]->sort = -1;
 	}
 	
 	if (in_array($lists[$i]->name,array('agreement','privacy')) == false && ($lists[$i]->sort < 0 || $lists[$i]->sort != $i - $agreements)) {
-		$this->db()->update($this->table->signup,array('sort'=>max(0,$i - $agreements)))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		if ($is_default == false) {
+			$this->db()->update($this->table->signup,array('sort'=>max(0,$i - $agreements)))->where('label',$lists[$i]->label)->where('name',$lists[$i]->name)->execute();
+		}
 		$lists[$i]->sort = max(0,$i - $agreements);
 	}
 }
