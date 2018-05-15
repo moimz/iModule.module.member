@@ -736,7 +736,6 @@ var Member = {
 					return new Ext.form.TextArea({
 						name:field.name,
 						fieldLabel:field.title,
-						height:80,
 						allowBlank:field.is_required === false
 					});
 				} else {
