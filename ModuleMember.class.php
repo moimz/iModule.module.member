@@ -49,6 +49,11 @@ class ModuleMember {
 	private $logged = null;
 	
 	/**
+	 * 기본 URL (다른 모듈에서 호출되었을 경우에 사용된다.)
+	 */
+	private $baseUrl = null;
+	
+	/**
 	 * class 선언
 	 *
 	 * @param iModule $IM iModule 코어클래스
@@ -146,7 +151,27 @@ class ModuleMember {
 	 * @return string $url
 	 */
 	function getUrl($view=null,$idx=null) {
-		return $this->IM->getUrl(null,null,$view,$idx);
+		$url = $this->baseUrl ? $this->baseUrl : $this->IM->getUrl(null,null,false);
+		
+		$view = $view === null ? $this->getView($this->baseUrl) : $view;
+		if ($view == null || $view == false) return $url;
+		$url.= '/'.$view;
+		
+		$idx = $idx === null ? $this->getIdx($this->baseUrl) : $idx;
+		if ($idx == null || $idx == false) return $url;
+		
+		return $url.'/'.$idx;
+	}
+	
+	/**
+	 * 다른모듈에서 호출된 경우 baseUrl 을 설정한다.
+	 *
+	 * @param string $url
+	 * @return $this
+	 */
+	function setUrl($url) {
+		$this->baseUrl = $this->IM->getUrl(null,null,$url,false);
+		return $this;
 	}
 	
 	/**
@@ -155,16 +180,7 @@ class ModuleMember {
 	 * @return string $view
 	 */
 	function getView() {
-		return $this->IM->getView();
-	}
-	
-	/**
-	 * view 값을 변경한다.
-	 *
-	 * @param string $view
-	 */
-	function setView($view) {
-		return $this->IM->setView($view);
+		return $this->IM->getView($this->baseUrl);
 	}
 	
 	/**
@@ -173,7 +189,7 @@ class ModuleMember {
 	 * @return string $idx
 	 */
 	function getIdx() {
-		return $this->IM->getIdx();
+		return $this->IM->getIdx($this->baseUrl);
 	}
 	
 	/**
@@ -510,7 +526,7 @@ class ModuleMember {
 		/**
 		 * 컨텍스트 컨테이너를 설정한다.
 		 */
-		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->getModule()->getName().'" data-context="'.$context.'">'.PHP_EOL;
+		$html = PHP_EOL.'<!-- MEMBER MODULE -->'.PHP_EOL.'<div data-role="context" data-type="module" data-module="'.$this->getModule()->getName().'" data-base-url="'.($this->baseUrl == null ? $this->IM->getUrl(null,null,false) : $this->baseUrl).'" data-context="'.$context.'" data-configs="'.GetString(json_encode($configs),'input').'">'.PHP_EOL;
 		
 		/**
 		 * 컨텍스트 헤더

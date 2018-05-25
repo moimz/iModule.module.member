@@ -7,9 +7,16 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2017. 11. 29.
+ * @modified 2018. 5. 25.
  */
 var Member = {
+	getUrl:function(view,idx) {
+		var url = $("div[data-module=member]").attr("data-base-url") ? $("div[data-module=member]").attr("data-base-url") : ENV.getUrl(null,null,false);
+		if (!view || view == false) return url;
+		url+= "/"+view;
+		if (!idx || idx == false) return url;
+		return url+"/"+idx;
+	},
 	/**
 	 * 회원로그인
 	 *
@@ -202,7 +209,7 @@ var Member = {
 		submit:function($form) {
 			$form.send(ENV.getProcessUrl("member","signup"),function(result) {
 				if (result.success == true) {
-					location.replace(ENV.getUrl(null,null,"complete",false));
+					location.replace(Member.getUrl("complete",false));
 				}
 			});
 		}
