@@ -654,9 +654,11 @@ class ModuleMember {
 				header("location:".$this->getUrl('register',$label));
 				exit;
 			}
+		} elseif ($label == null) {
+			$label = 0;
 		}
 		
-		if ($step != 'start' && $step != 'complete' && $label == null) return $this->getError('NOT_FOUND_PAGE');
+		if ($step != 'start' && $step != 'complete' && $label === null) return $this->getError('NOT_FOUND_PAGE');
 		if ($this->getLabel($label) == null || $this->getLabel($label)->allow_signup == false) return $this->getTemplet($configs)->getError('NOT_ALLOWED_SIGNUP',$this->getLabel($label));
 		
 		if ($step == 'agreement') {
