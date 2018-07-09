@@ -497,7 +497,7 @@ class ModuleMember {
 				break;
 				
 			case 'photo' :
-				$midx = $this->IM->view ? $this->IM->view : 0;
+				$midx = $this->getView() ? $this->getView() : 0;
 			
 				$path = $this->getModule()->getConfig('photo_privacy') == false && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg' : $this->getModule()->getPath().'/images/nophoto.png';
 				$extension = explode('.',$path);
@@ -938,8 +938,8 @@ class ModuleMember {
 		
 		$member = $this->getMember();
 		
-		$view = $this->IM->view ? $this->IM->view : 'all';
-		$p = is_numeric($this->IM->idx) == true ? $this->IM->idx : 1;
+		$view = $this->getView() ? $this->getView() : 'all';
+		$p = is_numeric($this->getIdx()) == true ? $this->getIdx() : 1;
 		$limit = 20;
 		$start = ($p - 1) * $limit;
 		$lists = $this->db()->select($this->table->point)->where('midx',$this->getLogged());
