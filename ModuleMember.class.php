@@ -1039,12 +1039,12 @@ class ModuleMember {
 			$content.= '<ul data-module="member" data-role="link">';
 			if ($this->getModule()->getConfig('allow_signup') == true) {
 				$signup = $this->IM->getContextUrl('member','signup');
-				$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$this->IM->getUrl($signup->menu,$signup->page,false).'">'.$signup->title.'</a>').'</li>';
+				$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$signup.'">'.$this->getText('text/signup').'</a>').'</li>';
 			}
 			
 			if ($this->getModule()->getConfig('allow_signup') == true) {
 				$help = $this->IM->getContextUrl('member','password');
-				$content.= '<li>'.($help == null ? '<button type="button" onclick="Member.helpPopup();">'.$this->getText('text/help').'</button>' : '<a href="'.$this->IM->getUrl($help->menu,$help->page,false).'">'.$help->title.'</a>').'</li>';
+				$content.= '<li>'.($help == null ? '<button type="button" onclick="Member.helpPopup();">'.$this->getText('text/help').'</button>' : '<a href="'.$help.'">'.$this->getText('text/help').'</a>').'</li>';
 			}
 			$content.= '</ul>';
 		}
