@@ -1546,7 +1546,7 @@ class ModuleMember {
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
-				$member->photo = $this->IM->getModuleUrl('member','photo',$member->idx).'/profile.jpg';
+				$member->photo = $this->IM->getModuleUrl('member','photo',$member->idx,false).'/profile.jpg';
 				$member->nickcon = is_file($this->IM->getAttachmentPath().'/nickcon/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/nickcon/'.$midx.'.gif' : null;
 				$member->level = $this->getLevel($member->exp);
 				$temp = explode('-',$member->birthday);
