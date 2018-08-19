@@ -40,6 +40,10 @@
 		"VERIFYING":"인증전",
 		"WAITING":"승인대기"
 	},
+	"genger":{
+		"MALE":"남자",
+		"FEMALE":"여자"
+	},
 	"signup":{
 		"agree":"위의 내용에 동의합니다.",
 		"email_help":"이메일주소가 로그인 아이디로 사용됩니다.",
