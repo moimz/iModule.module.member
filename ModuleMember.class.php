@@ -2720,7 +2720,7 @@ class ModuleMember {
 		$error->description = $path;
 		$error->type = 'back';
 		
-		$this->IM->printError($error,null,null,true);
+		$this->IM->printError($error);
 	}
 	
 	/**
