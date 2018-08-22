@@ -32,7 +32,7 @@ if (isset($_GET['code']) == true) {
 } elseif ($oauth->getAccessToken() == null) {
 	$_logged = new stdClass();
 	$_logged->site = $site;
-	$_logged->redirect = isset($_SERVER['HTTP_REFERER']) == true && strpos('oauth/'.$action,$_SERVER['HTTP_REFERER']) === false ? $_SERVER['HTTP_REFERER'] : $this->IM->getUrl(false);
+	$_logged->redirect = isset($_SERVER['HTTP_REFERER']) == true && strpos('oauth/'.$action,$_SERVER['HTTP_REFERER']) === false ? $_SERVER['HTTP_REFERER'] : $this->IM->getIndexUrl();
 	
 	$_SESSION['IM_SOCIAL_LOGGED'] = $_logged;
 	

@@ -27,7 +27,7 @@ if (defined('__IM__') == false) exit;
 				
 				<div data-role="button">
 					<button type="submit"><?php echo $me->getText('button/confirm'); ?></button>
-					<?php if (defined('__IM_CONTAINER__') == false) { ?><a href="<?php echo $IM->getUrl(false); ?>"><?php echo $me->getText('button/cancel'); ?></a><?php } ?>
+					<?php if (defined('__IM_CONTAINER__') == false) { ?><a href="<?php echo $IM->getIndexUrl(); ?>"><?php echo $me->getText('button/cancel'); ?></a><?php } ?>
 				</div>
 			<?php } ?>
 			
@@ -82,7 +82,7 @@ if (defined('__IM__') == false) exit;
 			
 				<div data-role="button">
 					<button type="submit"><?php echo $me->getText('button/confirm'); ?></button>
-					<?php if (defined('__IM_CONTAINER__') == false) { ?><a href="<?php echo $IM->getUrl(false); ?>"><?php echo $me->getText('button/cancel'); ?></a><?php } ?>
+					<?php if (defined('__IM_CONTAINER__') == false) { ?><a href="<?php echo $IM->getIndexUrl(); ?>"><?php echo $me->getText('button/cancel'); ?></a><?php } ?>
 				</div>
 			<?php } ?>
 		</div>
