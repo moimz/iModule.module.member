@@ -518,7 +518,7 @@ class ModuleMember {
 	/**
 	 * 페이지 컨텍스트를 가져온다.
 	 *
-	 * @param string $context 컨테이너 종류
+	 * @param string $context 컨텍스트 종류
 	 * @param object $configs 사이트맵 관리를 통해 설정된 페이지 컨텍스트 설정
 	 * @return string $html 컨텍스트 HTML
 	 */
