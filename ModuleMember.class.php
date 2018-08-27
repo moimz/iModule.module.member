@@ -1236,10 +1236,7 @@ class ModuleMember {
 			}
 		}
 		
-		$redirect = $_SERVER['REDIRECT_URL'];
-		$queryString = $this->IM->getQueryString(array('session'=>''));
-		$redirect.= $queryString ? '?'.$queryString : '';
-		header("location:".$redirect);
+		header("location:".$this->IM->getRequestUri());
 		exit;
 	}
 	
