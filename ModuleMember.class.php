@@ -1923,6 +1923,10 @@ class ModuleMember {
 			$token = $check->token;
 		}
 		
+		$this->db()->replace($this->table->password,array('token'=>$token,'midx'=>$midx,'reg_date'=>time()))->execute();
+		
+		$this->db()->unlock();
+		
 		/**
 		 * @todo 메일발송부분 언어팩 설정
 		 */
@@ -1936,11 +1940,9 @@ class ModuleMember {
 		$content.= '<br><br>위의 링크는 앞으로 약 6시간동안만 유효하며, 링크가 만료되었을 경우 <a href="'.$sendLink.'" target="_blank" style="word-break:break-all;">'.$sendLink.'</a> 에서 다시 발송가능합니다.<br><br>본 메일은 발신전용메일로 회신되지 않습니다.<br>감사합니다.';
 		
 		$result = $this->IM->getModule('email')->addTo($member->email,$member->nickname)->setSubject($subject)->setContent($content)->send();
-		if ($result == true) {
-			$this->db()->replace($this->table->password,array('token'=>$token,'midx'=>$midx,'reg_date'=>time()))->execute();
+		if ($result == false) {
+			$this->db()->delete($this->table->password)->where('token',$token)->execute();
 		}
-		
-		$this->db()->unlock();
 		
 		return $result;
 	}
