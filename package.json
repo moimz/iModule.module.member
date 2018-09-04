@@ -87,150 +87,174 @@
 	"databases":{
 		"member_activity_table":{
 			"columns":{
-				"idx":{
-					"type":"int",
-					"length":11
-				},
 				"midx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"회원고유값"
+				},
+				"reg_date":{
+					"type":"bigint",
+					"length":20,
+					"comment":"활동시각"
 				},
 				"module":{
 					"type":"varchar",
 					"length":20,
-					"is_null":true
+					"is_null":true,
+					"comment":"활동이 발생한 모듈"
 				},
 				"code":{
 					"type":"varchar",
 					"length":20,
-					"is_null":true
-				},
-				"content":{
-					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"활동코드"
 				},
 				"exp":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"획득경험치"
 				},
-				"reg_date":{
-					"type":"int",
-					"length":11
+				"content":{
+					"type":"text",
+					"is_null":true,
+					"comment":"활동내역"
 				}
 			},
 			"indexes":{
-				"idx":"primary_key",
+				"midx,reg_date":"primary_key",
 				"midx":"index"
 			},
-			"auto_increment":"idx"
+			"comment":"회원 활동내역 테이블"
 		},
 		"member_email_table":{
 			"columns":{
 				"midx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"회원고유값"
 				},
 				"email":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"이메일주소"
 				},
 				"code":{
 					"type":"char",
-					"length":6
+					"length":6,
+					"comment":"인증코드"
 				},
 				"reg_date":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"메일발송시각"
 				},
 				"status":{
 					"type":"enum",
 					"length":"'SENDING','VERIFIED','CANCELED'",
-					"default":"SENDING"
+					"default":"SENDING",
+					"comment":"인증상태"
 				}
 			},
 			"indexes":{
 				"midx,email":"primary_key"
-			}
+			},
+			"comment":"회원 이메일주소 인증내역 테이블"
 		},
 		"member_label_table":{
 			"columns":{
 				"idx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"고유값"
 				},
 				"title":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"분류명"
 				},
 				"description":{
 					"type":"varchar",
 					"length":255,
-					"is_null":true
+					"is_null":true,
+					"comment":"분류설명"
 				},
 				"languages":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"언어별 분류명"
 				},
 				"member":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"분류에 속한 회원수"
 				},
 				"allow_signup":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"TRUE"
+					"default":"TRUE",
+					"comment":"회원가입허용여부"
 				},
 				"approve_signup":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"회원가입승인여부"
 				},
 				"is_change":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"TRUE"
+					"default":"TRUE",
+					"comment":"분류수정가능여부"
 				},
 				"is_unique":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"유일분류여부"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
 				"idx":"primary_key"
 			},
-			"auto_increment":"idx"
+			"auto_increment":"idx",
+			"comment":"회원 분류 테이블"
 		},
 		"member_level_table":{
 			"columns":{
 				"level":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"레벨"
 				},
 				"exp":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"레벨달성 경험치요구치"
 				},
 				"next":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"다음레벨 경험치요구치"
 				},
 				"limit_exp":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"하루에 적립가능한 경험치제한"
 				},
 				"limit_point":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"하루에 적립가능한 포인트"
 				}
 			},
 			"indexes":{
@@ -288,145 +312,169 @@
 				{"level":48,"exp":230400,"next":240100,"limit_exp":0,"limit_point":50000},
 				{"level":49,"exp":240100,"next":250000,"limit_exp":0,"limit_point":50000},
 				{"level":50,"exp":250000,"next":0,"limit_exp":0,"limit_point":0}
-			]
+			],
+			"comment":"회원 레벨 테이블"
 		},
 		"member_member_label_table":{
 			"columns":{
 				"idx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"회원고유값"
 				},
 				"label":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"분류고유값"
 				},
 				"reg_date":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"등록일"
 				}
 			},
 			"indexes":{
 				"idx,label":"primary_key",
 				"idx":"index"
-			}
+			},
+			"comment":"회원 분류등록 테이블"
 		},
 		"member_password_table":{
 			"columns":{
 				"token":{
 					"type":"char",
-					"length":40
+					"length":40,
+					"comment":"인증토큰"
 				},
 				"midx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"회원고유값"
 				},
 				"reg_date":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"토큰발급시각"
 				},
 				"status":{
 					"type":"enum",
 					"length":"'SENDING','RESET'",
-					"default":"SENDING"
+					"default":"SENDING",
+					"comment":"상태"
 				}
 			},
 			"indexes":{
 				"token":"primary_key",
 				"midx,status":"index"
-			}
+			},
+			"comment":"회원 패스워드 초기화 요청내역 테이블"
 		},
 		"member_point_table":{
 			"columns":{
-				"idx":{
-					"type":"int",
-					"length":11
-				},
 				"midx":{
 					"type":"int",
-					"length":11
-				},
-				"point":{
-					"type":"int",
 					"length":11,
-					"default":0
+					"comment":"회원고유값"
+				},
+				"reg_date":{
+					"type":"bigint",
+					"length":20,
+					"comment":"적립시각"
 				},
 				"module":{
 					"type":"varchar",
 					"length":20,
-					"is_null":true
+					"is_null":true,
+					"comment":"적립을 요청한 모듈"
 				},
 				"code":{
 					"type":"varchar",
 					"length":20,
-					"is_null":true
+					"is_null":true,
+					"comment":"적립코드"
 				},
-				"content":{
-					"type":"text",
-					"is_null":true
+				"point":{
+					"type":"int",
+					"length":11,
+					"default":0,
+					"comment":"적립포인트"
 				},
 				"accumulation":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"누적포인트"
 				},
-				"reg_date":{
-					"type":"int",
-					"length":11
+				"content":{
+					"type":"text",
+					"is_null":true,
+					"comment":"적립내역"
 				}
 			},
 			"indexes":{
-				"idx":"primary_key",
+				"midx,reg_date":"primary_key",
 				"midx":"index"
 			},
-			"auto_increment":"idx"
+			"comment":"회원 포인트 적립내역 테이블"
 		},
 		"member_signup_table":{
 			"columns":{
 				"label":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"분류고유값"
 				},
 				"name":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"필드명"
 				},
 				"type":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"필드종류"
 				},
 				"input":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"필드폼종류"
 				},
 				"title":{
 					"type":"varchar",
-					"length":50
+					"length":50,
+					"comment":"필드명"
 				},
 				"title_languages":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"언어별 필드명"
 				},
 				"help":{
 					"type":"varchar",
 					"length":255,
-					"is_null":true
+					"is_null":true,
+					"comment":"필드설명"
 				},
 				"help_languages":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"언어별 필드설명"
 				},
 				"configs":{
-					"type":"longtext"
+					"type":"longtext",
+					"comment":"필드설정"
 				},
 				"is_required":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"필수필드여부"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
@@ -436,52 +484,62 @@
 				{"label":0,"name":"email","type":"email","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":0},
 				{"label":0,"name":"password","type":"password","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":1},
 				{"label":0,"name":"nickname","type":"nickname","input":"system","title":"LANGUAGE_SETTING","help":"LANGUAGE_SETTING","configs":"{}","is_required":"TRUE","sort":2}
-			]
+			],
+			"comment":"회원 분류별 회원가입폼 설정 테이블"
 		},
 		"member_social_oauth_table":{
 			"columns":{
 				"domain":{
 					"type":"varchar",
 					"length":100,
-					"default":"*"
+					"default":"*",
+					"comment":"사이트도메인"
 				},
 				"site":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"소셜미디어명"
 				},
 				"client_id":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"OAuth client_id"
 				},
 				"client_secret":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"OAuth client_secret"
 				},
 				"scope":{
 					"type":"varchar",
 					"length":255,
-					"is_null":true
+					"is_null":true,
+					"comment":"OAuth scope"
 				},
 				"callback_domain":{
 					"type":"varchar",
 					"length":100,
-					"default":"*"
+					"default":"*",
+					"comment":"OAuth 콜백주소"
 				}
 			},
 			"indexes":{
 				"domain,site":"primary_key"
-			}
+			},
+			"comment":"회원 소셜미디어 OAuth 테이블"
 		},
 		"member_social_sort_table":{
 			"columns":{
 				"site":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"소셜미디어명"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
@@ -494,48 +552,58 @@
 				{"site":"kakao","sort":3},
 				{"site":"naver","sort":4},
 				{"site":"github","sort":5}
-			]
+			],
+			"comment":"회원 소셜미디어 정렬 테이블"
 		},
 		"member_social_token_table":{
 			"columns":{
 				"midx":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"회원고유값"
 				},
 				"domain":{
 					"type":"varchar",
 					"length":100,
-					"default":"*"
+					"default":"*",
+					"comment":"사이트도메인"
 				},
 				"site":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"소셜미디어명"
 				},
 				"id":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"OAuth 인증고유값"
 				},
 				"scope":{
-					"type":"text"
+					"type":"text",
+					"comment":"OAuth scope"
 				},
 				"access_token":{
 					"type":"varchar",
-					"length":255
+					"length":255,
+					"comment":"OAuth 엑세스토큰"
 				},
 				"refresh_token":{
 					"type":"varchar",
 					"length":255,
-					"is_null":true
+					"is_null":true,
+					"comment":"OAuth 리프레시토큰"
 				},
 				"latest_login":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"마지막 로그인시각"
 				}
 			},
 			"indexes":{
 				"midx,site":"primary_key"
-			}
+			},
+			"comment":"회원 소셜미디어 OAuth 토큰 테이블"
 		},
 		"member_table":{
 			"columns":{
@@ -675,7 +743,7 @@
 				"latest_login":"index"
 			},
 			"auto_increment":"idx",
-			"comment":"회원관리"
+			"comment":"회원 테이블"
 		}
 	}
 }

@@ -962,6 +962,8 @@ class ModuleMember {
 					$lists[$i]->content = $mModule->syncMember('point_history',$code);
 				}
 			}
+			
+			$lists[$i]->reg_date = floor($lists[$i]->reg_date / 1000);
 		}
 		
 		$pagination = $this->getTemplet()->getPagination($p,ceil($total/$limit),10,$this->IM->getUrl(null,null,$view,'{PAGE}'));
@@ -1183,6 +1185,7 @@ class ModuleMember {
 	function login($midx,$is_fire_event=true) {
 		$member = $this->getMember($midx);
 		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
+		if ($this->getLogged() == $midx) return true;
 		
 		$logged = new stdClass();
 		$logged->idx = $midx;
@@ -1193,7 +1196,7 @@ class ModuleMember {
 		$this->logged = $logged;
 		
 		$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
-		$activity = $this->addActivity($midx,0,'member','login',array('ip'=>$logged->ip,'browser'=>$_SERVER['HTTP_USER_AGENT']));
+		$activity = $this->addActivity($midx,0,'member','login',array('ip'=>$logged->ip,'agent'=>$_SERVER['HTTP_USER_AGENT']));
 		
 		unset($_SESSION['LOGGED_FAIL']);
 		
@@ -1800,16 +1803,26 @@ class ModuleMember {
 	 * @param string $module 활동이 발생한 모듈명
 	 * @param string $code 활동코드
 	 * @param object[] $content 활동에 따른 정보
-	 * @return int $activity 활동 고유번호
+	 * @param int $reg_date 활동시각
+	 * @return int $reg_date 등록시각
 	 */
-	function addActivity($midx,$exp,$module,$code,$content=array()) {
+	function addActivity($midx,$exp,$module,$code,$content=array(),$reg_date=null) {
 		$member = $this->getMember($midx);
 		if ($member->idx == 0) return false;
 		
-		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>time()))->execute();
+		$reg_date = $reg_date ? $reg_date * 1000 : time() * 1000;
+		$this->db()->setLockMethod('WRITE')->lock(array($this->table->member,$this->table->activity));
+		while (true) {
+			if ($this->db()->select($this->table->activity)->where('midx',$member->idx)->where('reg_date',$reg_date)->has() == false) break;
+			$reg_date++;
+		}
+		
+		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date))->execute();
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
 		
-		return $idx;
+		$this->db()->unlock();
+		
+		return $reg_date;
 	}
 	
 	/**
@@ -1819,10 +1832,11 @@ class ModuleMember {
 	 * @param int $point 적립할 포인트
 	 * @param string $module 포인트 적립을 요청한 모듈명
 	 * @param any[] $content 포인트 적립을 요청한 모듈에서 사용할 데이터
-	 * @param boolean $isForce - 포인트를 사용할 지 여부
+	 * @param boolean $isForce - 포인트를 강제로 사용할 지 여부
+	 * @param int $reg_date 적립시각
 	 * @return boolean $success
 	 */
-	function sendPoint($midx,$point,$module='',$code='',$content=array(),$isForce=false) {
+	function sendPoint($midx,$point,$module='',$code='',$content=array(),$isForce=false,$reg_date=null) {
 		if ($point == 0) return false;
 		
 		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
@@ -1836,9 +1850,16 @@ class ModuleMember {
 			}
 		}
 		
+		$reg_date = $reg_date ? $reg_date * 1000 : time() * 1000;
 		$this->db()->setLockMethod('WRITE')->lock(array($this->table->member,$this->table->point));
+		while (true) {
+			if ($this->db()->select($this->table->point)->where('midx',$member->idx)->where('reg_date',$reg_date)->has() == false) break;
+			$reg_date++;
+		}
+		
+		$this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$member->point + $point,'reg_date'=>$reg_date))->execute();
 		$this->db()->update($this->table->member,array('point'=>$member->point + $point))->where('idx',$member->idx)->execute();
-		$this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$member->point + $point,'reg_date'=>time()))->execute();
+		
 		$this->db()->unlock();
 		
 		return true;
