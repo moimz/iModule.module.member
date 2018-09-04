@@ -179,25 +179,32 @@ div[data-module=member][data-context=connect] section.box > div > div > ul.selec
 /**
  * 포인트내역 컨텍스트
  */
-div[data-module=member] div[data-role=tool] {margin-bottom:10px;}
-div[data-module=member] div[data-role=tool] > h4 {display:inline-block; height:40px; line-height:40px; padding:0; margin:0;}
-div[data-module=member] div[data-role=tool] > div[data-role=input] {width:150px; float:right;}
-div[data-module=member] ul[data-role=table].point > li {min-width:500px;}
-div[data-module=member] ul[data-role=table].point > li > span.loopnum {width:70px; text-align:center;}
-div[data-module=member] ul[data-role=table].point > li > span.title {width:100%;}
-div[data-module=member] ul[data-role=table].point > li > span.title > a {color:#2196F3; text-decoration:none; font-weight:bold;}
-div[data-module=member] ul[data-role=table].point > li > span.count {width:70px;}
-div[data-module=member] ul[data-role=table].point > li > span.date {width:160px; text-align:center;}
-div[data-module=member] ul[data-role=table].point > li > span.accumulation {width:100px;}
-div[data-module=member] ul[data-role=table].point > li.tbody > span.count {text-align:right; font-weight:bold;}
-div[data-module=member] ul[data-role=table].point > li.tbody > span.accumulation {text-align:right; font-weight:bold;}
+div[data-module=member][data-context=point] div[data-role=toolbar] {margin-bottom:10px; text-align:right; font-size:0;}
+div[data-module=member][data-context=point] div[data-role=toolbar] > h4 {display:inline-block; height:40px; line-height:40px; padding:0; margin:0; float:left; font-size:14px;}
+div[data-module=member][data-context=point] div[data-role=toolbar] > div[data-role=input] {display:inline-block; width:150px; font-size:14px; vertical-align:middle;}
+div[data-module=member][data-context=point] div[data-role=toolbar] > a, div[data-module=member][data-context=point] div[data-role=toolbar] > button {display:inline-block; height:40px; line-height:40px; padding:0px; box-sizing:border-box; vertical-align:middle; margin-left:5px; text-decoration:none; cursor:pointer; background:#2196f3; color:#fff; font-size:0; border:0;}
+div[data-module=member][data-context=point] div[data-role=toolbar] > a > i, div[data-module=member][data-context=point] div[data-role=toolbar] > button > i {width:40px; height:40px; line-height:40px; vertical-align:middle; text-align:center; font-size:14px;}
+div[data-module=member][data-context=point] div[data-role=toolbar] > a > span, div[data-module=member][data-context=point] div[data-role=toolbar] > button > span {height:40px; line-height:40px; display:inline-block; vertical-align:middle; padding-right:15px; font-size:14px;}
+div[data-module=member][data-context=point] div[data-role=toolbar] > a:hover, div[data-module=member][data-context=point] div[data-role=toolbar] > button:hover{background:#1e88e5;}
+div[data-module=member][data-context=point] ul[data-role=table] > li {min-width:500px;}
+div[data-module=member][data-context=point] ul[data-role=table] > li > span.loopnum {width:70px; text-align:center;}
+div[data-module=member][data-context=point] ul[data-role=table] > li > span.title {width:100%;}
+div[data-module=member][data-context=point] ul[data-role=table] > li > span.title > a {color:#2196F3; text-decoration:none; font-weight:bold;}
+div[data-module=member][data-context=point] ul[data-role=table] > li > span.change {width:120px;}
+div[data-module=member][data-context=point] ul[data-role=table] > li > span.accumulation {width:125px;}
+div[data-module=member][data-context=point] ul[data-role=table] > li > span.date {width:160px; text-align:center;}
+div[data-module=member][data-context=point] ul[data-role=table] > li.tbody > span.change {text-align:right; font-weight:bold; font-size:14px; font-family:Roboto;}
+div[data-module=member][data-context=point] ul[data-role=table] > li.tbody > span.accumulation {text-align:right; font-weight:bold; font-size:14px; font-family:Roboto;}
+div[data-module=member][data-context=point] ul[data-role=table] > li.tbody > span.date {font-size:13px;}
 
-div[data-module=member] ul[data-role=table].point > li.tbody > span > span.increase {color:#4CAF50;}
-div[data-module=member] ul[data-role=table].point > li.tbody > span > span.decrease {color:#F44336;}
+div[data-module=member][data-context=point] ul[data-role=table] > li.tbody > span > span.increase {color:#4CAF50;}
+div[data-module=member][data-context=point] ul[data-role=table] > li.tbody > span > span.decrease {color:#F44336;}
+
+div[data-module=member][data-context=point] div.pagination {margin-top:20px; text-align:center;}
 
 @media (max-width:767px) {
-	div[data-module=member] div[data-role=tool] > h4 {display:block;}
-	div[data-module=member] div[data-role=tool] > div[data-role=input] {display:block; width:100%; float:none;}
-	div[data-module=member] ul[data-role=table].point > li > span.loopnum {display:none;}
-	div[data-module=member] ul[data-role=table].point > li > span.accumulation {display:none;}
+	div[data-module=member][data-context=point] div[data-role=toolbar] > h4 {display:block;}
+	div[data-module=member][data-context=point] div[data-role=toolbar] > div[data-role=input] {display:block; width:100%; float:none;}
+	div[data-module=member][data-context=point] ul[data-role=table] > li > span.loopnum {display:none;}
+	div[data-module=member][data-context=point] ul[data-role=table] > li > span.accumulation {display:none;}
 }
