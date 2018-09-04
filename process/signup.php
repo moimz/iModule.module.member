@@ -35,8 +35,8 @@ if ($this->getLabel($label)->allow_signup === false) {
 		else $insert['domain'] = $this->IM->getSite()->domain;
 		$insert['type'] = 'MEMBER';
 		
-		$insert['point'] = $this->getModule()->getConfig('point');
-		$insert['exp'] = $this->getModule()->getConfig('exp');
+		$insert['point'] = 0;
+		$insert['exp'] = 0;
 		$insert['reg_date'] = time();
 		
 		$insert['verified'] = $this->getModule()->getConfig('verified_email') == true ? 'FALSE' : 'NONE';
@@ -48,6 +48,10 @@ if ($this->getLabel($label)->allow_signup === false) {
 		if ($label !== 0) {
 			$this->db()->insert($this->table->member_label,array('idx'=>$idx,'label'=>$label,'reg_date'=>$insert['reg_date']))->execute();
 		}
+		
+		$this->sendPoint($idx,$this->getModule()->getConfig('point'),'member','signup',array(),false,$insert['reg_date']);
+		$this->addActivity($idx,$this->getModule()->getConfig('exp'),'member','signup',array('ip'=>$_SERVER['REMOTE_ADDR'],'agent'=>$_SERVER['HTTP_USER_AGENT']),$insert['reg_date']);
+		
 		$this->login($idx);
 		
 		if ($this->getModule()->getConfig('verified_email') == true) $this->sendVerificationEmail($idx);
