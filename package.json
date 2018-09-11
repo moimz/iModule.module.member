@@ -115,6 +115,12 @@
 					"default":0,
 					"comment":"획득경험치"
 				},
+				"accumulation":{
+					"type":"int",
+					"length":11,
+					"default":0,
+					"comment":"누적경험치"
+				},
 				"content":{
 					"type":"text",
 					"is_null":true,

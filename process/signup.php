@@ -49,7 +49,7 @@ if ($this->getLabel($label)->allow_signup === false) {
 			$this->db()->insert($this->table->member_label,array('idx'=>$idx,'label'=>$label,'reg_date'=>$insert['reg_date']))->execute();
 		}
 		
-		$this->sendPoint($idx,$this->getModule()->getConfig('point'),'member','signup',array(),false,$insert['reg_date']);
+		$this->sendPoint($idx,$this->getModule()->getConfig('point'),'member','signup',array('ip'=>$_SERVER['REMOTE_ADDR'],'agent'=>$_SERVER['HTTP_USER_AGENT']),false,$insert['reg_date']);
 		$this->addActivity($idx,$this->getModule()->getConfig('exp'),'member','signup',array('ip'=>$_SERVER['REMOTE_ADDR'],'agent'=>$_SERVER['HTTP_USER_AGENT']),$insert['reg_date']);
 		
 		$this->login($idx);
