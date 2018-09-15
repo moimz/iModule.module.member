@@ -638,17 +638,17 @@
 					"type":"varchar",
 					"length":65,
 					"is_null":true,
-					"comment":"비밀번호"
+					"comment":"패스워드"
 				},
 				"code":{
 					"type":"varchar",
 					"length":50,
 					"is_null":true,
-					"comment":"LMS고유값"
+					"comment":"회원코드"
 				},
 				"name":{
 					"type":"varchar",
-					"length":30,
+					"length":50,
 					"comment":"이름"
 				},
 				"nickname":{
