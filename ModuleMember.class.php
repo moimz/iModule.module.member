@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 4. 2.
+ * @modified 2019. 1. 7.
  */
 class ModuleMember {
 	/**
@@ -1401,6 +1401,30 @@ class ModuleMember {
 	function isAdmin($midx=null) {
 		$member = $this->getMember($midx);
 		return $member->type == 'ADMINISTRATOR';
+	}
+	
+	/**
+	 * 현재 로그인한 사용자가 특정모듈의 관리자권한이 있는지 확인한다.
+	 *
+	 * @param int $midx 회원고유번호 (없을경우 현재 로그인한 사용자)
+	 * @param string $module 모듈명 (없을경우 전체모듈)
+	 * @return boolean $hasAdmin
+	 */
+	function hasAdmin($midx=null,$module=null) {
+		if ($this->isAdmin() == true) return true;
+		
+		if ($module == null) {
+			$modules = $this->getModule()->getAdminModules();
+			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
+				$mModule = $this->IM->getModule($modules[$i]->module);
+				if (method_exists($mModule,'isAdmin') == true && $mModule->isAdmin($midx) !== false) return true;
+			}
+		} elseif ($this->getModule()->isInstalled($module) == true) {
+			$mModule = $this->IM->getModule($module);
+			if (method_exists($mModule,'isAdmin') == true && $mModule->isAdmin($midx) !== false) return true;
+		}
+		
+		return false;
 	}
 	
 	/**
