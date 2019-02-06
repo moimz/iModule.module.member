@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
  *
  * 회원가입 API 를 처리한다.
  * @todo 새버전에 맞게 수정되지 않았음

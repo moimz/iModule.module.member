@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
  *
  * 회원과 관련된 모든 기능을 제어한다.
  * 

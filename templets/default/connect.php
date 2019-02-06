@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
  *
  * 소셜계정과 회원계정을 연결하기 위한 페이지 템플릿
  *

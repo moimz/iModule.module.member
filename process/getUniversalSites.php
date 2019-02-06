@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
  * 
  * 통합로그인을 사용하는 사이트를 가져온다.
  *
