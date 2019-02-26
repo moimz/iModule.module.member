@@ -8,9 +8,9 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 9. 3.
+ * @modified 2019. 2. 19.
  */
-
+if (defined('__IM__') == false) exit;
 $IM->loadWebFont('Roboto');
 ?>
 <div data-role="toolbar">

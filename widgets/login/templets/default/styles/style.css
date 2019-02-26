@@ -7,17 +7,54 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 2. 14.
+ * @modified 2019. 2. 25.
  */
-div[data-role=widget][data-widget=member-login][data-templet=default] section {border:1px solid #e1e1e1; border-top:2px solid #f44336; padding:10px; background:#fff; font-size:14px;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > ul[data-role=social] {margin-bottom:5px;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=button] {padding:0px;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=button] > button {width:100%;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=link] {text-align:center; margin-top:5px; font-size:0;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=link] > a, div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=link] > button {border:0; text-decoration:none; color:#666; background:transparent; cursor:pointer; display:inline-block; height:20px; line-height:20px; margin:0px 10px; font-size:14px; vertical-align:middle;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=link] > a:hover, div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=link] > button:hover {color:#222;}
-div[data-role=widget][data-widget=member-login][data-templet=default] section.login > div[data-role=link] > i {display:inline-block; vertical-align:middle; background:#ccc; width:1px; height:12px; margin:4px 0px;}
+div[data-widget=member-login][data-templet=default] section {border:1px solid #dee2eb; border-top:2px solid #f44336; padding:10px 10px 5px 10px; background:#fff; font-size:14px;}
+div[data-widget=member-login][data-templet=default] section.login > ul[data-role=social] {margin-bottom:5px;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=button] {padding:0px;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=button] > button {width:100%;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] {text-align:right; width:100%; height:40px; font-size:0;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link]:after {clear:both; content:" "; display:block;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > div[data-role=input] {float:left; display:inline-block; width:auto; font-size:13px;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > a, div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > button {border:0; text-decoration:none; color:#666; background:transparent; cursor:pointer; display:inline-block; height:20px; line-height:20px; margin:10px 5px; font-size:13px; vertical-align:middle;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > a:hover, div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > button:hover {color:#222;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > *:last-child {margin-right:0;}
+div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > i {display:inline-block; vertical-align:middle; background:#ccc; width:1px; height:12px; margin:4px 0px;}
 
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] {font-size:0; margin-bottom:10px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > i.photo {width:58px; height:58px; border:1px solid #ccc; border-radius:50%; display:inline-block; vertical-align:top; margin-right:10px; background-size:cover; background-repeat:no-repeat; background-position:50% 50%; position:relative;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > i.photo > button {border:0; background:#919191; width:20px; height:20px; border-radius:50%; position:absolute; bottom:-3px; right:-3px; z-index:1; cursor:pointer;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > i.photo > button > i {width:20px; height:20px; line-height:20px; color:#fff; font-size:12px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div {width:calc(100% - 70px); height:60px; display:inline-block; vertical-align:top;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.nickname {font-size:14px; font-weight:bold; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; height:30px; line-height:30px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.nickname > button {height:26px; line-height:24px; color:#666; border:1px solid #ccc; background:#fff; cursor:pointer; float:right; font-size:12px; padding:0px 5px; margin:2px 0px 2px 10px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.nickname > button:hover {background:#f4f4f4;}
+
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level {display:table; table-layout:fixed; width:100%; margin-top:5px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > label {display:table-cell; width:40px; font-size:12px; font-family:Roboto; vertical-align:middle; height:20px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > label > b {color:#e4232c;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph {width:100%; font-size:0px; vertical-align:middle; position:relative; margin:4px 0px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.bar {height:10px; border:1px solid #c7c7c7; border-radius:5px; background:#e1e1e1; position:relative; margin-top:1px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.bar > div {margin:-1px; height:10px; border:1px solid #a6d592; width:50%; border-radius:5px; background:#e8f688; vertical-align:top;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.detail {display:none; position:absolute; z-index:150; width:100%; top:14px; text-align:center;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.detail > div {position:relative; background:#e4232c; border:1px solid #fa481d; height:20px; line-height:20px; padding:0 5px; color:#fff; font-size:11px; display:inline-block; vertical-align:middle;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.detail > div:after, div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph .levelDetail .arrowBox:before {bottom:100%; left:50%; border:solid transparent; content:" "; height:0; width:0; position:absolute; pointer-events:none;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.detail > div:after {border-color:rgba(228, 35, 44, 0); border-bottom-color:#e4232c; border-width:4px; margin-left:-4px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph > div.detail > div:before {border-color:rgba(250, 72, 29, 0); border-bottom-color:#fa481d; border-width:5px; margin-left:-5px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > div > div.level > div.graph:hover > div.detail {display:block;}
+
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=point] {font-family:Roboto; height:30px; line-height:30px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#666;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=point] > i {width:20px; height:30px; float:left; line-height:30px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=point] > button, div[data-widget=member-login][data-templet=default] section.logged > div[data-role=point] > a {display:inline-block; height:20px; margin-left:10px; float:right; margin:5px 0px; background:#b5b7c0; border:0; box-sizing:border-box; cursor:pointer; text-decoration:none; font-size:12px; color:#fff; padding:0px 5px; border-radius:2px; line-height:20px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=point] > button:hover, div[data-widget=member-login][data-templet=default] section.logged > div[data-role=point] > a:hover {background:#828594;}
+
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] {list-style:none; display:table; margin:8px -10px -5px -10px; width:calc(100% + 20px); background:#fafafa; font-size:0; table-layout:fixed; border-top:1px solid #dee2eb;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li {width:100%; height:60px; display:table-cell; border-left:1px solid #dee2eb; position:relative;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li:first-child {border-left:0;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a {display:block; width:100%; height:60px; background:transparent; font-size:12px; cursor:pointer; border:0; font-size:0; overflow:hidden; text-decoration:none; text-align:center;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button > i, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a > i {display:block; width:100%; height:35px; line-height:42px; font-size:18px; text-align:center; color:#666;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button > span, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a > span {display:block; width:100%; height:25px; line-height:20px; font-size:12px; color:#666;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > label {position:absolute; z-index:1; max-width:80%; top:-8px; right:-5px; height:18px; min-width:18px; border-radius:9px; box-sizing:border-box; padding:0px 5px; font-size:11px; font-family:Roboto; background:#F44336; color:#fff; line-height:18px; text-align:center; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
 
 /*
 .WidgetMemberLoginDefault {}
@@ -42,18 +79,7 @@ div[data-role=widget][data-widget=member-login][data-templet=default] section.lo
 .WidgetMemberLoginDefault .info div.detail {width:100%;}
 .WidgetMemberLoginDefault .info div.detail .nickname {font-size:15px; font-weight:bold; margin-bottom:10px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;}
 .WidgetMemberLoginDefault .info div.detail .nickname .reg_date {font-size:11px; font-family:OpenSans, defaultFont; color:#666; float:right; font-weight:normal; margin-top:3px;}
-.WidgetMemberLoginDefault .info div.detail .level {display:table; table-layout:fixed; width:100%;}
-.WidgetMemberLoginDefault .info div.detail .level .text {display:table-cell; width:40px; font-size:12px; font-family:OpenSans, defaultFont; vertical-align:middle;}
-.WidgetMemberLoginDefault .info div.detail .level .text b {color:#e4232c;}
-.WidgetMemberLoginDefault .info div.detail .level .graph {width:100%; font-size:0px; vertical-align:middle;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .bar {height:10px; border:1px solid #c7c7c7; border-radius:5px; background:#e1e1e1; position:relative; margin-top:1px;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .percentage {margin:-1px; height:10px; border:1px solid #a6d592; width:50%; border-radius:5px; background:#e8f688; vertical-align:top;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .levelDetail {display:none; position:absolute; z-index:150; width:100%; top:14px; text-align:center;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .levelDetail .arrowBox {position:relative; background:#e4232c; border:1px solid #fa481d; height:20px; line-height:20px; padding:0 5px; color:#fff; font-size:11px; display:inline-block; vertical-align:middle;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .levelDetail .arrowBox:after, .WidgetMemberLoginDefault .info div.detail .level .graph .levelDetail .arrowBox:before {bottom:100%; left:50%; border:solid transparent; content:" "; height:0; width:0; position:absolute; pointer-events:none;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .levelDetail .arrowBox:after {border-color:rgba(228, 35, 44, 0); border-bottom-color:#e4232c; border-width:4px; margin-left:-4px;}
-.WidgetMemberLoginDefault .info div.detail .level .graph .levelDetail .arrowBox:before {border-color:rgba(250, 72, 29, 0); border-bottom-color:#fa481d; border-width:5px; margin-left:-5px;}
-.WidgetMemberLoginDefault .info div.detail .level .graph:hover .levelDetail {display:block;}
+
 .WidgetMemberLoginDefault .blocks {display:table; width:100%; table-layout:fixed; color:#333;}
 .WidgetMemberLoginDefault .blocks > div {display:table-cell; width:50%; height:28px; line-height:28px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; vertical-align:middle;}
 .WidgetMemberLoginDefault .blocks > div > i {float:left; width:15px; height:28px; line-height:28px;}

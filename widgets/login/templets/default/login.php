@@ -2,13 +2,13 @@
 /**
  * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
  *
- * 로그인 위젯 기본템플릿
+ * 로그인 위젯 기본템플릿 - 로그인폼
  *
  * @file /modules/member/widgets/login/templets/default/login.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 4. 5.
+ * @modified 2019. 2. 26.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -32,12 +32,12 @@ if (defined('__IM__') == false) exit;
 	<button type="submit"><?php echo $me->getText('button/login'); ?></button>
 </div>
 
-<div data-role="input">
-	<label><input type="checkbox" name="auto" value="TRUE"><?php echo $me->getText('text/auto_login'); ?></label>
-</div>
-
 <?php if ($allow_signup == true || $allow_reset_password == true) { ?>
 <div data-role="link">
+	<div data-role="input">
+		<label><input type="checkbox" name="remember" value="TRUE"><?php echo $me->getText('text/remember'); ?></label>
+	</div>
+	
 	<?php if ($allow_signup == true) { ?>
 		<?php if ($signup == null) { ?><button type="button" onclick="Member.signupPopup();"><?php echo $Widget->getText('text/signup'); ?></button><?php } else { ?><a href="<?php echo $IM->getUrl($signup->menu,$signup->page,false); ?>"><?php echo $Widget->getText('text/signup'); ?></a><?php } ?>
 	<?php } ?>

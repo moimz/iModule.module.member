@@ -38,6 +38,9 @@ if ($forceLogin == true || $me->isLogged() == false) {
 	$footer = PHP_EOL.'</section>'.PHP_EOL;
 	
 	$modify = $IM->getContextUrl('member','modify');
+	$point = $IM->getContextUrl('member','point');
+	$activity = $IM->getContextUrl('member','activity');
+	$push = $IM->getContextUrl('push','list');
 	
 	return $Templet->getContext('logged',get_defined_vars(),$header,$footer);
 }
