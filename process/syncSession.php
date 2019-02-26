@@ -13,7 +13,7 @@
 if (defined('__IM__') == false) exit;
 
 $callback = Request('callback');
-$token = Decoder(Request('token'));
+$token = Decoder(Request('token'),null,'hex');
 
 if ($token !== false) {
 	$session = json_decode($token);
@@ -21,7 +21,6 @@ if ($token !== false) {
 	if ($session->idx == 0) {
 		unset($_SESSION['IM_MEMBER_LOGGED']);
 		
-		$results->success = true;
 		$results->success = null;
 	} else {
 		$member = $this->db()->select($this->table->member)->where('idx',$session->idx)->getOne();

@@ -13,7 +13,7 @@
 		"male":"남성",
 		"female":"여성",
 		"default_label_title":"일반회원",
-		"auto_login":"자동로그인",
+		"remember":"자동로그인",
 		"remain_time_second":"남은시간 : {SECOND}초"
 	},
 	"context":{

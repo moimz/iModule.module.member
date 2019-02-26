@@ -6,7 +6,8 @@
  * @file /modules/member/styles/style.css
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160910
+ * @version 3.0.0
+ * @modified 2019. 2. 25.
  */
 i[data-module=member][data-role=photo] {display:inline-block; background-position:50% 50%; background-repeat:no-repeat; background-size:cover; border-radius:50%; border:1px solid #ccc; box-sizing:border-box; vertical-align:middle;}
 i[data-module=member][data-role=photo][data-idx] {cursor:pointer;}
@@ -52,7 +53,12 @@ ul[data-module=member][data-role=social] > li.kakao > a {background:#fddc2f; col
 ul[data-module=member][data-role=social] > li.kakao > a > i {font-size:28px;}
 ul[data-module=member][data-role=social] > li.kakao > a > i:before {content:"\ef06"; color:#3b1f1f;}
 
-ul[data-module=member][data-role=link] {margin-top:15px; list-style:none; text-align:center; display:block;}
-ul[data-module=member][data-role=link] > li {display:inline-block; padding:0px 5px; border-right:1px solid #ccc; height:12px;}
-ul[data-module=member][data-role=link] > li:last-child {border-right:0;}
-ul[data-module=member][data-role=link] > li > button, ul[data-module=member][data-role=link] > li > a {display:inline-block; margin:-4px 0px; padding:0px 5px; height:20px; line-height:20px; font-size:14px; cursor:pointer; text-decoration:none; color:#666; border:0; background:transparent;}
+ul[data-module=member][data-role=link] {list-style:none; text-align:right; display:block; font-size:0;}
+ul[data-module=member][data-role=link] > li {display:inline-block; padding:10px; height:40px; position:relative; font-size:13px; box-sizing:border-box; vertical-align:middle;}
+ul[data-module=member][data-role=link] > li:after {position:absolute; top:15px; right:0; width:0; height:12px; border-right:1px solid #ccc; content:" ";}
+ul[data-module=member][data-role=link] > li:first-child {float:left; padding:0;}
+ul[data-module=member][data-role=link] > li:first-child:after {border-right:0;}
+ul[data-module=member][data-role=link] > li:last-child {padding-right:0;}
+ul[data-module=member][data-role=link] > li:last-child:after {border-right:0;}
+ul[data-module=member][data-role=link] > li > button, ul[data-module=member][data-role=link] > li > a {display:inline-block; margin:0px; padding:0px; height:20px; line-height:20px; font-size:13px; cursor:pointer; text-decoration:none; color:#666; border:0; background:transparent;}
+ul[data-module=member][data-role=link]:after {clear:both; content:" "; display:block;}

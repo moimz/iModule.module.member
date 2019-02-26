@@ -121,6 +121,18 @@
 					"type":"text",
 					"is_null":true,
 					"comment":"활동내역"
+				},
+				"ip":{
+					"type":"varchar",
+					"length":15,
+					"is_null":true,
+					"comment":"활동아이피"
+				},
+				"agent":{
+					"type":"varchar",
+					"length":150,
+					"is_null":true,
+					"comment":"브라우저"
 				}
 			},
 			"indexes":{
@@ -746,6 +758,36 @@
 			},
 			"auto_increment":"idx",
 			"comment":"회원 테이블"
+		},
+		"member_login_table":{
+			"columns":{
+				"hash":{
+					"type":"char",
+					"length":40,
+					"comment":"로그인세션 고유값"
+				},
+				"midx":{
+					"type":"int",
+					"length":11,
+					"comment":"로그인세션 회원고유값"
+				},
+				"latest_ip":{
+					"type":"varchar",
+					"length":15,
+					"comment":"최근 접속한 아이피"
+				},
+				"latest_date":{
+					"type":"int",
+					"length":11,
+					"comment":"최근 접속한 시각"
+				}
+			},
+			"indexes":{
+				"hash":"primary_key",
+				"midx":"index",
+				"latest_ip,midx":"index"
+			},
+			"comment":"회원 로그인세션 테이블"
 		}
 	}
 }

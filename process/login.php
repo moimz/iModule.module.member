@@ -15,6 +15,7 @@ if (defined('__IM__') == false) exit;
 $mHash = new Hash();
 $email = Request('email');
 $password = Request('password');
+$remember = Request('remember') ? true : false;
 
 $LOGGED_FAIL = Request('LOGGED_FAIL','session') != null && is_array(Request('LOGGED_FAIL','session')) == true ? Request('LOGGED_FAIL','session') : array('count'=>0,'time'=>0);
 
@@ -57,6 +58,7 @@ if ($LOGGED_FAIL['time'] > time()) {
 	} else {
 		$LOGGED_FAIL = array('count'=>0,'time'=>0);
 		$this->login($check->idx);
+		if ($remember == true) $this->makeCookie();
 		
 		$results->success = true;
 	}

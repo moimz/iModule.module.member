@@ -13,6 +13,10 @@
 if (defined('__IM__') == false) exit;
 
 unset($_SESSION['IM_MEMBER_LOGGED']);
+
+$cookie = Request('IM_MEMBER_COOKIE','cookie');
+if ($cookie != null) $this->removeCookie($cookie);
+
 if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) == true) {
 	$results->success = true;
 	$results->universal_login = $this->getModule()->getConfig('universal_login');

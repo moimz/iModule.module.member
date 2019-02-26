@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 1. 7.
+ * @modified 2019. 2. 26.
  */
 class ModuleMember {
 	/**
@@ -86,6 +86,7 @@ class ModuleMember {
 		$this->table->member_label = 'member_member_label_table';
 		$this->table->token = 'member_token_table';
 		$this->table->activity = 'member_activity_table';
+		$this->table->login = 'member_login_table';
 		
 		/**
 		 * 회원메뉴를 제공하기 위한 자바스크립트 및 스타일시트를 로딩한다.
@@ -101,6 +102,12 @@ class ModuleMember {
 		 */
 		$session = Request('session');
 		if ($session !== null) $this->loginBySessionToken($session);
+		
+		/**
+		 * 로그인 세션쿠키를 이용해 로그인처리를 한다.
+		 */
+		$cookie = Request('IM_MEMBER_COOKIE','cookie');
+		if ($cookie !== null) $this->loginByCookie($cookie);
 		
 		/**
 		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
@@ -1039,6 +1046,7 @@ class ModuleMember {
 		
 		if ($this->getModule()->getConfig('allow_signup') == true || $this->getModule()->getConfig('allow_reset_password') == true) {
 			$content.= '<ul data-module="member" data-role="link">';
+			$content.= '<li><div data-role="input"><label><input type="checkbox" name="auto" value="TRUE">'.$this->getText('text/auto_login').'</label></div></li>';
 			if ($this->getModule()->getConfig('allow_signup') == true) {
 				$signup = $this->IM->getContextUrl('member','signup');
 				$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$signup.'">'.$this->getText('text/signup').'</a>').'</li>';
@@ -1196,7 +1204,7 @@ class ModuleMember {
 		$this->logged = $logged;
 		
 		$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
-		$activity = $this->addActivity($midx,0,'member','login',array('ip'=>$logged->ip,'agent'=>$_SERVER['HTTP_USER_AGENT']));
+		$activity = $this->addActivity($midx,0,'member','login',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')));
 		
 		unset($_SESSION['LOGGED_FAIL']);
 		
@@ -1212,12 +1220,80 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 현재 로그인된 세션을 저장한다.
+	 */
+	function makeCookie() {
+		$midx = $this->getLogged();
+		
+		/**
+		 * 로그인상태가 아니거나, 이미 로그인 쿠키가 있다면 저장을 취소한다.
+		 */
+		if ($midx == 0 || Request('IM_MEMBER_COOKIE','cookie') != null) return;
+		
+		$this->db()->setLockMethod('WRITE')->lock($this->table->login);
+		/**
+		 * 현재 회원번호와 현재 접속한 아이피로 생성된 해시가 있다면 그것을 사용한다.
+		 */
+		$check = $this->db()->select($this->table->login)->where('midx',$midx)->where('latest_ip',$_SERVER['REMOTE_ADDR'])->getOne();
+		if ($check != null) {
+			$hash = $check->hash;
+		} else {
+			while (true) {
+				$hash = sha1($this->getLogged().time().$_SERVER['REMOTE_ADDR'].rand(1000,9999));
+				if ($this->db()->select($this->table->login)->where('hash',$hash)->has() == false) break;
+			}
+		}
+		$this->db()->replace($this->table->login,array('hash'=>$hash,'midx'=>$midx,'latest_ip'=>$_SERVER['REMOTE_ADDR'],'latest_date'=>time()))->execute();
+		$this->db()->unlock();
+		
+		setcookie('IM_MEMBER_COOKIE',$hash,time() + 60 * 60 * 24 * 365,'/');
+	}
+	
+	/**
+	 * 특정 로그인쿠키를 제거한다.
+	 *
+	 * @param string $hash
+	 */
+	function removeCookie($hash) {
+		if (Request('IM_MEMBER_COOKIE','cookie') == $hash) {
+			setcookie('IM_MEMBER_COOKIE','',time() - 3600,'/');
+		}
+		
+		$this->db()->delete($this->table->login)->where('hash',$hash)->execute();
+	}
+	
+	/**
+	 * 로그인 세션 쿠키로부터 로그인을 처리한다.
+	 */
+	function loginByCookie($cookie=null) {
+		/**
+		 * 이미 로그인되어 있다면 무시한다.
+		 */
+		if ($this->isLogged() == true) return;
+		$hash = $cookie == null ? Request('IM_MEMBER_COOKIE','cookie') : $cookie;
+		if ($hash == null) return;
+		
+		$check = $this->db()->select($this->table->login)->where('hash',$hash)->getOne();
+		
+		/**
+		 * 로그인세션 테이블에 없다면, 쿠키를 삭제한다.
+		 */
+		if ($check == null) {
+			setcookie('IM_MEMBER_COOKIE','',time() - 3600,'/');
+		} else {
+			setcookie('IM_MEMBER_COOKIE',$hash,time() + 60 * 60 * 24 * 365,'/');
+			$this->login($check->midx);
+			$this->db()->update($this->table->login,array('latest_ip'=>$_SERVER['REMOTE_ADDR'],'latest_date'=>time()))->where('hash',$hash)->execute();
+		}
+	}
+	
+	/**
 	 * GET 으로 전달받은 세션토큰으로 로그인을 처리한다.
 	 *
 	 * @param string $session 세션토큰
 	 */
 	function loginBySessionToken($session) {
-		$token = Decoder($session);
+		$token = Decoder($session,null,'hex');
 		$session = $token !== false ? json_decode($token) : null;
 		
 		if ($session != null) {
@@ -1388,7 +1464,7 @@ class ModuleMember {
 	 * @return boolean $isLogged
 	 */
 	function isLogged() {
-		if ($this->logged === false) return false;
+		if ($this->logged === false || $this->logged === null) return false;
 		else return true;
 	}
 	
@@ -1453,7 +1529,7 @@ class ModuleMember {
 	 */
 	function makeSessionToken() {
 		$token = array('idx'=>$this->getLogged(),'ip'=>ip2long($_SERVER['REMOTE_ADDR']),'lifetime'=>time() + 60);
-		return Encoder(json_encode($token));
+		return Encoder(json_encode($token),null,'hex');
 	}
 	
 	/**
@@ -1841,7 +1917,10 @@ class ModuleMember {
 			$reg_date++;
 		}
 		
-		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date))->execute();
+		$ip = isset($_SERVER['REMOTE_ADDR']) == true ? $_SERVER['REMOTE_ADDR'] : '';
+		$agent = isset($_SERVER['HTTP_USER_AGENT']) == true ? $_SERVER['HTTP_USER_AGENT'] : '';
+		
+		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
 		
 		$this->db()->unlock();

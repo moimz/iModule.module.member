@@ -60,15 +60,8 @@ var Member = {
 		
 		$.send(ENV.getProcessUrl("member","logout"),function(result) {
 			if (result.success == true) {
-				if (result.universal_login === true) {
-					Member.syncSession(function() {
-						if (typeof callback == "function") callback();
-						else location.replace(location.href.split("#").shift());
-					});
-				} else {
-					if (typeof callback == "function") callback();
-					else location.replace(location.href.split("#").shift());
-				}
+				if (typeof callback == "function") callback();
+				else location.replace(location.href.split("#").shift());
 			}
 		});
 	},
