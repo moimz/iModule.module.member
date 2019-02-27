@@ -98,6 +98,11 @@ class ModuleMember {
 		}
 		
 		/**
+		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
+		 */
+		$this->logged = Request('IM_MEMBER_LOGGED','session') != null && Decoder(Request('IM_MEMBER_LOGGED','session')) != false ? json_decode(Decoder(Request('IM_MEMBER_LOGGED','session'))) : null;
+		
+		/**
 		 * 세션토큰이 있을 경우 로그인처리를 한다.
 		 */
 		$session = Request('session');
@@ -108,11 +113,6 @@ class ModuleMember {
 		 */
 		$cookie = Request('IM_MEMBER_COOKIE','cookie');
 		if ($cookie !== null) $this->loginByCookie($cookie);
-		
-		/**
-		 * SESSION 을 검색하여 현재 로그인중인 사람의 정보를 구한다.
-		 */
-		$this->logged = Request('IM_MEMBER_LOGGED','session') != null && Decoder(Request('IM_MEMBER_LOGGED','session')) != false ? json_decode(Decoder(Request('IM_MEMBER_LOGGED','session'))) : false;
 		
 		/**
 		 * 통합로그인을 사용한다고 설정되어 있을 경우 통합로그인 세션처리를 위한 자바스크립트 파일을 로딩한다.
@@ -1191,8 +1191,8 @@ class ModuleMember {
 	 * @param boolean $isLogged 로그인여부
 	 */
 	function login($midx,$is_fire_event=true) {
-		$member = $this->getMember($midx);
-		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
+		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
+		if ($member == null || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		if ($this->getLogged() == $midx) return true;
 		
 		$logged = new stdClass();
@@ -1464,7 +1464,7 @@ class ModuleMember {
 	 * @return boolean $isLogged
 	 */
 	function isLogged() {
-		if ($this->logged === false || $this->logged === null) return false;
+		if ($this->logged === null) return false;
 		else return true;
 	}
 	
@@ -1907,8 +1907,8 @@ class ModuleMember {
 	 * @return int $reg_date 등록시각
 	 */
 	function addActivity($midx,$exp,$module,$code,$content=array(),$reg_date=null) {
-		$member = $this->getMember($midx);
-		if ($member->idx == 0) return false;
+		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
+		if ($member == null || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		
 		$reg_date = $reg_date ? $reg_date * 1000 : time() * 1000;
 		$this->db()->setLockMethod('WRITE')->lock(array($this->table->member,$this->table->activity));
@@ -1943,7 +1943,7 @@ class ModuleMember {
 		if ($point == 0) return false;
 		
 		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
-		if ($member == null) return false;
+		if ($member == null || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		if ($isForce == false && $point < 0 && $member->point < $point * -1) return false;
 		
 		if ($module && $this->IM->getModule()->isInstalled($module) == true) {
