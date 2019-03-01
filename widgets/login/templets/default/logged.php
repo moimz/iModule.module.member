@@ -41,35 +41,47 @@ $IM->loadWebFont('FontAwesome');
 </div>
 
 <div data-role="point">
-	<?php echo $point == null ? '<button type="button" onclick="Member.pointPopup();">' : '<a href="'.$point.'">'; ?>내역보기<?php echo $point == null ? '</button>' : '</a>'; ?><i class="xi xi-wallet"></i>포인트 : <?php echo number_format($member->point); ?>
+	<?php echo $point == null ? '<button type="button" onclick="Member.pointPopup();">' : '<a href="'.$point.'">'; ?>내역보기<?php echo $point == null ? '</button>' : '</a>'; ?><i class="xi xi-wallet"></i><?php echo $Widget->getText('text/point'); ?> : <?php echo number_format($member->point); ?>
 </div>
 
 <ul data-role="button">
+	<?php if ($message !== false) { ?>
 	<li>
-		<?php echo $message == null ? '<button type="button" onclick="Member.messagePopup();">' : '<a href="'.$message.'">'; ?>
-		<i class="xi xi-postbox"></i><span>메세지</span></button>
+		<?php echo $message == null ? '<button type="button" onclick="Message.inboxPopup();">' : '<a href="'.$message.'">'; ?>
+		<i class="xi xi-postbox"></i><span><?php echo $mMessage->getText('text/inbox'); ?></span></button>
 		<?php echo $message == null ? '</button>' : '</a>'; ?>
-		<label>1</label>
+		<label data-module="message" data-role="count"></label>
 	</li>
+	<?php } ?>
 	<li>
-		<button type="button" data-action="push"><i class="xi xi-bell"></i><span>알림</span></button>
-		<label>1,000</label>
-		
-		<!--
-		<?php if ($push == null) { ?><button type="button" onclick="Push.listPopup();"><?php } else { ?><a href="<?php echo $push; ?>"><?php } ?>
-		<i class="xi xi-bell"></i><span>알림</span></button>
-		<?php if ($push == null) { ?></button><?php } else { ?></a><?php } ?>
-		<label>1,000</label>
-		-->
+		<button type="button" data-action="push"><i class="xi xi-bell"></i><span><?php echo $mPush->getText('text/push'); ?></span></button>
+		<label data-module="push" data-role="count"></label>
 	</li>
 	<li>
 		<?php echo $modify == null ? '<button type="button" onclick="Member.modifyPopup();">' : '<a href="'.$modify.'">'; ?>
-		<i class="xi xi-user-info"></i><span>정보수정</span></button>
+		<i class="xi xi-user-info"></i><span><?php echo $Widget->getText('text/modify'); ?></span></button>
 		<?php echo $modify == null ? '</button>' : '</a>'; ?>
 	</li>
 	<li>
 		<?php echo $activity == null ? '<button type="button" onclick="Member.activityPopup();">' : '<a href="'.$activity.'">'; ?>
-		<i class="xi xi-paper"></i><span>활동기록</span></button>
+		<i class="xi xi-paper"></i><span><?php echo $Widget->getText('text/activity'); ?></span></button>
 		<?php echo $activity == null ? '</button>' : '</a>'; ?>
 	</li>
 </ul>
+
+<div data-role="layer" class="push">
+	<h6>
+		<div><?php echo $mPush->getText('text/push'); ?></div>
+		
+		<div class="button">
+			<button type="button" onclick="Push.readAll();"><?php echo $mPush->getText('button/read_all'); ?></button>
+			<button type="button" onclick="Push.settingPopup();"><?php echo $mPush->getText('button/setting'); ?></button>
+		</div>
+	</h6>
+	
+	<ul></ul>
+	
+	<?php echo ($push == null) ? '<button type="button" data-action="show_all" onclick="Push.listPopup();">' : '<a href="'.$push.'" data-action="show_all">'; ?>
+	<?php echo $mPush->getText('button/show_all'); ?>
+	<?php echo $push == null ? '</button>' : '</a>'; ?>
+</div>

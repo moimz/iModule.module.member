@@ -42,6 +42,14 @@ if ($forceLogin == true || $me->isLogged() == false) {
 	$activity = $IM->getContextUrl('member','activity');
 	$push = $IM->getContextUrl('push','list');
 	
+	$mPush = $IM->getModule('push');
+	
+	$message = $IM->getModule()->isInstalled('message');
+	if ($message == true) {
+		$message = $IM->getContextUrl('message','inbox');
+		$mMesseage = $IM->getModule('message');
+	}
+	
 	return $Templet->getContext('logged',get_defined_vars(),$header,$footer);
 }
 ?>

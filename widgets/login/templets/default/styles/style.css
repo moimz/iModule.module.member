@@ -21,6 +21,7 @@ div[data-widget=member-login][data-templet=default] section.login > div[data-rol
 div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > *:last-child {margin-right:0;}
 div[data-widget=member-login][data-templet=default] section.login > div[data-role=link] > i {display:inline-block; vertical-align:middle; background:#ccc; width:1px; height:12px; margin:4px 0px;}
 
+div[data-widget=member-login][data-templet=default] section.logged {position:relative;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] {font-size:0; margin-bottom:10px;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > i.photo {width:58px; height:58px; border:1px solid #ccc; border-radius:50%; display:inline-block; vertical-align:top; margin-right:10px; background-size:cover; background-repeat:no-repeat; background-position:50% 50%; position:relative;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=user] > i.photo > button {border:0; background:#919191; width:20px; height:20px; border-radius:50%; position:absolute; bottom:-3px; right:-3px; z-index:1; cursor:pointer;}
@@ -51,38 +52,36 @@ div[data-widget=member-login][data-templet=default] section.logged > div[data-ro
 div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] {list-style:none; display:table; margin:8px -10px -5px -10px; width:calc(100% + 20px); background:#fafafa; font-size:0; table-layout:fixed; border-top:1px solid #dee2eb;}
 div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li {width:100%; height:60px; display:table-cell; border-left:1px solid #dee2eb; position:relative;}
 div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li:first-child {border-left:0;}
-div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a {display:block; width:100%; height:60px; background:transparent; font-size:12px; cursor:pointer; border:0; font-size:0; overflow:hidden; text-decoration:none; text-align:center;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a {display:block; width:100%; height:60px; background:transparent; font-size:12px; cursor:pointer; border:0; font-size:0; text-decoration:none; text-align:center;}
 div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button > i, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a > i {display:block; width:100%; height:35px; line-height:42px; font-size:18px; text-align:center; color:#666;}
 div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > button > span, div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > a > span {display:block; width:100%; height:25px; line-height:20px; font-size:12px; color:#666;}
 div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > label {position:absolute; z-index:1; max-width:80%; top:-8px; right:-5px; height:18px; min-width:18px; border-radius:9px; box-sizing:border-box; padding:0px 5px; font-size:11px; font-family:Roboto; background:#F44336; color:#fff; line-height:18px; text-align:center; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li > label:empty {display:none;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li.selected > button {background:#828594;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li.selected > button > i {color:#fff;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li.selected > button > span {color:#fff;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li.selected:before {position:absolute; border-bottom:8px solid #dee2eb; bottom:-1px; left:calc(50% - 8px); content:" "; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent;}
+div[data-widget=member-login][data-templet=default] section.logged > ul[data-role=button] > li.selected:after {position:absolute; border-bottom:7px solid #fff; bottom:-1px; left:calc(50% - 7px); content:" "; width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent;}
 
-/*
-.WidgetMemberLoginDefault {}
-.WidgetMemberLoginDefault .inputBlock {margin-bottom:10px;}
-.WidgetMemberLoginDefault .buttons {display:table; width:100%; table-layout:fixed;}
-.WidgetMemberLoginDefault .buttons .social {display:table-cell; width:32px; vertical-align:top;}
-.WidgetMemberLoginDefault .buttons .button {display:table-cell; width:100%; vertical-align:top;}
-.WidgetMemberLoginDefault .btn {display:block; width:100%;}
-.WidgetMemberLoginDefault .buttons .social .btn {width:28px; padding:5px 0px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] {position:absolute; top:calc(100% + 1px); left:-1px; width:calc(100% + 2px); border:1px solid #dee2eb; border-top:0; background:#fff; z-index:5; box-sizing:border-box; display:none;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer].opened {display:block; box-shadow:1px 1px 2px rgba(0,0,0,0.1);}
 
-.WidgetMemberLoginDefault .bottom {height:30px; color:#666; font-size:11px;}
-.WidgetMemberLoginDefault .bottom .autoLogin, .WidgetMemberLoginDefault .bottom .mypage {display:inline-block; height:30px; line-height:30px; vertical-align:middle; cursor:pointer;}
-.WidgetMemberLoginDefault .bottom .autoLogin input {margin-right:5px; float:left; margin-top:8px;}
-.WidgetMemberLoginDefault .bottom .link {float:right; height:30px; line-height:30px;}
-.WidgetMemberLoginDefault .bottom a {text-decoration:none; color:#666;}
-.WidgetMemberLoginDefault .bottom a:hover {color:#e4232c;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 {font-size:0; height:30px; padding:0px 8px; margin:0;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div {display:inline-block; height:30px; line-height:30px; font-size:12px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button {float:right; font-size:0; line-height:1;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button > button {border:0; background:transparent; height:20px; line-height:20px; margin:5px; color:#2196F3; font-size:12px; position:relative; cursor:pointer;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button > button:after {width:2px; height:2px; background:#ccc; position:absolute; top:9px; right:-6px; content:" ";}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button > button:last-child {margin-right:0;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button > button:last-child:after {display:none;}
 
-.WidgetMemberLoginDefault .info {display:table; table-layout:fixed; width:100%;}
-.WidgetMemberLoginDefault .info > div {display:table-cell; vertical-align:middle;}
-.WidgetMemberLoginDefault .info div.photo {width:70px;}
-.WidgetMemberLoginDefault .info div.photo img {width:58px; height:58px; border:1px solid #ccc; border-radius:3px;}
-.WidgetMemberLoginDefault .info div.detail {width:100%;}
-.WidgetMemberLoginDefault .info div.detail .nickname {font-size:15px; font-weight:bold; margin-bottom:10px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;}
-.WidgetMemberLoginDefault .info div.detail .nickname .reg_date {font-size:11px; font-family:OpenSans, defaultFont; color:#666; float:right; font-weight:normal; margin-top:3px;}
-
-.WidgetMemberLoginDefault .blocks {display:table; width:100%; table-layout:fixed; color:#333;}
-.WidgetMemberLoginDefault .blocks > div {display:table-cell; width:50%; height:28px; line-height:28px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; vertical-align:middle;}
-.WidgetMemberLoginDefault .blocks > div > i {float:left; width:15px; height:28px; line-height:28px;}
-.WidgetMemberLoginDefault .blocks > div .number {font-family:OpenSans, defaultFont; font-size:11px;}
-.WidgetMemberLoginDefault .blocks > div b {color:#e4232c;}
-*/
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul {list-style:none; width:100%; display:block;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li {border-top:1px solid #dddfe2; font-size:0;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li.title {background:#f5f6f7; padding-left:8px; height:24px; line-height:24px; color:#666; font-size:12px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li.loading {height:100px; line-height:100px; text-align:center; color:#999; font-size:16px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li.message {height:100px; line-height:100px; text-align:center; color:#999; font-size:12px;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li > button {display:block; width:100%; border:0; padding:6px 8px; background:transparent; cursor:pointer; font-size:0; box-sizing:border-box; text-align:left;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li > button > i.icon {width:42px; height:42px; border-radius:50%; display:inline-block; border:1px solid #ccc; background-color:#fff; background-size:cover; background-repeat:no-repeat; background-position:50% 50%; box-sizing:border-box; margin-right:10px; vertical-align:top;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li > button > div.text {width:calc(100% - 52px); display:inline-block; line-height:20px; padding:1px 0px; font-size:12px; color:#222; vertical-align:top;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li > button > div.text > time {display:block; height:20px; line-height:20px; color:#666;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li > button.unread {background:#edf2fa;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > *[data-action] {width:100%; height:30px; line-height:30px; text-align:center; text-decoration:none; color:#2196F3; font-size:12px; display:block; cursor:pointer; border:0; background:transparent; border-top:1px solid #dddfe2;}
