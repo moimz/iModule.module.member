@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 2. 10.
+ * @modified 2019. 3. 3.
  */
 if (defined('__IM__') == false) exit;
 
@@ -38,7 +38,7 @@ if ($this->isLogged() == false) {
 		}
 		
 		$this->db()->update($this->table->member,$insert)->where('idx',$member->idx)->execute();
-		if ($this->getModule()->getConfig('verified_email') == true && $this->isAdmin() == false) $this->sendVerificationEmail($idx);
+		if ($this->getModule()->getConfig('verified_email') == true && $this->isAdmin() == false) $this->sendVerificationEmail($member->idx);
 		
 		$photo = Request('photo');
 		

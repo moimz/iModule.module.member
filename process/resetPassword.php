@@ -61,10 +61,12 @@ if ($token) {
 		return;
 	}
 	
-	$results->success = $this->sendResetPasswordEmail($check->idx);
-	if ($results->success == true) {
+	$result = $this->sendResetPasswordEmail($check->idx);
+	if ($result === true) {
+		$results->success = true;
 		$results->message = '패스워드 초기화 이메일을 발송하였습니다.';
 	} else {
-		$results->message = '이메일 발송에 실패하였습니다.<br>잠시 후 다시 시도하시거나, 관리자에게 문의하여 주시기 바랍니다.';
+		$results->success = false;
+		$results->message = $this->getErrorText($result);
 	}
 }

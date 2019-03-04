@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 2. 26.
+ * @modified 2019. 3. 3.
  */
 class ModuleMember {
 	/**
@@ -118,6 +118,14 @@ class ModuleMember {
 		 * 통합로그인을 사용한다고 설정되어 있을 경우 통합로그인 세션처리를 위한 자바스크립트 파일을 로딩한다.
 		 */
 		if (defined('__IM_ADMIN__') == false && $this->getModule()->getConfig('universal_login') == true) $this->IM->addHeadResource('script',$this->getModule()->getDir().'/scripts/session.js');
+		
+		/**
+		 * 이메일 인증을 사용하고 있고, 이메일 인증이 완료되지 않은 회원이 로그인하였을 경우
+		 */
+		if (defined('__IM_SITE__') == true && $this->getModule()->getConfig('verified_email') == true && $this->isLogged() == true && $this->getMember()->verified == 'FALSE') {
+			header('location:'.$this->IM->getModuleUrl('member','verification'));
+			exit;
+		}
 	}
 	
 	/**
@@ -1976,8 +1984,8 @@ class ModuleMember {
 	 * @return boolean/string 이메일 발송결과 (true : 성공, ALREADY_VERIFIED_EMAIL : 이미 인증됨, WAIT_VERIFIED_EMAIL : 이메일을 발송하고 대기중, SEND_FAILED_VERIFIED_EMAIL : 이메일 발송실패)
 	 */
 	function sendVerificationEmail($midx,$email=null) {
-		$member = $this->getMember($midx);
-		if ($member->idx == 0) return 'FAIL';
+		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
+		if ($member == null) return 'FAIL';
 		
 		$email = $email == null ? $member->email : $email;
 		$check = $this->db()->select($this->table->email)->where('midx',$midx)->where('email',$email)->getOne();
@@ -2043,6 +2051,8 @@ class ModuleMember {
 				$token = sha1($midx.time().rand(10000,99999));
 				if ($this->db()->select($this->table->password)->where('token',$token)->has() == false) break;
 			}
+		} elseif ($check->reg_date > time() - 300) {
+			return 'WAIT_RESET_PASSWORD_EMAIL';
 		} else {
 			$token = $check->token;
 		}
@@ -2055,7 +2065,7 @@ class ModuleMember {
 		 * @todo 메일발송부분 언어팩 설정
 		 */
 		$subject = '['.$this->IM->getSiteTitle().'] 패스워드 초기화';
-		$content = '회원님의 로그인 패스워드를 초기화하기 위한 이메일입니다.<br>아래의 링크를 클릭하여 패스워드를 초기화할 수 있습니다.';//<br>회원가입하신적이 없거나, 최근에 이메일주소변경신청을 하신적이 없다면 본 메일은 무시하셔도 됩니다.';
+		$content = '회원님의 로그인 패스워드를 초기화하기 위한 이메일입니다.<br>아래의 링크를 클릭하여 패스워드를 초기화할 수 있습니다.<br>패스워드 초기화요청을 하신적이 없다면 본 메일은 무시하셔도 됩니다.';
 		
 		$link = $this->IM->getModuleUrl('member','password','reset',$token,true);
 		$content.= '<br><br><a href="'.$link.'" target="_blank" style="word-break:break-all;">'.$link.'</a>';

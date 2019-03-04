@@ -84,6 +84,7 @@
 		"NOT_MATCHED_PASSWORD_CONFIRM":"패스워드와 패스워드 확인이 서로 일치하지 않습니다.",
 		"INVALID_GENDER":"성별 선택값이 유효하지 않습니다.",
 		"WAIT_VERIFIED_EMAIL":"최근에 인증이메일을 발송하였습니다. 5분후 다시 시도하여 주시기 바랍니다.",
+		"WAIT_RESET_PASSWORD_EMAIL":"최근에 패스워드 초기화 이메일을 발송하였습니다. 5분후 다시 시도하여 주시기 바랍니다.",
 		"RESEND_EMAIL_VERIFICATION_CODE":"이메일을 성공적으로 발송하였습니다.",
 		"INVALID_EMAIL_VERIFICATION_TOKEN":"이메일 인증정보를 찾을 수 없습니다.",
 		"INCORRECT_EMAIL_VERIFICATION_CODE":"인증코드가 일치하지 않습니다."
