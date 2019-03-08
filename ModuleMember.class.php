@@ -1054,7 +1054,7 @@ class ModuleMember {
 		
 		if ($this->getModule()->getConfig('allow_signup') == true || $this->getModule()->getConfig('allow_reset_password') == true) {
 			$content.= '<ul data-module="member" data-role="link">';
-			$content.= '<li><div data-role="input"><label><input type="checkbox" name="auto" value="TRUE">'.$this->getText('text/auto_login').'</label></div></li>';
+			$content.= '<li><div data-role="input"><label><input type="checkbox" name="remember" value="TRUE">'.$this->getText('text/remember').'</label></div></li>';
 			if ($this->getModule()->getConfig('allow_signup') == true) {
 				$signup = $this->IM->getContextUrl('member','signup');
 				$content.= '<li>'.($signup == null ? '<button type="button" onclick="Member.signupPopup();">'.$this->getText('text/signup').'</button>' : '<a href="'.$signup.'">'.$this->getText('text/signup').'</a>').'</li>';
