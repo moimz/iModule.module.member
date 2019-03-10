@@ -981,7 +981,7 @@ class ModuleMember {
 			$lists[$i]->reg_date = floor($lists[$i]->reg_date / 1000);
 		}
 		
-		$pagination = $this->getTemplet()->getPagination($p,ceil($total/$limit),10,$this->IM->getUrl(null,null,$view,'{PAGE}'));
+		$pagination = $this->getTemplet()->getPagination($p,ceil($total/$limit),10,$this->getUrl($view,'{PAGE}'));
 		
 		$header = PHP_EOL.'<form id="ModuleMemberPointForm">'.PHP_EOL;
 		$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.point.init("ModuleMemberPointForm");</script>'.PHP_EOL;
