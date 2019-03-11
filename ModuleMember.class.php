@@ -954,7 +954,7 @@ class ModuleMember {
 		$member = $this->getMember();
 		
 		$view = $this->getView() ? $this->getView() : 'all';
-		$p = is_numeric($this->getIdx()) == true ? $this->getIdx() : 1;
+		$p = is_numeric($this->getIdx()) == true && $this->getIdx() > 0 ? $this->getIdx() : 1;
 		$limit = 20;
 		$start = ($p - 1) * $limit;
 		$lists = $this->db()->select($this->table->point)->where('midx',$this->getLogged());
