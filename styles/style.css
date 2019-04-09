@@ -6,7 +6,7 @@
  * @file /modules/member/styles/style.css
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0
+ * @version 3.1.0
  * @modified 2019. 2. 25.
  */
 i[data-module=member][data-role=photo] {display:inline-block; background-position:50% 50%; background-repeat:no-repeat; background-size:cover; border-radius:50%; border:1px solid #ccc; box-sizing:border-box; vertical-align:middle;}

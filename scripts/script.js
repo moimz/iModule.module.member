@@ -6,7 +6,7 @@
  * @file /modules/member/scripts/script.js
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0
+ * @version 3.1.0
  * @modified 2019. 3. 3.
  */
 var Member = {

@@ -8,7 +8,7 @@
  * @file /modules/member/api/signup.post.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0
+ * @version 3.1.0
  * @modified 2017. 11. 22.
  */
 if (defined('__IM__') == false) exit;

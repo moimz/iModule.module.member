@@ -6,7 +6,7 @@
  * @file /modules/member/widgets/login/templets/default/scripts/script.js
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0
+ * @version 3.1.0
  * @modified 2019. 2. 26.
  */
 $(document).ready(function() {
