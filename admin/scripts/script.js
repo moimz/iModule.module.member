@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 2. 6.
+ * @modified 2019. 4. 20.
  */
 var Member = {
 	/**
@@ -1359,5 +1359,138 @@ var Member = {
 		for (var i=0, loop=checked.length;i<loop;i++) {
 			Ext.getCmp("ModuleMemberSignupStepUsed").getSelectionModel().select(Ext.getCmp("ModuleMemberSignupStepUsed").getStore().findExact("step",checked[i].get("step")),true);
 		}
+	},
+	/**
+	 * 회원검색패널을 불러온다.
+	 */
+	search:function(callback) {
+		new Ext.Window({
+			id:"ModuleMemberSearchWindow",
+			title:Member.getText("admin/search/title"),
+			width:700,
+			height:500,
+			modal:true,
+			autoScroll:true,
+			border:false,
+			layout:"fit",
+			items:[
+				new Ext.grid.Panel({
+					id:"ModuleMemberSearchResult",
+					border:false,
+					tbar:[
+						new Ext.form.TextField({
+							id:"ModuleMemberSearchKeyword",
+							width:140,
+							emptyText:Member.getText("admin/list/columns/name") + " / " + Member.getText("admin/list/columns/nickname") + " / " + Member.getText("admin/list/columns/email"),
+							enableKeyEvents:true,
+							flex:1,
+							listeners:{
+								keyup:function(form,e) {
+									if (e.keyCode == 13) {
+										Ext.getCmp("ModuleMemberSearchResult").getStore().getProxy().setExtraParam("keyword",Ext.getCmp("ModuleMemberSearchKeyword").getValue());
+										Ext.getCmp("ModuleMemberSearchResult").getStore().loadPage(1);
+									}
+								}
+							}
+						}),
+						new Ext.Button({
+							iconCls:"mi mi-search",
+							handler:function() {
+								Ext.getCmp("ModuleMemberSearchResult").getStore().getProxy().setExtraParam("keyword",Ext.getCmp("ModuleMemberSearchKeyword").getValue());
+								Ext.getCmp("ModuleMemberSearchResult").getStore().loadPage(1);
+							}
+						})
+					],
+					store:new Ext.data.JsonStore({
+						proxy:{
+							type:"ajax",
+							simpleSortMode:true,
+							url:ENV.getProcessUrl("member","@getMembers"),
+							reader:{type:"json"}
+						},
+						remoteSort:true,
+						sorters:[{property:"idx",direction:"ASC"}],
+						autoLoad:false,
+						pageSize:50,
+						fields:["idx","name","nickname","email","type"],
+						listeners:{
+							load:function(store,records,success,e) {
+								if (success == false) {
+									if (e.getError()) {
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									} else {
+										Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+									}
+								}
+							}
+						}
+					}),
+					columns:[{
+						text:Member.getText("admin/list/columns/name"),
+						width:100,
+						dataIndex:"name",
+						sortable:true
+					},{
+						text:Member.getText("admin/list/columns/nickname"),
+						width:100,
+						dataIndex:"nickname",
+						sortable:true
+					},{
+						text:Member.getText("admin/list/columns/type"),
+						width:80,
+						dataIndex:"type",
+						sortable:true,
+						renderer:function(value) {
+							return Member.getText("type/"+value);
+						}
+					},{
+						text:Member.getText("admin/list/columns/email"),
+						minWidth:150,
+						dataIndex:"email",
+						flex:1,
+						sortable:true
+					}],
+					selModel:new Ext.selection.CheckboxModel({mode:"SINGLE"}),
+					bbar:new Ext.PagingToolbar({
+						store:null,
+						displayInfo:false,
+						items:[
+							"->",
+							{xtype:"tbtext",text:Member.getText("admin/search/help")}
+						],
+						listeners:{
+							beforerender:function(tool) {
+								tool.bindStore(Ext.getCmp("ModuleMemberSearchResult").getStore());
+							}
+						}
+					}),
+					listeners:{
+						itemdblclick:function(grid,record) {
+							callback(record.data);
+							Ext.getCmp("ModuleMemberSearchWindow").close();
+						}
+					}
+				})
+			],
+			buttons:[
+				new Ext.Button({
+					text:Admin.getText("button/confirm"),
+					handler:function() {
+						if (Ext.getCmp("ModuleMemberSearchResult").getSelectionModel().getSelection().length == 0) {
+							Ext.Msg.show({title:Admin.getText("alert/error"),msg:Member.getErrorText("NOT_SELECTED_MEMBER"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+						} else {
+							callback(Ext.getCmp("ModuleMemberSearchResult").getSelectionModel().getSelection().pop().data);
+							Ext.getCmp("ModuleMemberSearchWindow").close();
+						}
+					}
+				}),
+				new Ext.Button({
+					text:Admin.getText("button/close"),
+					handler:function() {
+						Ext.getCmp("ModuleMemberSearchWindow").close();
+					}
+				})
+			]
+		}).show();
 	}
 };

@@ -35,6 +35,11 @@
 		"kakao":"카카오",
 		"github":"깃허브"
 	},
+	"type":{
+		"MEMBER":"일반회원",
+		"MODERATOR":"부관리자",
+		"ADMINISTRATOR":"최고관리자"
+	},
 	"status":{
 		"ACTIVATED":"활성",
 		"DEACTIVATED":"비활성",
@@ -87,7 +92,8 @@
 		"WAIT_RESET_PASSWORD_EMAIL":"최근에 패스워드 초기화 이메일을 발송하였습니다. 5분후 다시 시도하여 주시기 바랍니다.",
 		"RESEND_EMAIL_VERIFICATION_CODE":"이메일을 성공적으로 발송하였습니다.",
 		"INVALID_EMAIL_VERIFICATION_TOKEN":"이메일 인증정보를 찾을 수 없습니다.",
-		"INCORRECT_EMAIL_VERIFICATION_CODE":"인증코드가 일치하지 않습니다."
+		"INCORRECT_EMAIL_VERIFICATION_CODE":"인증코드가 일치하지 않습니다.",
+		"NOT_SELECTED_MEMBER":"선택된 회원이 없습니다."
 	},
 	"admin":{
 		"list":{
@@ -97,6 +103,7 @@
 				"status":"상태",
 				"email":"이메일주소",
 				"name":"이름",
+				"type":"구분",
 				"nickname":"닉네임",
 				"cellphone":"휴대전화번호",
 				"exp":"경험치",
@@ -226,6 +233,10 @@
 				"is_required":"필수항목",
 				"is_required_help":"해당필드를 반드시 입력해야하는 필수항목으로 설정합니다."
 			}
+		},
+		"search":{
+			"title":"회원검색",
+			"help":"대상을 더블클릭하거나 선택 후 확인버튼을 클릭하여 주십시오."
 		},
 		"configs":{
 			"form":{

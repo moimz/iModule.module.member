@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 2. 6.
+ * @modified 2019. 4. 21.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -22,6 +22,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 		items:[
 			new Ext.grid.Panel({
 				id:"ModuleMemberList",
+				iconCls:"mi mi-group",
 				title:Member.getText("admin/list/title"),
 				border:false,
 				tbar:[
@@ -122,14 +123,6 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						return Member.getText("status/"+value);
 					}
 				},{
-					text:Member.getText("admin/list/columns/email"),
-					minWidth:150,
-					flex:1,
-					dataIndex:"email",
-					renderer:function(value) {
-						if (value) return '<a href="mailto:'+value+'">'+value+'</a>';
-					}
-				},{
 					text:Member.getText("admin/list/columns/name"),
 					dataIndex:"name",
 					width:100
@@ -139,6 +132,21 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					width:150,
 					renderer:function(value,p,record) {
 						return '<i style="width:24px; height:24px; float:left; display:block; background:url('+record.data.photo+'); background-size:cover; background-repeat:no-repeat; border:1px solid #ccc; border-radius:50%; margin:-3px 5px -3px -5px;"></i>'+value;
+					}
+				},{
+					text:Member.getText("admin/list/columns/type"),
+					width:100,
+					dataIndex:"type",
+					renderer:function(value) {
+						return Member.getText("type/"+value);
+					}
+				},{
+					text:Member.getText("admin/list/columns/email"),
+					minWidth:150,
+					flex:1,
+					dataIndex:"email",
+					renderer:function(value) {
+						if (value) return '<a href="mailto:'+value+'">'+value+'</a>';
 					}
 				},{
 					text:Member.getText("admin/list/columns/cellphone"),
@@ -238,6 +246,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 			}),
 			new Ext.Panel({
 				id:"ModuleMemberLabel",
+				iconCls:"xi xi-form",
 				title:Member.getText("admin/label/title"),
 				border:false,
 				layout:{type:"hbox",align:"stretch"},
