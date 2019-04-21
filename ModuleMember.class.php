@@ -330,17 +330,9 @@ class ModuleMember {
 		$templet = new stdClass();
 		$templet->title = $this->IM->getText('text/templet');
 		$templet->name = 'templet';
-		$templet->type = 'select';
-		$templet->data = array();
-		
-		$templet->data[] = array('#',$this->getText('admin/configs/form/default_setting'));
-		
-		$templets = $this->getModule()->getTemplets();
-		for ($i=0, $loop=count($templets);$i<$loop;$i++) {
-			$templet->data[] = array($templets[$i]->getName(),$templets[$i]->getTitle().' ('.$templets[$i]->getDir().')');
-		}
-		
-		$templet->value = count($templet->data) > 0 ? $templet->data[0][0] : '#';
+		$templet->type = 'templet';
+		$templet->use_default = true;
+		$templet->value = $values != null && isset($values->templet) == true ? $values->templet : '#';
 		$configs[] = $templet;
 		
 		return $configs;
