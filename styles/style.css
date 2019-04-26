@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 2. 25.
+ * @modified 2019. 4. 27.
  */
 i[data-module=member][data-role=photo] {display:inline-block; background-position:50% 50%; background-repeat:no-repeat; background-size:cover; border-radius:50%; border:1px solid #ccc; box-sizing:border-box; vertical-align:middle;}
 i[data-module=member][data-role=photo][data-idx] {cursor:pointer;}
@@ -34,24 +34,24 @@ ul[data-module=member][data-role=social].icon > li > a > span {display:none;}
 
 ul[data-module=member][data-role=social] > li.google > a {background:#da483f;}
 ul[data-module=member][data-role=social] > li.google > a > i {font-size:28px;}
-ul[data-module=member][data-role=social] > li.google > a > i:before {content:"\ef01";}
+ul[data-module=member][data-role=social] > li.google > a > i:before {content:"\ee00";}
 
 ul[data-module=member][data-role=social] > li.facebook > a {background:#4367b0;}
-ul[data-module=member][data-role=social] > li.facebook > a > i:before {content:"\ef02";}
+ul[data-module=member][data-role=social] > li.facebook > a > i:before {content:"\ee02";}
 
 ul[data-module=member][data-role=social] > li.twitter > a {background:#25a0ef;}
-ul[data-module=member][data-role=social] > li.twitter > a > i:before {content:"\ef03";}
+ul[data-module=member][data-role=social] > li.twitter > a > i:before {content:"\ee03";}
 
 ul[data-module=member][data-role=social] > li.naver > a {background:#15c642;}
-ul[data-module=member][data-role=social] > li.naver > a > i:before {content:"\ef04";}
+ul[data-module=member][data-role=social] > li.naver > a > i:before {content:"\ee04";}
 
 ul[data-module=member][data-role=social] > li.github > a {background:#555;}
 ul[data-module=member][data-role=social] > li.github > a > i {font-size:28px;}
-ul[data-module=member][data-role=social] > li.github > a > i:before {content:"\ef05"; color:#fff;}
+ul[data-module=member][data-role=social] > li.github > a > i:before {content:"\ee05"; color:#fff;}
 
 ul[data-module=member][data-role=social] > li.kakao > a {background:#fddc2f; color:#3b1f1f;}
 ul[data-module=member][data-role=social] > li.kakao > a > i {font-size:28px;}
-ul[data-module=member][data-role=social] > li.kakao > a > i:before {content:"\ef06"; color:#3b1f1f;}
+ul[data-module=member][data-role=social] > li.kakao > a > i:before {content:"\ee06"; color:#3b1f1f;}
 
 ul[data-module=member][data-role=link] {list-style:none; text-align:right; display:block; font-size:0;}
 ul[data-module=member][data-role=link] > li {display:inline-block; padding:10px; height:40px; position:relative; font-size:13px; box-sizing:border-box; vertical-align:middle;}
