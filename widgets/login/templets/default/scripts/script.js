@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 2. 26.
+ * @modified 2019. 4. 27.
  */
 $(document).ready(function() {
 	var $widget = $("div[data-widget=member-login][data-templet=default]");
@@ -58,8 +58,8 @@ $(document).ready(function() {
 								$button.append($text);
 								
 								$button.on("click",function(e) {
-									var item = $button.data("item");
-									Push.view(item.module,item.type,item.idx);
+									var item = $(this).data("item");
+									Push.view(item.module,item.type,item.idx,$(this));
 								});
 								
 								$lists.append($("<li>").append($button));
@@ -83,8 +83,8 @@ $(document).ready(function() {
 								$button.append($text);
 								
 								$button.on("click",function(e) {
-									var item = $button.data("item");
-									Push.view(item.module,item.type,item.idx);
+									var item = $(this).data("item");
+									Push.view(item.module,item.type,item.idx,$(this));
 								});
 								
 								$lists.append($("<li>").append($button));
