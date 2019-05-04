@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 5.
+ * @modified 2019. 4. 30.
  */
 if (defined('__IM__') == false) exit;
 
@@ -47,7 +47,7 @@ if ($forceLogin == true || $me->isLogged() == false) {
 	$message = $IM->getModule()->isInstalled('message');
 	if ($message == true) {
 		$message = $IM->getContextUrl('message','inbox');
-		$mMesseage = $IM->getModule('message');
+		$mMessage = $IM->getModule('message');
 	}
 	
 	return $Templet->getContext('logged',get_defined_vars(),$header,$footer);
