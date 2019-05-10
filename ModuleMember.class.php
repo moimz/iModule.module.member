@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 3. 3.
+ * @modified 2019. 5. 10.
  */
 class ModuleMember {
 	/**
@@ -1203,8 +1203,12 @@ class ModuleMember {
 		$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));
 		$this->logged = $logged;
 		
-		$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
-		$activity = $this->addActivity($midx,0,'member','login',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')));
+		if ($this->isLogged() == true) {
+			$activity = $this->addActivity($midx,0,'member','login_from',array('origin'=>$this->getLogged()));
+		} else {
+			$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
+			$activity = $this->addActivity($midx,0,'member','login',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')));
+		}
 		
 		unset($_SESSION['LOGGED_FAIL']);
 		

@@ -8,10 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 9.
+ * @modified 2019. 5. 10.
  */
- 
-$idx = Request('idx');
+if (defined('__IM__') == false) exit;
+
+$idx = Param('idx');
 if ($this->getMember($idx)->idx != 0) {
 	$this->login($idx);
 	
