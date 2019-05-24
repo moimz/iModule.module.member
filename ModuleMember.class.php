@@ -122,7 +122,7 @@ class ModuleMember {
 		/**
 		 * 이메일 인증을 사용하고 있고, 이메일 인증이 완료되지 않은 회원이 로그인하였을 경우
 		 */
-		if (defined('__IM_SITE__') == true && $this->getModule()->getConfig('verified_email') == true && $this->isLogged() == true && $this->getMember()->verified == 'FALSE') {
+		if (defined('__IM_SITE__') == true && $this->getModule()->getConfig('verified_email') == true && $this->isLogged() == true && $this->getMember(null,true,false)->verified == 'FALSE') {
 			header('location:'.$this->IM->getModuleUrl('member','verification'));
 			exit;
 		}
@@ -1629,7 +1629,7 @@ class ModuleMember {
 	 * @param boolean $forceReload(optional) 캐싱되어 있는 회원정보가 아닌, 최신의 회원정보를 요청
 	 * @return object $member 회원정보
 	 */
-	function getMember($midx=null,$forceReload=false) {
+	function getMember($midx=null,$forceReload=false,$fireEvent=true) {
 		$midx = $midx !== null ? $midx : $this->getLogged();
 		if ($forceReload == true || isset($this->members[$midx]) == false) {
 			$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
@@ -1669,10 +1669,13 @@ class ModuleMember {
 				}
 			}
 			
+			if ($fireEvent == true) $this->IM->fireEvent('afterGetData',$this->getModule()->getName(),'member',$member);
+			if ($forceReload == true) return $member;
+			
 			$this->members[$midx] = $member;
+			
 		}
 		
-		$this->IM->fireEvent('afterGetData',$this->getModule()->getName(),'member',$this->members[$midx]);
 		return $this->members[$midx];
 	}
 	
