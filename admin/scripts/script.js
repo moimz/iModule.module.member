@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 4. 20.
+ * @modified 2019. 5. 29.
  */
 var Member = {
 	/**
@@ -328,7 +328,7 @@ var Member = {
 							width:160,
 							sortable:true,
 							renderer:function(value) {
-								return moment(value * 1000).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
+								return moment(value).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
 							}
 						},{
 							text:"적립사유",
