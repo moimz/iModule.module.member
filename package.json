@@ -403,7 +403,7 @@
 				},
 				"code":{
 					"type":"varchar",
-					"length":20,
+					"length":30,
 					"is_null":true,
 					"comment":"적립코드"
 				},
