@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 5. 10.
+ * @modified 2019. 6. 8.
  */
 class ModuleMember {
 	/**
@@ -505,11 +505,16 @@ class ModuleMember {
 				
 			case 'photo' :
 				$midx = $this->getView() ? $this->getView() : 0;
-			
-				$path = $this->getModule()->getConfig('photo_privacy') == false && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true ? $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg' : $this->getModule()->getPath().'/images/nophoto.png';
-				$extension = explode('.',$path);
 				
-				header('Content-Type: image/'.end($extension));
+				if (($this->getModule()->getConfig('photo_privacy') == true || $this->isLogged() == true) && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true) {
+					$mime = 'image/jpeg';
+					$path = $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg';
+				} else {
+					$mime = 'image/png';
+					$path = $this->getModule()->getPath().'/images/nophoto.png';
+				}
+				
+				header('Content-Type: '.$mime);
 				header('Content-Length: '.filesize($path));
 				
 				readfile($path);
