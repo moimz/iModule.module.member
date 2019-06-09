@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 6. 8.
+ * @modified 2019. 6. 9.
  */
 class ModuleMember {
 	/**
@@ -1768,6 +1768,17 @@ class ModuleMember {
 	}
 	
 	/**
+	 * 회원 사진주소를 가져온다.
+	 *
+	 * @param int $midx 회원번호
+	 * @param boolean $isFullUrl 전체경로여부
+	 * @return string $photo
+	 */
+	function getMemberPhotoUrl($midx=null,$isFullUrl=false) {
+		return $this->IM->getModuleUrl('member','photo',$midx,'profile.jpg',$isFullUrl);
+	}
+	
+	/**
 	 * 회원 사진을 가져온다.
 	 *
 	 * @param int $midx 회원번호, 없을 경우 현재 로그인한 회원번호
@@ -1776,15 +1787,7 @@ class ModuleMember {
 	 * @return string $photo 회원사진 태그
 	 */
 	function getMemberPhoto($midx=null,$width=null,$height=null) {
-		if ($midx === 0) {
-			$photo = $this->getModule()->getDir().'/images/nophoto.png';
-		} else {
-			$member = $this->getMember($midx);
-			$midx = $member->idx;
-			$photo = $member->photo;
-		}
-		
-		$style = 'background-image:url('.$photo.');';
+		$style = 'background-image:url('.$this->getMemberPhotoUrl($midx).');';
 		if ($width) $style.= ' width:'.$width.'px;';
 		if ($height) $style.= ' height:'.$height.'px;';
 		
