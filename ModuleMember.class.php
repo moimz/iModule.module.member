@@ -506,7 +506,7 @@ class ModuleMember {
 			case 'photo' :
 				$midx = $this->getView() ? $this->getView() : 0;
 				
-				if (($this->getModule()->getConfig('photo_privacy') == true || $this->isLogged() == true) && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true) {
+				if (($this->getModule()->getConfig('photo_privacy') == false || $this->isLogged() == true) && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == true) {
 					$mime = 'image/jpeg';
 					$path = $this->IM->getAttachmentPath().'/member/'.$midx.'.jpg';
 				} else {
