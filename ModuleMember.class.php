@@ -970,6 +970,7 @@ class ModuleMember {
 				if (method_exists($mModule,'syncMember') == true) {
 					$code = new stdClass();
 					$code->code = $lists[$i]->code;
+					$code->midx = $lists[$i]->midx;
 					$code->content = json_decode($lists[$i]->content);
 					$lists[$i]->content = $mModule->syncMember('point_history',$code);
 				}
