@@ -951,9 +951,21 @@ class ModuleMember {
 		$member = $this->getMember();
 		
 		$view = $this->getView() ? $this->getView() : 'all';
+		$t = Request('t');
 		$p = is_numeric($this->getIdx()) == true && $this->getIdx() > 0 ? $this->getIdx() : 1;
 		$limit = 20;
 		$start = ($p - 1) * $limit;
+		
+		if ($t != null) {
+			$check = $this->db()->select($this->table->point)->where('midx',$this->getLogged())->where('reg_date',$t)->getOne();
+			if ($check != null) {
+				$later = $this->db()->select($this->table->point)->where('midx',$this->getLogged())->where('reg_date',$t,'>')->count();
+				$p = ceil($later/$limit);
+			} else {
+				$t = null;
+			}
+		}
+		
 		$lists = $this->db()->select($this->table->point)->where('midx',$this->getLogged());
 		if ($view == 'increase') $lists->where('point',0,'>');
 		elseif ($view == 'decrease') $lists->where('point',0,'<');
@@ -1206,15 +1218,15 @@ class ModuleMember {
 		$logged->time = time();
 		$logged->ip = $_SERVER['REMOTE_ADDR'];
 		
-		$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));
-		$this->logged = $logged;
-		
 		if ($this->isLogged() == true) {
 			$activity = $this->addActivity($midx,0,'member','login_from',array('origin'=>$this->getLogged()));
 		} else {
 			$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
 			$activity = $this->addActivity($midx,0,'member','login',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')));
 		}
+		
+		$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));
+		$this->logged = $logged;
 		
 		unset($_SESSION['LOGGED_FAIL']);
 		
