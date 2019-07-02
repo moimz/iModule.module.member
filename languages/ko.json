@@ -99,6 +99,9 @@
 		"list":{
 			"title":"회원관리",
 			"add_member":"회원추가",
+			"modify_member":"회원정보수정",
+			"deactive_member":"회원 비활성화",
+			"deactive_confirm":"선택한 회원을 비활성화하시겠습니까?<br>기존정보보호를 위해 회원의 기본정보는 보관합니다.",
 			"columns":{
 				"status":"상태",
 				"email":"이메일주소",
@@ -110,6 +113,10 @@
 				"point":"포인트",
 				"reg_date":"가입일",
 				"latest_login":"최종접속일"
+			},
+			"form":{
+				"default":"기본정보",
+				"extra":"부가정보"
 			}
 		},
 		"point":{

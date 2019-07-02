@@ -1,0 +1,18 @@
+{
+	"title":{
+		"ko":"가로바 템플릿"
+	},
+	"version":"3.0.0",
+	"author":{
+		"name":"Arzz",
+		"email":"arzz@arzz.com"
+	},
+	"homepage":"https://www.imodules.io",
+	"language":"ko",
+	"styles":[
+		"/styles/style.css"
+	],
+	"scripts":[
+		"/scripts/script.js"
+	]
+}

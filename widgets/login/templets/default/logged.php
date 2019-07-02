@@ -48,7 +48,7 @@ $IM->loadWebFont('FontAwesome');
 	<?php if ($message !== false) { ?>
 	<li>
 		<?php echo $message == null ? '<button type="button" onclick="Message.inboxPopup();">' : '<a href="'.$message.'">'; ?>
-		<i class="xi xi-postbox"></i><span><?php echo $mMessage->getText('text/inbox'); ?></span></button>
+		<i class="xi xi-postbox"></i><span><?php echo $mMessage->getText('text/inbox'); ?></span>
 		<?php echo $message == null ? '</button>' : '</a>'; ?>
 		<label data-module="message" data-role="count"></label>
 	</li>
@@ -59,12 +59,12 @@ $IM->loadWebFont('FontAwesome');
 	</li>
 	<li>
 		<?php echo $modify == null ? '<button type="button" onclick="Member.modifyPopup();">' : '<a href="'.$modify.'">'; ?>
-		<i class="xi xi-user-info"></i><span><?php echo $Widget->getText('text/modify'); ?></span></button>
+		<i class="xi xi-user-info"></i><span><?php echo $Widget->getText('text/modify'); ?></span>
 		<?php echo $modify == null ? '</button>' : '</a>'; ?>
 	</li>
 	<li>
 		<?php echo $activity == null ? '<button type="button" onclick="Member.activityPopup();">' : '<a href="'.$activity.'">'; ?>
-		<i class="xi xi-paper"></i><span><?php echo $Widget->getText('text/activity'); ?></span></button>
+		<i class="xi xi-paper"></i><span><?php echo $Widget->getText('text/activity'); ?></span>
 		<?php echo $activity == null ? '</button>' : '</a>'; ?>
 	</li>
 </ul>

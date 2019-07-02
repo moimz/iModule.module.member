@@ -20,7 +20,7 @@ var Member = {
 		add:function(idx,fields) {
 			new Ext.Window({
 				id:"ModuleMemberAddWindow",
-				title:(idx ? "회원정보수정" : "회원추가"),
+				title:(idx ? Member.getText("admin/list/modify_member") : Member.getText("admin/list/add_member")),
 				width:600,
 				modal:true,
 				autoScroll:true,
@@ -36,7 +36,7 @@ var Member = {
 								name:"idx"
 							}),
 							new Ext.form.FieldSet({
-								title:"기본정보",
+								title:Member.getText("admin/list/form/default"),
 								items:(function(fields) {
 									var items = [];
 									
@@ -51,7 +51,7 @@ var Member = {
 								if (fields.length == 0) return null;
 								
 								return new Ext.form.FieldSet({
-									title:"부가정보",
+									title:Member.getText("admin/list/form/extra"),
 									items:(function(fields) {
 										var items = [];
 										
@@ -161,6 +161,31 @@ var Member = {
 					Ext.Msg.close();
 				}
 			});
+		},
+		/**
+		 * 회원비활성화
+		 */
+		deactive:function() {
+			var selected = Ext.getCmp("ModuleMemberList").getSelectionModel().getSelection();
+			if (selected.length == 0) return;
+			
+			var idxes = [];
+			for (var i=0, loop=selected.length;i<loop;i++) {
+				idxes.push(selected[i].get("idx"));
+			}
+			
+			Ext.Msg.show({title:Admin.getText("alert/info"),msg:Member.getText("admin/list/deactive_confirm"),buttons:Ext.Msg.OKCANCEL,icon:Ext.Msg.QUESTION,fn:function(button) {
+				if (button == "ok") {
+					Ext.Msg.wait(Admin.getText("action/working"),Admin.getText("action/wait"));
+					$.send(ENV.getProcessUrl("member","@deactiveMember"),{idxes:idxes.join(",")},function(result) {
+						if (result.success == true) {
+							Ext.Msg.show({title:Admin.getText("alert/info"),msg:Admin.getText("action/worked"),buttons:Ext.Msg.OK,icon:Ext.Msg.INFO,fn:function() {
+								Ext.getCmp("ModuleMemberList").getStore().reload();
+							}});
+						}
+					});
+				}
+			}});
 		}
 	},
 	/**

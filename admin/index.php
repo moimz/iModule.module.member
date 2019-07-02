@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 4. 21.
+ * @modified 2019. 7. 2.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -125,11 +125,13 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 				},{
 					text:Member.getText("admin/list/columns/name"),
 					dataIndex:"name",
-					width:100
+					width:100,
+					sortable:true
 				},{
 					text:Member.getText("admin/list/columns/nickname"),
 					dataIndex:"nickname",
 					width:150,
+					sortable:true,
 					renderer:function(value,p,record) {
 						return '<i style="width:24px; height:24px; float:left; display:block; background:url('+record.data.photo+'); background-size:cover; background-repeat:no-repeat; border:1px solid #ccc; border-radius:50%; margin:-3px 5px -3px -5px;"></i>'+value;
 					}
@@ -215,7 +217,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						
 						menu.add({
 							iconCls:"xi xi-form",
-							text:"회원정보수정",
+							text:Member.getText("admin/list/modify_member"),
 							handler:function() {
 								Member.list.show(record.data.idx);
 							}
@@ -238,6 +240,16 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 								Member.point.add(record.data.idx);
 							}
 						});
+						
+						menu.add("-");
+						
+						menu.add({
+							iconCls:"mi mi-trash",
+							text:Member.getText("admin/list/deactive_member"),
+							handler:function() {
+								Member.list.deactive();
+							}
+						})
 						
 						e.stopEvent();
 						menu.showAt(e.getXY());

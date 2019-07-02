@@ -1658,6 +1658,7 @@ class ModuleMember {
 				$member->code = '';
 				$member->type = 'GUEST';
 				$member->name = $member->nickname = 'Unknown';
+				$member->email = 'unknown@unknown.com';
 				$member->photo = $this->getModule()->getDir().'/images/nophoto.png';
 				$member->nickcon = null;
 				$member->level = $this->getLevel(0);
