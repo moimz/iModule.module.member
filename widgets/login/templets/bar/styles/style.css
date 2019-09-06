@@ -23,6 +23,7 @@ div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > button 
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > button > i.photo {border-radius:50%; border:1px solid transparent; background-size:cover; background-repeat:no-repeat; background-position:50% 50%; opacity:1;}
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > button > i.icon {font-family:moimz; font-size:20px; line-height:30px; opacity:0.6;}
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > button > i.icon:hover {opacity:1;}
+div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > button[data-action=nickname] {width:auto;}
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > button > span {font-size:13px; font-weight:bold;}
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > label {position:absolute; z-index:1; max-width:80%; top:8px; right:8px; width:8px; height:8px; border-radius:50%; font-size:0; color:transparent; background:#F44336;}
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > label:empty {display:none;}
