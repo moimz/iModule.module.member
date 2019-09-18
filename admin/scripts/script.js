@@ -7,9 +7,20 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 5. 29.
+ * @modified 2019. 9. 18.
  */
 var Member = {
+	login:function(midx,name) {
+		Ext.Msg.show({title:Admin.getText("alert/info"),msg:name+"님 계정으로 로그인을 하시겠습니까?<br>로그인 계정을 변경할 경우 현 관리자권한을 잃게됩니다.",buttons:Ext.Msg.OKCANCEL,icon:Ext.Msg.QUESTION,fn:function(button) {
+			if (button == "ok") {
+				$.send(ENV.getProcessUrl("member","@login"),{idx:midx},function(result) {
+					if (result.success == true) {
+						location.replace(ENV.getUrl(false));
+					}
+				});
+			}
+		}});
+	},
 	/**
 	 * 회원관리
 	 */

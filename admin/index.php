@@ -244,12 +244,20 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						menu.add("-");
 						
 						menu.add({
+							iconCls:"xi xi-user-lock",
+							text:Member.getText("admin/login"),
+							handler:function() {
+								Member.login(record.data.idx,record.data.name);
+							}
+						});
+						
+						menu.add({
 							iconCls:"mi mi-trash",
 							text:Member.getText("admin/list/deactive_member"),
 							handler:function() {
 								Member.list.deactive();
 							}
-						})
+						});
 						
 						e.stopEvent();
 						menu.showAt(e.getXY());

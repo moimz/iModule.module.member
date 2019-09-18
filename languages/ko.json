@@ -96,6 +96,7 @@
 		"NOT_SELECTED_MEMBER":"선택된 회원이 없습니다."
 	},
 	"admin":{
+		"login":"... 으로 로그인",
 		"list":{
 			"title":"회원관리",
 			"add_member":"회원추가",
