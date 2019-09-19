@@ -76,9 +76,6 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					pageSize:50,
 					fields:["status","email","name","nickname","exp","point","reg_date","latest_login"],
 					listeners:{
-						beforeload:function() {
-							Ext.getCmp("ModuleMemberListSearch").setIconCls("mi mi-loading").disable();
-						},
 						load:function(store,records,success,e) {
 							if (success == false) {
 								if (e.getError()) {
@@ -87,7 +84,6 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 								}
 							}
-							Ext.getCmp("ModuleMemberListSearch").setIconCls("mi mi-search").enable();
 						}
 					}
 				}),
