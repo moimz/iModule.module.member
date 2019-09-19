@@ -51,27 +51,9 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 							}
 						}
 					}),
-					new Ext.form.TextField({
-						id:"ModuleMemberListKeyword",
-						width:140,
-						emptyText:Member.getText("text/keyword"),
-						enableKeyEvents:true,
-						listeners:{
-							keyup:function(form,e) {
-								if (e.keyCode == 13) {
-									Ext.getCmp("ModuleMemberList").getStore().getProxy().setExtraParam("keyword",Ext.getCmp("ModuleMemberListKeyword").getValue());
-									Ext.getCmp("ModuleMemberList").getStore().loadPage(1);
-								}
-							}
-						}
-					}),
-					new Ext.Button({
-						id:"ModuleMemberListSearch",
-						iconCls:"mi mi-search",
-						handler:function() {
-							Ext.getCmp("ModuleMemberList").getStore().getProxy().setExtraParam("keyword",Ext.getCmp("ModuleMemberListKeyword").getValue());
-							Ext.getCmp("ModuleMemberList").getStore().loadPage(1);
-						}
+					Admin.searchField("ModuleMemberListKeyword",180,Member.getText("text/keyword"),function(keyword) {
+						Ext.getCmp("ModuleMemberList").getStore().getProxy().setExtraParam("keyword",keyword);
+						Ext.getCmp("ModuleMemberList").getStore().loadPage(1);
 					}),
 					"-",
 					new Ext.Button({
