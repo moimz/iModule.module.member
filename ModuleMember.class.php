@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 6. 9.
+ * @modified 2019. 11. 12.
  */
 class ModuleMember {
 	/**
@@ -1208,7 +1208,7 @@ class ModuleMember {
 	 * @param int $midx 회원 고유번호
 	 * @param boolean $isLogged 로그인여부
 	 */
-	function login($midx,$is_fire_event=true) {
+	function login($midx,$is_fire_event=true,$is_logging=true) {
 		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
 		if ($member == null || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		if ($this->getLogged() == $midx) return true;
@@ -1218,11 +1218,13 @@ class ModuleMember {
 		$logged->time = time();
 		$logged->ip = $_SERVER['REMOTE_ADDR'];
 		
-		if ($this->isLogged() == true) {
-			$activity = $this->addActivity($midx,0,'member','login_from',array('origin'=>$this->getLogged()));
-		} else {
-			$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
-			$activity = $this->addActivity($midx,0,'member','login',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')));
+		if ($is_logging == true) {
+			if ($this->isLogged() == true) {
+				$activity = $this->addActivity($midx,0,'member','login_from',array('origin'=>$this->getLogged()));
+			} else {
+				$this->db()->update($this->table->member,array('latest_login'=>$logged->time))->where('idx',$midx)->execute();
+				$activity = $this->addActivity($midx,0,'member','login',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')));
+			}
 		}
 		
 		$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));

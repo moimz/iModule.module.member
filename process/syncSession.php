@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2017. 11. 23.
+ * @modified 2019. 11. 12.
  */
 if (defined('__IM__') == false) exit;
 
@@ -23,21 +23,8 @@ if ($token !== false) {
 		
 		$results->success = null;
 	} else {
-		$member = $this->db()->select($this->table->member)->where('idx',$session->idx)->getOne();
-		if ($member->idx == 0 || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) {
-			$results->success = false;
-			$results->message = 'NOT_FOUND';
-		} else {
-			$logged = new stdClass();
-			$logged->idx = $session->idx;
-			$logged->time = time();
-			$logged->ip = $_SERVER['REMOTE_ADDR'];
-			
-			$_SESSION['IM_MEMBER_LOGGED'] = Encoder(json_encode($logged));
-			
-			$results->success = true;
-			$results->logged = $logged;
-		}
+		$results->success = $this->login($session->idx,true,false);
+		$results->logged = $results->success == true ? $this->getLogged() : null;
 	}
 } else {
 	$results->success = false;

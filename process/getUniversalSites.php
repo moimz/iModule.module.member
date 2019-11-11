@@ -7,9 +7,8 @@
  * @file /modules/member/process/getUniversalSites.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.1.0.160923
- *
- * @return object $results
+ * @version 3.1.0
+ * @modified 2019. 11. 12.
  */
 if (defined('__IM__') == false) exit;
 
