@@ -12,7 +12,7 @@
  */
 if (defined('__IM__') == false) exit;
 
-$sites = $this->IM->db()->select($this->IM->getTable('site'),'domain,is_ssl')->where('domain',$this->IM->domain,'!=')->where('member','UNIVERSAL')->groupBy('domain')->groupBy('is_ssl')->get();
+$sites = $this->IM->db()->select($this->IM->getTable('site'),'domain,is_https')->where('domain',$this->IM->domain,'!=')->where('member','UNIVERSAL')->groupBy('domain')->groupBy('is_ssl')->get();
 for ($i=0, $loop=count($sites);$i<$loop;$i++) {
 	$sites[$i] = ($sites[$i]->is_ssl == 'TRUE' ? 'https://' : 'http://').$sites[$i]->domain;
 }
