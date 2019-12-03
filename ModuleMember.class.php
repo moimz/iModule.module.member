@@ -688,7 +688,7 @@ class ModuleMember {
 				$help = isset($help_languages->{$this->IM->language}) == true ? $help_languages->{$this->IM->language} : $form->help;
 				
 				$agreement = new stdClass();
-				$agreement->name = $agreement->name;
+				$agreement->name = $form->name;
 				$agreement->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/agreement') : $title;
 				$agreement->content = $configs->content;
 				$agreement->help = $help == 'LANGUAGE_SETTING' ? $this->getText('signup/agree') : $help;
