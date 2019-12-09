@@ -1209,9 +1209,9 @@ class ModuleMember {
 	 * @param boolean $isLogged 로그인여부
 	 */
 	function login($midx,$is_fire_event=true,$is_logging=true) {
+		if ($this->getLogged() == $midx) return true;
 		$member = $this->db()->select($this->table->member)->where('idx',$midx)->getOne();
 		if ($member == null || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
-		if ($this->getLogged() == $midx) return true;
 		
 		$logged = new stdClass();
 		$logged->idx = $midx;
@@ -1952,7 +1952,7 @@ class ModuleMember {
 		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		
 		if ($result === false) {
-			return $this->addActivity($midx,$exp,$module,$code,$content,$reg_date);
+			return $this->addActivity($midx,$exp,$module,$code,$content,ceil($reg_date / 1000));
 		}
 		
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
@@ -1994,7 +1994,7 @@ class ModuleMember {
 		
 		$result = $this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$accumulation,'reg_date'=>$reg_date))->execute();
 		if ($result === false) {
-			return $this->sendPoint($midx,$point,$module,$code,$content,$isForce,$reg_date);
+			return $this->sendPoint($midx,$point,$module,$code,$content,$isForce,ceil($reg_date / 1000));
 		}
 		$this->db()->update($this->table->member,array('point'=>$accumulation))->where('idx',$member->idx)->execute();
 		
