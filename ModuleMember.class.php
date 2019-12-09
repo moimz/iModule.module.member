@@ -1942,19 +1942,15 @@ class ModuleMember {
 		if ($member == null || in_array($member->status,array('LEAVE','DEACTIVATED')) == true) return false;
 		
 		$reg_date = $reg_date ? $reg_date * 1000 : time() * 1000;
-		$this->db()->setLockMethod('WRITE')->lock(array($this->table->member,$this->table->activity));
 		while (true) {
 			if ($this->db()->select($this->table->activity)->where('midx',$member->idx)->where('reg_date',$reg_date)->has() == false) break;
 			$reg_date++;
 		}
-		
 		$ip = isset($_SERVER['REMOTE_ADDR']) == true ? $_SERVER['REMOTE_ADDR'] : '';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) == true ? $_SERVER['HTTP_USER_AGENT'] : '';
 		
-		$idx = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		$idx = $this->db()->replace($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
-		
-		$this->db()->unlock();
 		
 		return $reg_date;
 	}
