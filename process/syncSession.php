@@ -23,7 +23,7 @@ if ($token !== false) {
 		
 		$results->success = null;
 	} else {
-		$results->success = $this->login($session->idx,true,false);
+		$results->success = $this->login($session->idx,false,false);
 		$results->logged = $results->success == true ? $this->getLogged() : null;
 	}
 } else {

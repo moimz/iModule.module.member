@@ -1949,7 +1949,7 @@ class ModuleMember {
 		$ip = isset($_SERVER['REMOTE_ADDR']) == true ? $_SERVER['REMOTE_ADDR'] : '';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) == true ? $_SERVER['HTTP_USER_AGENT'] : '';
 		
-		$result = $this->db()->replace($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		
 		if ($result === false) {
 			return $this->addActivity($midx,$exp,$module,$code,$content,$reg_date);
