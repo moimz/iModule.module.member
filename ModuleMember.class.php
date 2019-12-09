@@ -1949,7 +1949,12 @@ class ModuleMember {
 		$ip = isset($_SERVER['REMOTE_ADDR']) == true ? $_SERVER['REMOTE_ADDR'] : '';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) == true ? $_SERVER['HTTP_USER_AGENT'] : '';
 		
-		$idx = $this->db()->replace($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		$result = $this->db()->replace($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		
+		if ($result === false) {
+			return $this->addActivity($midx,$exp,$module,$code,$content,$reg_date);
+		}
+		
 		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
 		
 		return $reg_date;
@@ -1981,16 +1986,17 @@ class ModuleMember {
 		}
 		
 		$reg_date = $reg_date ? $reg_date * 1000 : time() * 1000;
-		$this->db()->setLockMethod('WRITE')->lock(array($this->table->member,$this->table->point));
 		while (true) {
 			if ($this->db()->select($this->table->point)->where('midx',$member->idx)->where('reg_date',$reg_date)->has() == false) break;
 			$reg_date++;
 		}
+		$accumulation = $member->point + $point;
 		
-		$this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$member->point + $point,'reg_date'=>$reg_date))->execute();
-		$this->db()->update($this->table->member,array('point'=>$member->point + $point))->where('idx',$member->idx)->execute();
-		
-		$this->db()->unlock();
+		$result = $this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$accumulation,'reg_date'=>$reg_date))->execute();
+		if ($result === false) {
+			return $this->sendPoint($midx,$point,$module,$code,$content,$isForce,$reg_date);
+		}
+		$this->db()->update($this->table->member,array('point'=>$accumulation))->where('idx',$member->idx)->execute();
 		
 		return true;
 	}
