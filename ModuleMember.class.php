@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 11. 12.
+ * @modified 2019. 12. 13.
  */
 class ModuleMember {
 	/**
@@ -1663,6 +1663,7 @@ class ModuleMember {
 				$member->email = 'unknown@unknown.com';
 				$member->photo = $this->getModule()->getDir().'/images/nophoto.png';
 				$member->nickcon = null;
+				$member->cellphone = null;
 				$member->level = $this->getLevel(0);
 				$member->label = array();
 				$member->extras = null;
@@ -1949,13 +1950,15 @@ class ModuleMember {
 		$ip = isset($_SERVER['REMOTE_ADDR']) == true ? $_SERVER['REMOTE_ADDR'] : '';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) == true ? $_SERVER['HTTP_USER_AGENT'] : '';
 		
-		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		$accumulation = $member->exp + $exp;
+		
+		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'accumulation'=>$accumulation,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		
 		if ($result === false) {
 			return $this->addActivity($midx,$exp,$module,$code,$content,ceil($reg_date / 1000));
 		}
 		
-		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
+		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$accumulation))->where('idx',$member->idx)->execute();
 		
 		return $reg_date;
 	}

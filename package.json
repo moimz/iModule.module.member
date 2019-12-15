@@ -130,7 +130,7 @@
 				},
 				"agent":{
 					"type":"varchar",
-					"length":150,
+					"length":255,
 					"is_null":true,
 					"comment":"브라우저"
 				}
