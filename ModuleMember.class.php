@@ -1952,7 +1952,7 @@ class ModuleMember {
 		
 		$accumulation = $member->exp + $exp;
 		
-		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'exp'=>$exp,'accumulation'=>$accumulation,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES),'exp'=>$exp,'accumulation'=>$accumulation,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		
 		if ($result === false) {
 			return $this->addActivity($midx,$exp,$module,$code,$content,ceil($reg_date / 1000));
@@ -1995,7 +1995,7 @@ class ModuleMember {
 		}
 		$accumulation = $member->point + $point;
 		
-		$result = $this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK),'accumulation'=>$accumulation,'reg_date'=>$reg_date))->execute();
+		$result = $this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES),'accumulation'=>$accumulation,'reg_date'=>$reg_date))->execute();
 		if ($result === false) {
 			return $this->sendPoint($midx,$point,$module,$code,$content,$isForce,ceil($reg_date / 1000));
 		}
