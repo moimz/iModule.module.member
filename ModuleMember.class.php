@@ -1722,7 +1722,7 @@ class ModuleMember {
 				$member->label = $this->getMemberLabel($midx);
 				$member->extras = json_decode($member->extras);
 				$member->address = json_decode($member->address);
-                $member->cpnumber = $member->cpnumber ? substr($member->cpnumber,0,2).'-'.substr($member->cpnumber,2,3)."-".substr($member->cpnumber, -5) : null;
+                $member->cpnumber = isset($member->cpnumber) ? substr($member->cpnumber,0,2).'-'.substr($member->cpnumber,2,3)."-".substr($member->cpnumber, -5) : null;
 
 				/**
 				 * 추가정보를 $member 객체에 추가한다.
