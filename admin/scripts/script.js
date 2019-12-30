@@ -833,6 +833,7 @@ var Member = {
 												[Member.getText("admin/field/type/homepage"),"homepage"],
 												[Member.getText("admin/field/type/gender"),"gender"],
 												[Member.getText("admin/field/type/address"),"address"],
+												[Member.getText("admin/field/type/cpname"),"cpname"],
 												[Member.getText("admin/field/type/etc"),"etc"]
 											]
 										}),
@@ -855,7 +856,7 @@ var Member = {
 													form.findField("input").disable();
 												}
 												
-												if ($.inArray(value,["email","password","name","nickname","agreement","privacy"]) == -1) {
+												if ($.inArray(value,["email","password","name","nickname","agreement","privacy","cpnumber","cpname"]) == -1) {
 													form.findField("is_required").setValue(false).enable();
 												} else {
 													form.findField("is_required").setValue(true).disable();

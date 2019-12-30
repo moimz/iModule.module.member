@@ -719,10 +719,48 @@ class ModuleMember {
 			} else {
 				$privacy = null;
 			}
-			
-			$nextStep = 'register';
+
+            $form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('(type=? or type=?)',array('cpname','cpnumber'))->orderBy('label','desc')->getOne();
+            if ($form != null) {
+                $nextStep = 'businessnum';
+            } else {
+                $nextStep = 'register';
+            }
 		}
-		
+
+        if ($step == 'businessnum') {
+            $form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','cpnumber')->orderBy('label','desc')->getOne();
+            if ($form != null) {
+                $title_languages = json_decode($form->title_languages);
+                $configs = json_decode($form->configs);
+
+                $title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
+
+                $businessnum = new stdClass();
+                $businessnum->name = $form->name;
+                $businessnum->is_required = $form->is_required;
+                $businessnum->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/cpnumber') : $title;
+            } else {
+                $businessnum = null;
+            }
+
+            $form = $this->db()->select($this->table->signup)->where('label',array($label,0),'IN')->where('name','cpname')->orderBy('label','desc')->getOne();
+            if ($form != null) {
+                $title_languages = json_decode($form->title_languages);
+                $configs = json_decode($form->configs);
+
+                $title = isset($title_languages->{$this->IM->language}) == true ? $title_languages->{$this->IM->language} : $form->title;
+
+                $companyname = new stdClass();
+                $companyname->name = $form->name;
+                $companyname->is_required = $form->is_required;
+                $companyname->title = $title == 'LANGUAGE_SETTING' ? $this->getText('text/cpnumber') : $title;
+            } else {
+                $companyname = null;
+            }
+            $nextStep = 'register';
+        }
+
 		if ($step == 'register') {
 			/**
 			 * 가입폼을 가져온다.
@@ -767,6 +805,11 @@ class ModuleMember {
 				$header.= '<input type="hidden" name="'.$key.'" value="'.$value.'">'.PHP_EOL;
 			}
 		}
+        if ($step == 'businessnum') {
+            foreach ($_POST as $key=>$value) {
+                $header.= '<input type="hidden" name="'.$key.'" value="'.$value.'">'.PHP_EOL;
+            }
+        }
 		$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
 		
 		/**
@@ -1679,7 +1722,8 @@ class ModuleMember {
 				$member->label = $this->getMemberLabel($midx);
 				$member->extras = json_decode($member->extras);
 				$member->address = json_decode($member->address);
-				
+                $member->cpnumber = $member->cpnumber ? substr($member->cpnumber,0,2).'-'.substr($member->cpnumber,2,3)."-".substr($member->cpnumber, -5) : null;
+
 				/**
 				 * 추가정보를 $member 객체에 추가한다.
 				 */
@@ -2325,6 +2369,19 @@ class ModuleMember {
 					'</div>'
 				);
 			}
+
+            /**
+             * 사업자번호, 업체명
+             */
+            if ($field->name == 'cpname' || $field->name == 'cpnumber') {
+                $val_set = $member !== null && isset($member->{$field->name}) == true ? GetString($member->{$field->name},'input') : GetString(Request($field->name),'input');
+                array_push($html,
+                    '<div>'.$val_set.'</div>',
+                    '<div>',
+                    '<input type="hidden" name="'.$field->name.'" value= "'.str_replace("-", "", $val_set).'">',
+                    '</div>'
+                );
+            }
 		} else {
 			/**
 			 * 옵션박스
