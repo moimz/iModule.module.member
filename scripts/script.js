@@ -147,7 +147,11 @@ var Member = {
 					$("button[type=submit]",$form).setDisabled($("input[type=checkbox]",$form).length != $("input[type=checkbox]:checked",$form).length);
 				});
 			}
-			
+
+			if (step == "businessnum") {
+				$("button[type=submit]",$form).disable();
+			}
+
 			$("button[data-action]",$form).on("click",function() {
 				var action = $(this).attr("data-action");
 				
@@ -158,6 +162,40 @@ var Member = {
 					} else {
 						location.replace(ENV.getUrl(false));
 					}
+				} else if(action == "auth_chk") {
+					$(this).disable();
+					var _forms = $("#ModuleMemberSignUpForm");
+					var cp_nums = $("input[name=cpnumber]", _forms);
+					var cp_name = $("input[name=cpname]", _forms);
+
+					cp_nums.status("success", "");
+					if(/[^0123456789-]/g.test(cp_nums.val()) && cp_name.val()) {
+						$("div[data-name=cpnumber]", _forms).attr("class", 'error');
+						$(this).setDisabled(false);
+						return false;
+					}
+					if(!cp_name.val()) {
+						$("div[data-name=cpname]", _forms).attr("class", 'error');
+						$(this).setDisabled(false);
+						return false;
+					}
+					var data = {
+						'name' : "companyAuth",
+						'cpnum' : cp_nums.val(),
+						'cpname' : cp_name.val()
+					};
+					$.send(ENV.getProcessUrl("member","checkMemberValue"), data, function(result) {
+						if (result.success == true) {
+							var __forms = $("input[name=cpnumber], input[name=cpname]", $form);
+							var form_cp = __forms.clone(true);
+							__forms.prop("disabled", true).append(form_cp);
+							$("button[type=submit]", $form).setDisabled(false);
+						} else {
+							$("input[name=cpnumber]", $("#ModuleMemberSignUpForm")).status(result.success == true ? "success" : "error",result.message ? result.message : "");
+							$("button[data-action]", $form).setDisabled(false);
+						}
+						return false;
+					});
 				}
 			});
 			

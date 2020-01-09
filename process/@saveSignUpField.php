@@ -60,7 +60,7 @@ for ($i=0, $loop=count($codes);$i<$loop;$i++) {
 	}
 }
 $is_required = Request('is_required') == 'on' ? 'TRUE' : 'FALSE';
-if (in_array($name,array('agreement','privacy','email','password','name','nickname')) == true) $is_required = true;
+if (in_array($name,array('agreement','privacy','email','password','name','nickname', 'cpnumber', 'cpname')) == true) $is_required = true;
 
 if ($is_system === false && in_array($name,$reservation) == true) {
 	$errors['name_etc'] = $this->getErrorText('RESERVED_NAME');
