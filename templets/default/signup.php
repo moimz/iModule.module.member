@@ -68,36 +68,6 @@ if (defined('__IM__') == false) exit;
 				</div>
 				
 			<?php } ?>
-
-            <?php if ($step == 'businessnum') { ?>
-                <h4>기업인증</h4>
-                <ul data-role="form" class="inner black">
-                    <li>
-                        <label <?php echo $companyname->is_required == true ? ' class="required"' : ''; ?>><?php echo $companyname->title; ?></label>
-                        <div>
-                            <div data-role="input" data-name="<?php echo $companyname->name; ?>" class="default" data-type="input">
-                                <input type="text" name="<?php echo $companyname->name; ?>">
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <label <?php echo $businessnum->is_required == true ? ' class="required"' : ''; ?>><?php echo $businessnum->title; ?></label>
-                        <div>
-                            <div data-role="input" data-name="<?php echo $businessnum->name; ?>" class="default" data-type="input">
-                                <input type="text" name="<?php echo $businessnum->name; ?>">
-                            </div>
-                            <div data-role="button">
-                                <button data-action="auth_chk">인증하기</button>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <div data-role="button">
-                    <button type="submit"><?php echo $me->getText('button/next'); ?></button>
-                    <?php if (defined('__IM_CONTAINER__') == false) { ?><a href="<?php echo $IM->getIndexUrl(); ?>"><?php echo $me->getText('button/cancel'); ?></a><?php } ?>
-                </div>
-
-            <?php } ?>
 			
 			<?php if ($step == 'register') { ?>
 			
