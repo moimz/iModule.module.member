@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 12. 13.
+ * @modified 2020. 1. 16.
  */
 class ModuleMember {
 	/**
@@ -988,6 +988,9 @@ class ModuleMember {
 				}
 			}
 			
+			$accumulation = $this->db()->select($this->table->point,'sum(point) as accumulation')->where('midx',$this->getLogged())->where('reg_date',$lists[$i]->reg_date,'<=')->getOne();
+			$lists[$i]->accumulation = $accumulation->accumulation ? $accumulation->accumulation : 0;
+			
 			$lists[$i]->reg_date = floor($lists[$i]->reg_date / 1000);
 		}
 		
@@ -1950,15 +1953,13 @@ class ModuleMember {
 		$ip = isset($_SERVER['REMOTE_ADDR']) == true ? $_SERVER['REMOTE_ADDR'] : '';
 		$agent = isset($_SERVER['HTTP_USER_AGENT']) == true ? $_SERVER['HTTP_USER_AGENT'] : '';
 		
-		$accumulation = $member->exp + $exp;
-		
-		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES),'exp'=>$exp,'accumulation'=>$accumulation,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
+		$result = $this->db()->insert($this->table->activity,array('midx'=>$member->idx,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES),'exp'=>$exp,'reg_date'=>$reg_date,'ip'=>$ip,'agent'=>$agent))->execute();
 		
 		if ($result === false) {
 			return $this->addActivity($midx,$exp,$module,$code,$content,ceil($reg_date / 1000));
 		}
 		
-		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$accumulation))->where('idx',$member->idx)->execute();
+		if ($exp > 0) $this->db()->update($this->table->member,array('exp'=>$member->exp + $exp))->where('idx',$member->idx)->execute();
 		
 		return $reg_date;
 	}
@@ -1993,13 +1994,12 @@ class ModuleMember {
 			if ($this->db()->select($this->table->point)->where('midx',$member->idx)->where('reg_date',$reg_date)->has() == false) break;
 			$reg_date++;
 		}
-		$accumulation = $member->point + $point;
 		
-		$result = $this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES),'accumulation'=>$accumulation,'reg_date'=>$reg_date))->execute();
+		$result = $this->db()->insert($this->table->point,array('midx'=>$member->idx,'point'=>$point,'module'=>$module,'code'=>$code,'content'=>json_encode($content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES),'reg_date'=>$reg_date))->execute();
 		if ($result === false) {
 			return $this->sendPoint($midx,$point,$module,$code,$content,$isForce,ceil($reg_date / 1000));
 		}
-		$this->db()->update($this->table->member,array('point'=>$accumulation))->where('idx',$member->idx)->execute();
+		$this->db()->update($this->table->member,array('point'=>$member->point + $point))->where('idx',$member->idx)->execute();
 		
 		return true;
 	}

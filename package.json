@@ -111,12 +111,6 @@
 					"default":0,
 					"comment":"획득경험치"
 				},
-				"accumulation":{
-					"type":"int",
-					"length":11,
-					"default":0,
-					"comment":"누적경험치"
-				},
 				"content":{
 					"type":"text",
 					"is_null":true,
@@ -412,12 +406,6 @@
 					"length":11,
 					"default":0,
 					"comment":"적립포인트"
-				},
-				"accumulation":{
-					"type":"int",
-					"length":11,
-					"default":0,
-					"comment":"누적포인트"
 				},
 				"content":{
 					"type":"text",
