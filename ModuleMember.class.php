@@ -310,7 +310,7 @@ class ModuleMember {
 	 * @param string $context 설정대상 컨텍스트명
 	 * @return object[] $configs 환경설정
 	 */
-	function getContextConfigs($site,$context) {
+	function getContextConfigs($site,$values,$context) {
 		$configs = array();
 		
 		if ($context == 'signup') {
@@ -319,12 +319,13 @@ class ModuleMember {
 			$label->name = 'label';
 			$label->type = 'select';
 			$label->data = array();
+			$label->data[] = array('',$this->getText('text/select_label'));
 			$label->data[] = array(0,$this->getText('text/no_label'));
 			$labels = $this->db()->select($this->table->label,'idx,title')->get();
 			for ($i=0, $loop=count($labels);$i<$loop;$i++) {
 				$label->data[] = array($labels[$i]->idx,$labels[$i]->title);
 			}
-			$label->value = 0;
+			$label->value = '';
 			$configs[] = $label;
 		}
 		
