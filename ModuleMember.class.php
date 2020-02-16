@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 1. 16.
+ * @modified 2020. 2. 17.
  */
 class ModuleMember {
 	/**
@@ -306,6 +306,7 @@ class ModuleMember {
 	 * [사이트관리자] 모듈의 컨텍스트 환경설정을 구성한다.
 	 *
 	 * @param object $site 설정대상 사이트
+	 * @param object $values 설정값
 	 * @param string $context 설정대상 컨텍스트명
 	 * @return object[] $configs 환경설정
 	 */
@@ -331,6 +332,7 @@ class ModuleMember {
 		$templet->title = $this->IM->getText('text/templet');
 		$templet->name = 'templet';
 		$templet->type = 'templet';
+		$templet->target = 'member';
 		$templet->use_default = true;
 		$templet->value = $values != null && isset($values->templet) == true ? $values->templet : '#';
 		$configs[] = $templet;
@@ -640,13 +642,14 @@ class ModuleMember {
 		if ($this->getModule()->getConfig('allow_signup') == false) return $this->getError('NOT_ALLOWED_SIGNUP');
 		
 		$step = $this->getView() !== null ? $this->getView() : 'start';
-		$label = $this->getIdx() !== null ? $this->getIdx() : null;
+		$label = $configs != null && isset($configs->label) == true && strlen($configs->label) > 0 ? $configs->label : null;
+		$label = $this->getIdx() !== null ? $this->getIdx() : $label;
 		
 		if ($this->isLogged() == true && $step != 'complete') return $this->getError('ALREADY_LOGGED');
 		if ($step == 'complete' && $this->isLogged() == false) return $this->getError('FORBIDDEN');
 		
 		if ($step == 'start') {
-			if ($label == null && $this->db()->select($this->table->label)->where('allow_signup','TRUE')->count() > 0) {
+			if ($label === null && $this->db()->select($this->table->label)->where('allow_signup','TRUE')->count() > 0) {
 				$labels = $this->db()->select($this->table->label)->where('allow_signup','TRUE')->orderBy('sort','asc')->get();
 				
 				$header = PHP_EOL.'<form id="ModuleMemberSignUpForm" method="post">'.PHP_EOL;
@@ -654,7 +657,7 @@ class ModuleMember {
 				$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>Member.signup.init();</script>'.PHP_EOL;
 				
 				return $this->getTemplet($configs)->getContext('signup',get_defined_vars(),$header,$footer);
-			} elseif ($label == null) {
+			} elseif ($label === null) {
 				$label = 0;
 			}
 			
@@ -666,7 +669,7 @@ class ModuleMember {
 				header("location:".$this->getUrl('register',$label));
 				exit;
 			}
-		} elseif ($label == null) {
+		} elseif ($label === null) {
 			$label = 0;
 		}
 		

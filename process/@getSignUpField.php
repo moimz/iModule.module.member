@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 9.
+ * @modified 2020. 2. 17.
  */
 if (defined('__IM__') == false) exit;
 
@@ -35,6 +35,10 @@ if ($data == null) {
 	if (in_array($data->input,array('select','radio','checkbox')) == true) {
 		$data->options = $configs->options;
 		if ($data->input == 'checkbox') $data->max = $configs->max;
+	}
+	
+	if (in_array($data->type,array('agreement','privacy')) == true) {
+		$data->content = $configs->content;
 	}
 	
 	$results->success = true;

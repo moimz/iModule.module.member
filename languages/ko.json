@@ -10,6 +10,7 @@
 		"help":"패스워드찾기",
 		"label":"회원라벨",
 		"no_label":"라벨없음",
+		"select_label":"라벨선택",
 		"all_label":"전체라벨",
 		"male":"남성",
 		"female":"여성",
@@ -224,7 +225,7 @@
 			},
 			"form":{
 				"name":"필드명",
-				"name_help":"데이터를 저장할 변수명을 설정합니다. (<?php echo $member->필드명; ?> 으로 해당 필드의 데이터를 가져옵니다.",
+				"name_help":"데이터를 저장할 변수명을 설정합니다. (&lt;?php echo $member->필드명; ?&gt; 으로 해당 필드의 데이터를 가져옵니다.",
 				"name_etc_help":"영어소문자 및 언더바(_)만 입력가능합니다.",
 				"input":"필드종류",
 				"title":"필드제목",

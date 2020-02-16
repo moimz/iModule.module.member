@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2017. 11. 30.
+ * @modified 2020. 2. 17.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -46,7 +46,7 @@ if (defined('__IM__') == false) exit;
 				</article>
 				
 				<div data-role="input">
-					<label><input type="checkbox" name="<?php echo $agreement->name; ?>" value="<?php echo $privacy->value; ?>"><?php echo $privacy->help; ?></label>
+					<label><input type="checkbox" name="<?php echo $agreement->name; ?>" value="<?php echo $agreement->value; ?>"><?php echo $agreement->help; ?></label>
 				</div>
 				<?php } ?>
 				

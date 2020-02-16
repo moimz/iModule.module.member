@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 9. 18.
+ * @modified 2020. 2. 17.
  */
 var Member = {
 	login:function(midx,name) {
@@ -794,12 +794,13 @@ var Member = {
 				modal:true,
 				width:800,
 				border:false,
-				autoScroll:true,
+				layout:"fit",
 				items:[
 					new Ext.form.Panel({
 						id:"ModuleMemberAddFieldForm",
 						border:false,
 						bodyPadding:"10 10 0 10",
+						autoScroll:true,
 						fieldDefaults:{labelAlign:"right",labelWidth:100,anchor:"100%",allowBlank:true},
 						items:[
 							new Ext.form.Hidden({
@@ -820,21 +821,14 @@ var Member = {
 										disabled:oName ? true : false,
 										store:new Ext.data.ArrayStore({
 											fields:["display","value"],
-											data:[
-												[Member.getText("admin/field/type/agreement"),"agreement"],
-												[Member.getText("admin/field/type/privacy"),"privacy"],
-												[Member.getText("admin/field/type/email"),"email"],
-												[Member.getText("admin/field/type/password"),"password"],
-												[Member.getText("admin/field/type/name"),"name"],
-												[Member.getText("admin/field/type/nickname"),"nickname"],
-												[Member.getText("admin/field/type/birthday"),"birthday"],
-												[Member.getText("admin/field/type/telephone"),"telephone"],
-												[Member.getText("admin/field/type/cellphone"),"cellphone"],
-												[Member.getText("admin/field/type/homepage"),"homepage"],
-												[Member.getText("admin/field/type/gender"),"gender"],
-												[Member.getText("admin/field/type/address"),"address"],
-												[Member.getText("admin/field/type/etc"),"etc"]
-											]
+											data:(function() {
+												var datas = [];
+												for (var type in Member.getText("admin/field/type")) {
+													datas.push([Member.getText("admin/field/type/"+type),type]);
+												}
+												
+												return datas;
+											})()
 										}),
 										editable:false,
 										displayField:"display",
@@ -883,19 +877,14 @@ var Member = {
 								fieldLabel:Member.getText("admin/field/form/input"),
 								store:new Ext.data.ArrayStore({
 									fields:["display","value"],
-									data:[
-										[Member.getText("admin/field/input/text"),"text"],
-										[Member.getText("admin/field/input/select"),"select"],
-										[Member.getText("admin/field/input/radio"),"radio"],
-										[Member.getText("admin/field/input/checkbox"),"checkbox"],
-										[Member.getText("admin/field/input/email"),"email"],
-										[Member.getText("admin/field/input/password"),"password"],
-										[Member.getText("admin/field/input/date"),"date"],
-										[Member.getText("admin/field/input/url"),"url"],
-										[Member.getText("admin/field/input/tel"),"tel"],
-										[Member.getText("admin/field/input/textarea"),"textarea"],
-										[Member.getText("admin/field/input/address"),"address"]
-									]
+									data:(function() {
+										var datas = [];
+										for (var type in Member.getText("admin/field/input")) {
+											datas.push([Member.getText("admin/field/input/"+type),type]);
+										}
+										
+										return datas;
+									})()
 								}),
 								editable:false,
 								displayField:"display",
