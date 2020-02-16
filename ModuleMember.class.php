@@ -325,7 +325,7 @@ class ModuleMember {
 			for ($i=0, $loop=count($labels);$i<$loop;$i++) {
 				$label->data[] = array($labels[$i]->idx,$labels[$i]->title);
 			}
-			$label->value = '';
+			$label->value = $values != null && isset($values->label) == true ? $values->label : '';
 			$configs[] = $label;
 		}
 		
