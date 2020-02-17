@@ -1869,7 +1869,7 @@ class ModuleMember {
 		/**
 		 * 추가하고자 하는 라벨이 UNIQUE 라벨일 경우 모든 라벨을 지운다.
 		 */
-		if ($label->is_unique == true) $this->deleteMemberLabel($midx);
+		if ($label->is_unique == true) $this->removeMemberLabel($midx);
 		
 		$this->db()->insert($this->table->member_label,array('idx'=>$midx,'label'=>$label->idx,'reg_date'=>time()))->execute();
 		$this->updateLabel($label->idx);
@@ -1884,7 +1884,7 @@ class ModuleMember {
 	 * @param int $label(옵션) 회원라벨고유번호 (없을 경우 모든 라벨을 지운다.)
 	 * @return boolean $success 제거여부
 	 */
-	function deleteMemberLabel($midx,$label=null) {
+	function removeMemberLabel($midx,$label=null) {
 		/**
 		 * 대상회원의 라벨정보를 가져온다.
 		 */
