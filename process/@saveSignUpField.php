@@ -8,11 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 9.
+ * @modified 2020. 2. 17.
  */
 if (defined('__IM__') == false) exit;
 
-$reservation = array('idx','domain','type','email','password','code','name','nickname','homepage','telephone','cellphone','gender','birthday','zipcode','address','exp','point','last_login','leave_date','status','etc','level','photo');
+$reservation = array('idx','domain','type','agreement','privacy','email','password','code','name','nickname','homepage','telephone','cellphone','gender','birthday','zipcode','address','exp','point','last_login','leave_date','status','etc','level','photo');
 
 $errors = array();
 $label = Request('label');
