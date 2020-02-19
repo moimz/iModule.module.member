@@ -14,7 +14,7 @@ if (defined('__IM__') == false) exit;
 $IM->loadWebFont('Roboto');
 ?>
 <div data-role="toolbar">
-	<h4>총 포인트 : <?php echo number_format($member->point); ?></h4>
+	<h4><?php echo $this->getText('text/point'); ?> : <?php echo number_format($member->point); ?></h4>
 	
 	<div data-role="input">
 		<select name="type">
@@ -30,7 +30,7 @@ $IM->loadWebFont('Roboto');
 		<span class="loopnum">번호</span>
 		<span class="title">내역</span>
 		<span class="change">변동</span>
-		<span class="accumulation">누적포인트</span>
+		<span class="accumulation">누적</span>
 		<span class="date">날짜 <i class="fa fa-caret-down"></i></span>
 	</li>
 	<?php foreach ($lists as $item) { ?>
