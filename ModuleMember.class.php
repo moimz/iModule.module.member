@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 2. 17.
+ * @modified 2020. 2. 20.
  */
 class ModuleMember {
 	/**
@@ -2886,6 +2886,17 @@ class ModuleMember {
 		$error->type = 'back';
 		
 		$this->IM->printError($error);
+	}
+	
+	/**
+	 * 회원계정을 비활성화한다.
+	 *
+	 * @param int $midx 회원고유값
+	 */
+	function deleteMember($midx) {
+		if (!$midx) return;
+		$this->removeMemberLabel($midx);
+		$this->db()->update($this->table->member,array('status'=>'LEAVE'))->where('idx',$midx)->execute();
 	}
 	
 	/**
