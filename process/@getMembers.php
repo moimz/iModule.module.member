@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 4. 21.
+ * @modified 2020. 2. 20.
  */
 if (defined('__IM__') == false) exit;
 
@@ -20,7 +20,7 @@ $dir = Request('dir') ? Request('dir') : 'DESC';
 $label = Request('label') ? Request('label') : 0;
 $keyword = Request('keyword');
 
-$lists = $this->db()->select($this->table->member.' m');
+$lists = $this->db()->select($this->table->member.' m')->where('m.status','LEAVE','!=');
 if ($label) $lists->join($this->table->member_label.' l','l.idx=m.idx','LEFT')->where('l.label',$label);
 if ($keyword) $lists->where('(m.email like ? or m.name like ? or m.nickname like ?)',array('%'.$keyword.'%','%'.$keyword.'%','%'.$keyword.'%'));
 $total = $lists->copy()->count();
