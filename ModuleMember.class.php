@@ -122,9 +122,8 @@ class ModuleMember {
 		/**
 		 * 이메일 인증을 사용하고 있고, 이메일 인증이 완료되지 않은 회원이 로그인하였을 경우
 		 */
-		if (defined('__IM_SITE__') == true && $this->getModule()->getConfig('verified_email') == true && $this->isLogged() == true && $this->getMember(null,true,false)->verified == 'FALSE') {
+		if (defined('__IM_SITE__') == true && defined('__IM_CONTAINER__') == false && $this->getModule()->getConfig('verified_email') == true && $this->isLogged() == true && $this->getMember(null,true,false)->verified == 'FALSE') {
 			header('location:'.$this->IM->getModuleUrl('member','verification'));
-			exit;
 		}
 	}
 	
