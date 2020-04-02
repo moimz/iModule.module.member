@@ -44,7 +44,7 @@ if ($LOGGED_FAIL['time'] > time()) {
 			$LOGGED_FAIL['count'] = 0;
 			$LOGGED_FAIL['time'] = time() + 60 * 5;
 		}
-	} elseif ($check->status == 'DEACTIVATED') {
+	} elseif ($check->status == 'DEACTIVATED' || $check->status == 'WAITING') {
 		$results->success = false;
 		$results->errors['email'] = $this->getErrorText('DEACTIVATED_ACCOUNT');
 	} elseif ($mHash->password_validate($password,$check->password) == false) {
