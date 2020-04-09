@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 2. 20.
+ * @modified 2020. 4. 9.
  */
 class ModuleMember {
 	/**
@@ -2443,10 +2443,10 @@ class ModuleMember {
 	 * @param &array $errors(옵션) 에러처리를 위한 배열 포인터
 	 * @param boolean $isValid 유효한지 여부
 	 */
-	function isValidMemberData($idx,$data,&$insert=null,&$errors=null,$isAdmin=false) {
+	function isValidMemberData($idx,$data,&$insert=null,&$errors=null,$isAdmin=false,$site=null) {
 		if (is_array($data) == true) $data = (object)$data;
 		
-		$siteType = $this->IM->getSite(false)->member;
+		$siteType = $site ? $site->member : $this->IM->getSite(false)->member;
 		
 		if (is_array($idx) == true) {
 			$labels = $idx;
@@ -2566,7 +2566,7 @@ class ModuleMember {
 								if (strlen($field->value) < 6) {
 									$field->error = $this->getErrorText('TOO_SHORT_PASSWORD');
 								} elseif (isset($data->password_confirm) == true && $field->value != $data->password_confirm) {
-									$field->error = $this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM').$field->value.'/'.$data->password_confirm;
+									$field->error = $this->getErrorText('NOT_MATCHED_PASSWORD_CONFIRM');
 								} else {
 									$field->value = $mHash->password_hash($field->value);
 								}

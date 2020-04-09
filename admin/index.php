@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2019. 7. 2.
+ * @modified 2020. 4. 9.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -60,6 +60,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						text:Member.getText("admin/list/add_member"),
 						iconCls:"mi mi-plus",
 						handler:function() {
+							Member.list.add();
 						}
 					})
 				],
