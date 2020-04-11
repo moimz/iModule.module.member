@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 2. 20.
+ * @modified 2020. 4. 11.
  */
 if (defined('__IM__') == false) exit;
 
@@ -27,6 +27,7 @@ $total = $lists->copy()->count();
 $lists = $lists->orderBy('m.'.$sort,$dir)->limit($start,$limit)->get();
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
 	$lists[$i]->photo = $this->IM->getModuleUrl('member','photo',$lists[$i]->idx).'/profile.jpg';
+	$lists[$i]->extras = json_decode($lists[$i]->extras);
 }
 
 $results->success = true;
