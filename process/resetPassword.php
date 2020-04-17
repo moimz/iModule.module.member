@@ -17,7 +17,7 @@ $token = Request('token');
 
 if ($token) {
 	$check = $this->db()->select($this->table->password)->where('token',$token)->getOne();
-	if ($check == null || $check->reg_date < time() - 60 * 60 * 6) return $this->getError('EXPIRED_LINK');
+	if ($check == null || $check->status == 'RESET' || $check->reg_date < time() - 60 * 60 * 6) return $this->getError('EXPIRED_LINK');
 	
 	$member = $this->getMember($check->midx);
 	if ($member->idx == 0) return $this->getError('EXPIRED_LINK');
@@ -34,6 +34,7 @@ if ($token) {
 	}
 	
 	if (count($errors) == 0) {
+		$this->db()->update($this->table->password,array('status'=>'RESET'))->where('token',$token)->execute();
 		$this->db()->update($this->table->member,array('password'=>$mHash->password_hash($password)))->where('idx',$member->idx)->execute();
 		
 		$results->success = true;

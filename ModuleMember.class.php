@@ -923,7 +923,7 @@ class ModuleMember {
 			$token = $this->getIdx();
 			
 			$check = $this->db()->select($this->table->password)->where('token',$token)->getOne();
-			if ($check == null || $check->reg_date < time() - 60 * 60 * 6) return $this->getError('EXPIRED_LINK');
+			if ($check == null || $check->status == 'RESET' || $check->reg_date < time() - 60 * 60 * 6) return $this->getError('EXPIRED_LINK');
 			
 			$member = $this->getMember($check->midx);
 			if ($member->idx == 0) return $this->getError('EXPIRED_LINK');
