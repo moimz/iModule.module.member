@@ -22,6 +22,7 @@ $checks = $this->db()->select($this->table->member,'idx,domain,password')->where
 foreach ($checks as $check) {
 	if ($mHash->password_validate($password,$check->password) == true) {
 		$user = new stdClass();
+		$user->idx = $check->idx;
 		$user->domain = $check->domain;
 		$user->token = $this->makeAuthToken($client_id,$check->idx);
 		$users[] = $user;
