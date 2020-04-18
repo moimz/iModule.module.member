@@ -1199,9 +1199,9 @@ class ModuleMember {
 			}
 		} else {
 			$data = json_decode(Decoder($token));
-			$midx = array_pop($data);
-			$client_id = array_pop($data);
-			$this->login($midx);
+			$idx = $data->idx;
+			$client_id = $data->client_id;
+			$this->login($idx);
 		}
 		
 		return true;
@@ -1534,24 +1534,6 @@ class ModuleMember {
 	}
 	
 	/**
-	 * 회원 이메일 및 패스워드가 유효한지 확인한다.
-	 *
-	 * @param string $email
-	 * @param string $password
-	 * @return boolean $isValidate
-	 */
-	function isValidate($email,$password) {
-		$siteType = $this->IM->getSite(false)->member;
-		if ($siteType == 'MERGE') $domain = '*';
-		else $domain = $this->IM->getSite()->domain;
-		
-		$check = $this->db()->select($this->table->member)->where('domain',$domain)->where('email',$email)->where('status','ACTIVATED')->getOne();
-		if ($check == null) return false;
-		$mHash = new Hash();
-		return $mHash->password_validate($password,$check->password) == true ? $check->idx : false;
-	}
-	
-	/**
 	 * 세션토큰을 생성한다.
 	 * 서로 다른 도메인간 통합로그인을 사용하기 위해 사용된다.
 	 *
@@ -1559,6 +1541,17 @@ class ModuleMember {
 	 */
 	function makeSessionToken() {
 		$token = array('idx'=>$this->getLogged(),'ip'=>ip2long($_SERVER['REMOTE_ADDR']),'lifetime'=>time() + 60);
+		return Encoder(json_encode($token),null,'hex');
+	}
+	
+	/**
+	 * API 인증토큰을 생성한다.
+	 * 회원인증이 필요한 API 호출시 사용된다.
+	 *
+	 * @return string $token
+	 */
+	function makeAuthToken($client_id,$idx) {
+		$token = array('idx'=>$this->getLogged(),'client_id'=>$client_id);
 		return Encoder(json_encode($token),null,'hex');
 	}
 	

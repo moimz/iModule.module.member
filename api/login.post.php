@@ -8,20 +8,31 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2017. 11. 22.
+ * @modified 2020. 4. 18.
  */
 if (defined('__IM__') == false) exit;
 
-$email = Request('email');
-$password = Request('password');
+$email = Param('email');
+$password = Param('password');
 $client_id = Request('client_id');
 
-$loginIdx = $this->isValidate($email,$password);
-if ($loginIdx === false) {
+$mHash = new Hash();
+$users = array();
+$checks = $this->db()->select($this->table->member,'idx,domain,password')->where('email',$email)->where('status','ACTIVATED')->get();
+foreach ($checks as $check) {
+	if ($mHash->password_validate($password,$check->password) == true) {
+		$user = new stdClass();
+		$user->domain = $check->domain;
+		$user->token = $this->makeAuthToken($client_id,$check->idx);
+		$users[] = $user;
+	}
+}
+
+if (count($users) == 0) {
 	$data->success = false;
+	$data->message = 'NOT_FOUND_USER';
 } else {
 	$data->success = true;
-	$data->idx = $loginIdx;
-	$data->access_token = $this->makeAuthToken($client_id,$loginIdx);
+	$data->users = $users;
 }
 ?>
