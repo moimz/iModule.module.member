@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 4. 9.
+ * @modified 2020. 4. 24.
  */
 class ModuleMember {
 	/**
@@ -1015,6 +1015,9 @@ class ModuleMember {
 	 * @return $html 컨텍스트 HTML
 	 */
 	function getConnectContext($configs=null) {
+		$this->IM->loadWebFont('XEIcon');
+		$this->IM->loadWebFont('FontAwesome');
+		
 		/**
 		 * 소셜 로그인 세션을 가져온다.
 		 */
@@ -1345,7 +1348,9 @@ class ModuleMember {
 			}
 		}
 		
-		header("location:".$this->IM->getRequestUri());
+		$url = explode('?',$this->IM->getRequestUri());
+		
+		header("location:".$url[0].$this->IM->getQueryString(array('session'=>''),$url[1]));
 		exit;
 	}
 	
