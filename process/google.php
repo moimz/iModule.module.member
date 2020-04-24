@@ -8,15 +8,15 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 6.
+ * @modified 2020. 4. 24.
  */
 if (defined('__IM__') == false) exit;
 
 $site = $this->db()->select($this->table->social_oauth)->where('site',$action)->where('domain',array('*',$this->IM->domain),'IN')->orderBy('domain','desc')->getOne();
 if ($site == null) $this->printError('OAUTH_API_ERROR',null,null,true);
 
-$_auth_url = 'https://accounts.google.com/o/oauth2/auth';
-$_token_url = 'https://accounts.google.com/o/oauth2/token';
+$_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth';
+$_token_url = 'https://oauth2.googleapis.com/token';
 
 $oauth = new OAuthClient();
 $oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setScope($site->scope)->setAccessType('offline')->setAuthUrl($_auth_url)->setTokenUrl($_token_url)->setApprovalPrompt('auto');
@@ -46,22 +46,16 @@ if ($_logged == null) {
 	$this->printError('OAUTH_API_ERROR',null,null,true);
 }
 
-$data = $oauth->get('https://www.googleapis.com/plus/v1/people/me');
-if ($data === false || empty($data->emails) == true) $this->printError('OAUTH_API_ERROR');
+$data = $oauth->get('https://www.googleapis.com/oauth2/v2/userinfo');
+if ($data === false || empty($data->email) == true) $this->printError('OAUTH_API_ERROR');
 
 $_logged->user = new stdClass();
 $_logged->user->id = $data->id;
-$_logged->user->name = $data->displayName;
-$_logged->user->nickname = $data->displayName;
+$_logged->user->email = $data->email;
+$_logged->user->name = $data->name;
+$_logged->user->nickname = $data->name;
 
-for ($i=0, $loop=count($data->emails);$i<$loop;$i++) {
-	if ($data->emails[$i]->type == 'account') {
-		$_logged->user->email = $data->emails[$i]->value;
-		break;
-	}
-}
-
-$_logged->user->photo = str_replace('sz=50','sz=250',$data->image->url);
+$_logged->user->photo = str_replace('sz=50','sz=250',$data->picture);
 
 $_logged->token = new stdClass();
 $_logged->token->access = $oauth->getAccessToken();
