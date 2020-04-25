@@ -1015,9 +1015,6 @@ class ModuleMember {
 	 * @return $html 컨텍스트 HTML
 	 */
 	function getConnectContext($configs=null) {
-		$this->IM->loadWebFont('XEIcon');
-		$this->IM->loadWebFont('FontAwesome');
-		
 		/**
 		 * 소셜 로그인 세션을 가져온다.
 		 */

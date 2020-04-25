@@ -7,16 +7,17 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 4. 10.
+ * @modified 2020. 4. 26.
  */
 body {background:#f2f3f5;}
 div[data-module=member] {width:100%; height:100%;}
-div[data-module=member] > header {height:60px; font-size:0; background:#2196f3; color:#fff;}
+div[data-module=member] > header {display:block; width:100%; height:60px; font-size:0; background:#2196f3; color:#fff; position:fixed; top:0; left:0; z-index:10;}
 div[data-module=member] > header > div.container > h1 {height:60px; line-height:60px; width:calc(100% - 60px); font-size:18px; display:inline-block; vertical-align:middle; box-sizing:border-box;}
 div[data-module=member] > header > div.container > button {width:60px; height:60px; vertical-align:middle; background:rgba(0,0,0,0.1); cursor:pointer; font-size:32px; border:0; color:#fff;}
 div[data-module=member] > header > div.container > button:hover {background:rgba(0,0,0,0.2);}
 
-div[data-module=member] > div.container {padding-top:10px; padding-bottom:10px;}
+div[data-module=member] > div.container {padding-top:20px; padding-bottom:20px;}
+div[data-module=member] > header + div.container {padding-top:80px;}
 div[data-module=member] > div.center {width:100%; height:100%;}
 div[data-module=member] > div.center > form {width:100%; height:100%;}
 div[data-module=member] > div.center > form > section.box {width:100%; height:100%; display:table;}

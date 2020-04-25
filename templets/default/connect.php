@@ -18,7 +18,7 @@ $IM->loadWebFont('XEIcon');
 		<div>
 			<?php if ($type == 'login') { ?>
 			<ul class="connect">
-				<li class="icon"><i class="xi <?php echo $logged->site->site; ?>"></i><i class="photo" style="background-image:url(<?php echo $logged->user->photo; ?>);"></i></li>
+				<li class="icon"><i class="site" data-social="<?php echo $logged->site->site; ?>"></i><i class="photo" style="background-image:url(<?php echo $logged->user->photo; ?>);"></i></li>
 				<li class="link"><i class="xi xi-link"></i></li>
 				<li class="icon"><i class="site" style="background-image:url(<?php echo $IM->getSiteEmblem(); ?>);"></i><i class="photo" style="background-image:url(<?php echo $member->photo; ?>);"></i></li>
 			</ul>

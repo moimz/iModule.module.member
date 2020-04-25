@@ -34,7 +34,8 @@
 		"google":"구글",
 		"naver":"네이버",
 		"kakao":"카카오",
-		"github":"깃허브"
+		"github":"깃허브",
+		"slack":"슬랙"
 	},
 	"type":{
 		"MEMBER":"일반회원",

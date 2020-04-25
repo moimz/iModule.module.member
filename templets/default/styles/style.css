@@ -65,19 +65,19 @@ div[data-module=member][data-context=modify] ul[data-role=form].social > li > di
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social] > i.disconnect:before {content:"\ec26";}
 
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=google] {background:#da483f; color:#fff;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=google] > i.site:before {content:"\ef01";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=google] > i.site:before {content:"\ee00";}
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=facebook] {background:#4367b0; color:#fff;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=facebook] > i.site:before {content:"\ef02";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=facebook] > i.site:before {content:"\ee02";}
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=twitter] {background:#25a0ef; color:#fff;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=twitter] > i.site:before {content:"\ef03";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=twitter] > i.site:before {content:"\ee03";}
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=naver] {background:#15c642; color:#fff;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=naver] > i.site:before {content:"\ef04";}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=naver] > i.site:before {content:"\ee04";}
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=github] {background:#555; color:#fff;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=github] > i.site:before {content:"\ef05"; font-size:24px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=github] > i.site:before {content:"\ee05"; font-size:24px;}
 div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=kakao] {background:#fddc2f; color:#3b1f1f;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=kakao] > i.site:before {content:"\ef06"; font-size:24px;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=slack] {font-family:FontAwesome; background:#611f69; color:#3b1f1f;}
-div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=slack] > i.site:before {content:"\f198"; font-size:24px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=kakao] > i.site:before {content:"\ee06"; font-size:24px;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=slack] {background:#611f69; color:#fff;}
+div[data-module=member][data-context=modify] ul[data-role=form].social > li > div > *[data-social=slack] > i.site:before {content:"\ee08"; font-size:20px;}
 
 /**
  * 회원사진 수정 모달
@@ -146,24 +146,23 @@ div[data-module=member][data-context=connect] section.box > div > div {margin:50
 
 div[data-module=member][data-context=connect] section.box > div > div > ul.connect {list-style:none; width:200px; height:80px; display:block; margin:20px auto; font-size:0;}
 div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li {height:80px; display:inline-block; vertical-align:middle;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon {width:80px; position:relative;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon {width:80px; position:relative; font-size:20px; font-family:moimz;}
 div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.link {width:40px; line-height:80px; text-align:center;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.link > i {font-size:20px;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi {display:block; width:30px; height:30px; position:absolute; font-size:20px; border-radius:50%; top:-5px; left:-5px; text-align:center; line-height:30px;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.facebook {background:#4367b0; color:#fff;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.facebook:before {content:"\e819";}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.google {background:#da483f; color:#fff;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.google:before {content:"\e81a";}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.naver {background:#15c642; color:#fff;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.naver:before {content:"\e820";}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.kakao {background:#fddc2f; color:#3b1f1f;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.kakao:before {content:"\e899";}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.github {background:#444; color:#fff;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.github:before {content:"\e82e";}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.slack {font-family:FontAwesome; background:#611f69; color:#fff;}
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.xi.slack:before {content:"\f198";}
-
-div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site {display:block; width:30px; height:30px; position:absolute; font-size:20px; border-radius:50%; top:-5px; left:-5px; text-align:center; line-height:30px; background-color:#fff; background-size:contain; background-position:50% 50%; background-repeat:no-repeat; border:1px solid #ccc; box-sizing:border-box; box-shadow:1px 1px 3px rgba(0,0,0,0.3);}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site {display:block; width:30px; height:30px; position:absolute; font-size:20px; border-radius:50%; top:-5px; left:-5px; text-align:center; line-height:30px; background-color:#fff; background-size:contain; background-position:50% 50%; background-repeat:no-repeat; border:1px solid #ccc; box-sizing:border-box; box-shadow:1px 1px 3px rgba(0,0,0,0.3); font-family:moimz; font-style:normal;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=google] {background:#da483f; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=google]:before {content:"\ee00";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=facebook] {background:#4367b0; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=facebook]:before {content:"\ee02";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=twitter] {background:#25a0ef; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=twitter]:before {content:"\ee03";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=naver] {background:#15c642; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=naver]:before {content:"\ee04";}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=github] {background:#555; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=github]:before {content:"\ee05"; font-size:24px;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=kakao] {background:#fddc2f; color:#3b1f1f;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=kakao]:before {content:"\ee06"; font-size:24px;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=slack] {background:#611f69; color:#fff;}
+div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.site[data-social=slack]:before {content:"\ee08";}
 
 div[data-module=member][data-context=connect] section.box > div > div > ul.connect > li.icon > i.photo {display:block; width:80px; height:80px; box-sizing:border-box; border-radius:50%; background-repeat:no-repeat; background-size:cover; background-position:50% 50%; box-sizing:border-box; border:1px solid #ccc;}
 
