@@ -1200,14 +1200,18 @@ class ModuleMember {
 		
 				exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
 			}
-		} else {
-			$data = json_decode(Decoder($token));
+			
+			return true;
+		} elseif (Decoder($token,null,'hex') !== false) {
+			$data = json_decode(Decoder($token,null,'hex'));
 			$idx = $data->idx;
 			$client_id = $data->client_id;
 			$this->login($idx);
+			
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	/**
@@ -1556,7 +1560,7 @@ class ModuleMember {
 	 * @return string $token
 	 */
 	function makeAuthToken($client_id,$idx) {
-		$token = array('idx'=>$this->getLogged(),'client_id'=>$client_id);
+		$token = array('idx'=>$idx,'client_id'=>$client_id);
 		return Encoder(json_encode($token),null,'hex');
 	}
 	
