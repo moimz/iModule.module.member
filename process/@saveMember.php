@@ -45,8 +45,6 @@ if ($isValid && count($errors) == 0) {
 	if ($idx) {
 		$this->db()->update($this->table->member,$insert)->where('idx',$idx)->execute();
 	} else {
-		
-		
 		if ($site->member == 'UNIVERSAL') $insert['domain'] = '*';
 		else $insert['domain'] = $site->domain;
 		$insert['type'] = 'MEMBER';
