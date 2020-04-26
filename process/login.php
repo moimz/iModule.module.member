@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 6.
+ * @modified 2020. 4. 27.
  */
 if (defined('__IM__') == false) exit;
 
@@ -57,7 +57,7 @@ if ($LOGGED_FAIL['time'] > time()) {
 		}
 	} else {
 		$LOGGED_FAIL = array('count'=>0,'time'=>0);
-		$this->login($check->idx);
+		$this->login($check->idx,false);
 		if ($remember == true) $this->makeCookie();
 		
 		$results->success = true;
