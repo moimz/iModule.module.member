@@ -362,7 +362,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 									}),
 									"-",
 									new Ext.Button({
-										text:'<i class="fa fa-refresh"></i>',
+										iconCls:"x-tbar-loading",
 										handler:function() {
 											Ext.getCmp("ModuleMemberLabelList").getStore().reload();
 										}
@@ -515,7 +515,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 							}),
 							"-",
 							new Ext.Button({
-								text:'<i class="fa fa-refresh"></i>',
+								iconCls:"x-tbar-loading",
 								handler:function() {
 									Ext.getCmp("ModuleMemberSignUpFieldList").getStore().reload();
 								}
