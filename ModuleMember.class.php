@@ -1720,12 +1720,12 @@ class ModuleMember {
 		if ($is_exact == true) {
 			if ($mode == 'NAME') $midxes->where('name',$keyword);
 			elseif ($mode == 'NICKNAME') $midxes->where('nickname',$keyword);
-			elseif ($mode == 'NAME') $midxes->where('(name = ? or nickname = ?)',array($keyword,$keyword));
+			elseif ($mode == 'BOTH') $midxes->where('(name = ? or nickname = ?)',array($keyword,$keyword));
 		} else {
 			$keyword = '%'.$keyword.'%';
 			if ($mode == 'NAME') $midxes->where('name',$keyword,'LIKE');
 			elseif ($mode == 'NICKNAME') $midxes->where('nickname',$keyword,'LIKE');
-			elseif ($mode == 'NAME') $midxes->where('(name like ? or nickname like ?)',array($keyword,$keyword));
+			elseif ($mode == 'BOTH') $midxes->where('(name like ? or nickname like ?)',array($keyword,$keyword));
 		}
 		
 		return $midxes->get('idx');
