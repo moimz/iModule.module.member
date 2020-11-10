@@ -31,12 +31,12 @@ div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > label:e
 div[data-widget=member-login][data-templet=bar][data-thema=dark] ul[data-role=bar] > li > button {color:#fff;}
 div[data-widget=member-login][data-templet=bar][data-thema=dark] ul[data-role=bar] > li > button > i {border-color:#222;}
 div[data-widget=member-login][data-templet=bar][data-thema=dark] ul[data-role=bar] > li > button[data-action=push] > i:before {content:"\ef01";}
-div[data-widget=member-login][data-templet=bar][data-thema=dark] ul[data-role=bar] > li > button[data-action=message] > i:before {content:"\ef03";}
+div[data-widget=member-login][data-templet=bar][data-thema=dark] ul[data-role=bar] > li > button[data-action=message] > i:before {content:"\ef07";}
 
 div[data-widget=member-login][data-templet=bar][data-thema=light] ul[data-role=bar] > li > button {color:#000;}
 div[data-widget=member-login][data-templet=bar][data-thema=light] ul[data-role=bar] > li > button > i {border-color:#ccc;}
 div[data-widget=member-login][data-templet=bar][data-thema=light] ul[data-role=bar] > li > button[data-action=push] > i:before {content:"\ef02";}
-div[data-widget=member-login][data-templet=bar][data-thema=light] ul[data-role=bar] > li > button[data-action=message] > i:before {content:"\ef04";}
+div[data-widget=member-login][data-templet=bar][data-thema=light] ul[data-role=bar] > li > button[data-action=message] > i:before {content:"\ef08";}
 
 
 div[data-widget=member-login][data-templet=bar] ul[data-role=bar] > li > div[data-role=layer] {position:absolute; top:40px; left:0; border:1px solid transparent; background:#fff; box-sizing:border-box; z-index:5; box-shadow:0px 1px 4px rgba(0,0,0,0.2); display:none;}
