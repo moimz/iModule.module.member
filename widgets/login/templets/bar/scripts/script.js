@@ -3,7 +3,7 @@
  *
  * 로그인 위젯 가로바 템플릿 UI 처리
  * 
- * @file /modules/member/widgets/login/scripts/script.js
+ * @file /modules/member/widgets/login/templets/bar/scripts/script.js
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
