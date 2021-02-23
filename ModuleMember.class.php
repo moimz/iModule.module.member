@@ -1543,9 +1543,11 @@ class ModuleMember {
 	 * 세션토큰을 생성한다.
 	 * 서로 다른 도메인간 통합로그인을 사용하기 위해 사용된다.
 	 *
+	 * @param int $midx 회원고유값
 	 * @return string $token
 	 */
-	function makeSessionToken() {
+	function makeSessionToken($midx=null) {
+		$midx = $midx == null ? $this->getLogged() : $midx;
 		$token = array('idx'=>$this->getLogged(),'ip'=>ip2long($_SERVER['REMOTE_ADDR']),'lifetime'=>time() + 60);
 		return Encoder(json_encode($token),null,'hex');
 	}

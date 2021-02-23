@@ -25,6 +25,7 @@ foreach ($checks as $check) {
 		$user->idx = $check->idx;
 		$user->domain = $check->domain;
 		$user->token = $this->makeAuthToken($client_id,$check->idx);
+		$user->session_token = $this->makeSessionToken($check->idx);
 		$users[] = $user;
 	}
 }
