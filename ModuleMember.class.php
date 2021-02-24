@@ -2910,6 +2910,9 @@ class ModuleMember {
 			switch ($data->code) {
 				case 'ADMIN' :
 					return '관리자 적립 ('.$data->content->content.')';
+					
+				case 'signup' :
+					return '회원가입 포인트';
 			}
 			
 			return json_encode($data);
