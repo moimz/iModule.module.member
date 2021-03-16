@@ -1620,7 +1620,7 @@ var Member = {
 				step.getAt(step.findExact("step","complete")).set("sort",step.getCount());
 				continue;
 			}
-//			if (stepSort.agreement !== undefined)
+			
 			break;
 		}
 		
