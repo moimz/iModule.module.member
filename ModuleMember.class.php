@@ -2908,7 +2908,7 @@ class ModuleMember {
 	function syncMember($action,$data) {
 		if ($action == 'point_history') {
 			switch ($data->code) {
-				case 'ADMIN' :
+				case 'admin' :
 					return '관리자 적립 ('.$data->content->content.')';
 					
 				case 'signup' :

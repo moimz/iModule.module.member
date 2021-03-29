@@ -16,7 +16,7 @@ $idx = Request('idx');
 $point = Request('point');
 $content = Request('content');
 
-$this->sendPoint($idx,$point,'member','ADMIN',array('content'=>$content,'from'=>$this->getLogged()),true);
+$this->sendPoint($idx,$point,'member','admin',array('content'=>$content,'from'=>$this->getLogged()),true);
 
 $results->success = true;
 ?>
