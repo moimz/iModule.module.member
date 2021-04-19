@@ -74,7 +74,7 @@ div[data-widget=member-login][data-templet=default] section.logged > div[data-ro
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button > button:last-child {margin-right:0;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > h6 > div.button > button:last-child:after {display:none;}
 
-div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul {list-style:none; width:100%; display:block;}
+div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul {list-style:none; width:100%; max-height:300px; display:block; overflow-y:scroll;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li {border-top:1px solid #dddfe2; font-size:0;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li.title {background:#f5f6f7; padding-left:8px; height:24px; line-height:24px; color:#666; font-size:12px;}
 div[data-widget=member-login][data-templet=default] section.logged > div[data-role=layer] > ul > li.loading {height:100px; line-height:100px; text-align:center; color:#999; font-size:16px;}
