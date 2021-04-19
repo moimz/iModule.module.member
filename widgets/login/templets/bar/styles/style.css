@@ -97,7 +97,7 @@ div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[d
 
 
 
-div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > h6 {font-size:0; height:30px; padding:0px 8px; margin:0;}
+div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > h6 {font-size:0; height:30px; padding:0px 8px; margin:0; border-bottom:1px solid #dddfe2;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > h6 > div {display:inline-block; height:30px; line-height:30px; font-size:12px;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > h6 > div.button {float:right; font-size:0; line-height:1;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > h6 > div.button > button {border:0; background:transparent; height:20px; line-height:20px; margin:5px; color:#2196F3; font-size:12px; position:relative; cursor:pointer;}
@@ -107,6 +107,7 @@ div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[d
 
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > ul {list-style:none; width:100%; height:calc(100% - 30px - 30px); overflow-y:auto; display:block;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > ul > li {border-top:1px solid #dddfe2; font-size:0;}
+div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > ul > li:first-child {border-top:0;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > ul > li.title {background:#f5f6f7; padding-left:8px; height:24px; line-height:24px; color:#666; font-size:12px;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > ul > li.loading {height:100px; line-height:100px; text-align:center; color:#999; font-size:16px;}
 div[data-widget=member-login][data-templet=bar] div[data-role=layer] > section[data-role=push] > ul > li.message {height:100px; line-height:100px; text-align:center; color:#999; font-size:12px;}
