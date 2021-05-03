@@ -660,7 +660,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					itemcontextmenu:function(grid,record,item,index,e) {
 						var menu = new Ext.menu.Menu();
 						
-						menu.add('<div class="x-menu-title">'+record.data.content+'</div>');
+						menu.add('<div class="x-menu-title">'+record.data.member+'</div>');
 						
 						menu.add({
 							iconCls:"xi xi-form",

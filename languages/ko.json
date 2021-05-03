@@ -125,10 +125,20 @@
 			}
 		},
 		"point":{
-			"history":"포인트 내역",
+			"title":"포인트내역",
+			"history":"포인트 적립내역",
 			"add":"포인트 적립",
-			"point":"적립 포인트",
-			"accumulation":"누적 포인트"
+			"keyword":"회원성명/닉네임/이메일주소",
+			"grid_help":"항목 더블클릭 : 회원별 적립내역 / 항목 우클릭 : 메뉴",
+			"columns":{
+				"reg_date":"적립일시",
+				"module":"모듈명",
+				"code":"코드적립",
+				"content":"적립사유",
+				"member":"대상회원",
+				"point":"적립 포인트",
+				"accumulation":"누적 포인트"
+			}
 		},
 		"label":{
 			"add":"라벨추가",
