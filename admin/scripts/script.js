@@ -633,14 +633,6 @@ var Member = {
 							}
 						})
 					})
-				],
-				buttons:[
-					new Ext.Button({
-						text:Admin.getText("button/close"),
-						handler:function() {
-							Ext.getCmp("ModuleMemberPointHistoryWindow").close();
-						}
-					})
 				]
 			}).show();
 		}
@@ -730,14 +722,6 @@ var Member = {
 								}
 							}
 						})
-					})
-				],
-				buttons:[
-					new Ext.Button({
-						text:Admin.getText("button/close"),
-						handler:function() {
-							Ext.getCmp("ModuleMemberActivityHistoryWindow").close();
-						}
 					})
 				]
 			}).show();
