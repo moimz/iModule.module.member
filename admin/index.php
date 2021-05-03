@@ -223,6 +223,14 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						menu.add("-");
 						
 						menu.add({
+							iconCls:"xi xi-time-back",
+							text:Member.getText("admin/activity/history"),
+							handler:function() {
+								Member.activity.history(record.data.idx);
+							}
+						});
+						
+						menu.add({
 							iconCls:"xi xi-user-lock",
 							text:Member.getText("admin/login"),
 							handler:function() {
@@ -665,6 +673,121 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						menu.add({
 							iconCls:"xi xi-form",
 							text:Member.getText("admin/point/history"),
+							handler:function() {
+								Member.point.history(record.data.midx);
+							}
+						});
+						
+						e.stopEvent();
+						menu.showAt(e.getXY());
+					}
+				}
+			}),
+			new Ext.grid.Panel({
+				id:"ModuleMemberActivityList",
+				title:Member.getText("admin/activity/title"),
+				iconCls:"xi xi-time-back",
+				border:false,
+				tbar:[
+					Admin.searchField("ModuleMemberActivityKeyword",200,Member.getText("admin/activity/keyword"),function(keyword) {
+						Ext.getCmp("ModuleMemberActivityList").getStore().getProxy().setExtraParam("keyword",keyword);
+						Ext.getCmp("ModuleMemberActivityList").getStore().loadPage(1);
+					})
+				],
+				store:new Ext.data.JsonStore({
+					proxy:{
+						type:"ajax",
+						simpleSortMode:true,
+						url:ENV.getProcessUrl("member","@getActivities"),
+						reader:{type:"json"}
+					},
+					remoteSort:true,
+					sorters:[{property:"reg_date",direction:"DESC"}],
+					autoLoad:true,
+					pageSize:50,
+					fields:[""],
+					listeners:{
+						load:function(store,records,success,e) {
+							if (success == false) {
+								if (e.getError()) {
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+								} else {
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+								}
+							}
+						}
+					}
+				}),
+				columns:[{
+					text:Member.getText("admin/activity/columns/module"),
+					width:120,
+					dataIndex:"module_title"
+				},{
+					text:Member.getText("admin/activity/columns/code"),
+					width:140,
+					dataIndex:"code"
+				},{
+					text:Member.getText("admin/activity/columns/content"),
+					minWidth:200,
+					flex:1,
+					dataIndex:"content"
+				},{
+					text:Member.getText("admin/activity/columns/member"),
+					width:140,
+					dataIndex:"member",
+					renderer:function(value,p,record) {
+						return '<i style="display:inline-block; width:26px; height:26px; vertical-align:middle; background:url('+record.data.photo+') no-repeat 50% 50%; background-size:cover; border-radius:50%; border:1px solid #ccc; box-sizing:border-box; margin:-4px 5px -3px -5px;"></i>' + value;
+					}
+				},{
+					text:Member.getText("admin/activity/columns/reg_date"),
+					width:140,
+					dataIndex:"reg_date",
+					renderer:function(value) {
+						return moment(value).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
+					}
+				},{
+					text:Member.getText("admin/activity/columns/exp"),
+					width:100,
+					dataIndex:"exp",
+					align:"right",
+					renderer:function(value) {
+						return Ext.util.Format.number(value,"0,000");
+					}
+				},{
+					text:Member.getText("admin/activity/columns/accumulation"),
+					width:100,
+					dataIndex:"accumulation",
+					align:"right",
+					renderer:function(value) {
+						return Ext.util.Format.number(value,"0,000");
+					}
+				}],
+				selModel:new Ext.selection.CheckboxModel(),
+				bbar:new Ext.PagingToolbar({
+					store:null,
+					displayInfo:false,
+					items:[
+						"->",
+						{xtype:"tbtext",text:Member.getText("admin/activity/grid_help")}
+					],
+					listeners:{
+						beforerender:function(tool) {
+							tool.bindStore(Ext.getCmp("ModuleMemberActivityList").getStore());
+						}
+					}
+				}),
+				listeners:{
+					itemdblclick:function(grid,record) {
+						Member.point.history(record.data.midx);
+					},
+					itemcontextmenu:function(grid,record,item,index,e) {
+						var menu = new Ext.menu.Menu();
+						
+						menu.add('<div class="x-menu-title">'+record.data.member+'</div>');
+						
+						menu.add({
+							iconCls:"xi xi-form",
+							text:Member.getText("admin/activity/history"),
 							handler:function() {
 								Member.point.history(record.data.midx);
 							}

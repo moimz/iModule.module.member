@@ -595,8 +595,9 @@ var Member = {
 						columns:[{
 							text:Member.getText("admin/point/columns/reg_date"),
 							dataIndex:"reg_date",
-							width:160,
+							width:145,
 							sortable:true,
+							align:"center",
 							renderer:function(value) {
 								return moment(value).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
 							}
@@ -638,6 +639,100 @@ var Member = {
 						text:Admin.getText("button/close"),
 						handler:function() {
 							Ext.getCmp("ModuleMemberPointHistoryWindow").close();
+						}
+					})
+				]
+			}).show();
+		}
+	},
+	/**
+	 * 활동내역
+	 */
+	activity:{
+		history:function(idx) {
+			new Ext.Window({
+				id:"ModuleMemberActivityHistoryWindow",
+				title:Member.getText("admin/activity/history"),
+				width:700,
+				height:500,
+				modal:true,
+				border:false,
+				layout:"fit",
+				items:[
+					new Ext.grid.Panel({
+						id:"ModuleMemberActivityHistoryList",
+						border:false,
+						store:new Ext.data.JsonStore({
+							proxy:{
+								type:"ajax",
+								url:ENV.getProcessUrl("member","@getActivities"),
+								extraParams:{idx:idx},
+								reader:{type:"json"}
+							},
+							remoteSort:true,
+							sorters:[{property:"idx",direction:"ASC"}],
+							autoLoad:true,
+							pageSize:50,
+							fields:["idx","exp","reg_date"],
+							listeners:{
+								load:function(store,records,success,e) {
+									if (success == false) {
+										if (e.getError()) {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										} else {
+											Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("LOAD_DATA_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+										}
+									}
+								}
+							}
+						}),
+						columns:[{
+							text:Member.getText("admin/activity/columns/reg_date"),
+							dataIndex:"reg_date",
+							width:145,
+							sortable:true,
+							align:"center",
+							renderer:function(value) {
+								return moment(value).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
+							}
+						},{
+							text:Member.getText("admin/activity/columns/content"),
+							dataIndex:"content",
+							minWidth:200,
+							flex:1
+						},{
+							text:Member.getText("admin/activity/columns/exp"),
+							width:100,
+							dataIndex:"exp",
+							align:"right",
+							renderer:function(value) {
+								return Ext.util.Format.number(value,"0,000");
+							}
+						},{
+							text:Member.getText("admin/activity/columns/accumulation"),
+							width:100,
+							dataIndex:"accumulation",
+							align:"right",
+							renderer:function(value) {
+								return Ext.util.Format.number(value,"0,000");
+							}
+						}],
+						bbar:new Ext.PagingToolbar({
+							store:null,
+							displayInfo:false,
+							listeners:{
+								beforerender:function(tool) {
+									tool.bindStore(Ext.getCmp("ModuleMemberActivityHistoryList").getStore());
+								}
+							}
+						})
+					})
+				],
+				buttons:[
+					new Ext.Button({
+						text:Admin.getText("button/close"),
+						handler:function() {
+							Ext.getCmp("ModuleMemberActivityHistoryWindow").close();
 						}
 					})
 				]

@@ -2,9 +2,9 @@
 /**
  * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
  * 
- * 포인트 내역을 가져온다.
+ * 활동내역을 내역을 가져온다.
  *
- * @file /modules/member/process/@getPoints.php
+ * @file /modules/member/process/@getActivities.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
@@ -17,11 +17,11 @@ $start = Request('start');
 $limit = Request('limit');
 $keyword = Request('keyword');
 
-$lists = $this->db()->select($this->table->point.' p','p.*')->join($this->table->member.' m','m.idx=p.midx','LEFT');
-if ($idx) $lists->where('p.midx',$idx);
+$lists = $this->db()->select($this->table->activity.' a','a.*')->join($this->table->member.' m','m.idx=a.midx','LEFT');
+if ($idx) $lists->where('a.midx',$idx);
 if ($keyword) $lists->where('(')->where('m.name','%'.$keyword.'%','LIKE')->orWhere('m.nickname','%'.$keyword.'%','LIKE')->orWhere('m.email','%'.$keyword.'%','LIKE')->where(')');
 $total = $lists->copy()->count();
-$lists = $lists->orderBy('p.reg_date','desc')->limit($start,$limit)->get();
+$lists = $lists->orderBy('a.reg_date','desc')->limit($start,$limit)->get();
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
 	$mModule = $this->IM->getModule($lists[$i]->module);
 	$lists[$i]->module_title = $this->getModule()->getTitle($lists[$i]->module);
@@ -31,12 +31,12 @@ for ($i=0, $loop=count($lists);$i<$loop;$i++) {
 		$data = new stdClass();
 		$data->code = $lists[$i]->code;
 		$data->content = $lists[$i]->content;
-		$content = $mModule->syncMember('point_history',$data);
+		$content = $mModule->syncMember('activity_history',$data);
 		$lists[$i]->content = $content == null ? $lists[$i]->content : $content;
 	}
 	
 	$lists[$i]->content = is_string($lists[$i]->content) == true ? $lists[$i]->content : json_encode($lists[$i]->content,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
-	$lists[$i]->accumulation = $this->db()->select($this->table->point,'SUM(point) as accumulation')->where('midx',$lists[$i]->midx)->where('reg_date',$lists[$i]->reg_date,'<=')->getOne()->accumulation;
+	$lists[$i]->accumulation = $this->db()->select($this->table->activity,'SUM(exp) as accumulation')->where('midx',$lists[$i]->midx)->where('reg_date',$lists[$i]->reg_date,'<=')->getOne()->accumulation;
 	
 	if ($idx == null) {
 		$member = $this->IM->getModule('member')->getMember($lists[$i]->midx);

@@ -133,11 +133,26 @@
 			"columns":{
 				"reg_date":"적립일시",
 				"module":"모듈명",
-				"code":"코드적립",
+				"code":"적립코드",
 				"content":"적립사유",
 				"member":"대상회원",
 				"point":"적립 포인트",
 				"accumulation":"누적 포인트"
+			}
+		},
+		"activity":{
+			"title":"활동내역",
+			"history":"활동내역",
+			"keyword":"회원성명/닉네임/이메일주소",
+			"grid_help":"항목 더블클릭 : 회원별 활동내역 / 항목 우클릭 : 메뉴",
+			"columns":{
+				"reg_date":"활동일시",
+				"module":"모듈명",
+				"code":"활동코드",
+				"content":"활동상세내역",
+				"member":"대상회원",
+				"exp":"적립 경험치",
+				"accumulation":"누적 경험치"
 			}
 		},
 		"label":{
