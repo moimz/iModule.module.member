@@ -467,7 +467,7 @@ var Member = {
 								value:""
 							}),
 							new Ext.form.FieldContainer({
-								fieldLabel:Member.getText("admin/point/point"),
+								fieldLabel:Member.getText("admin/point/columns/point"),
 								layout:"hbox",
 								items:[
 									new Ext.form.NumberField({
