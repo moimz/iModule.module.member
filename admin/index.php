@@ -590,7 +590,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					sorters:[{property:"reg_date",direction:"DESC"}],
 					autoLoad:true,
 					pageSize:50,
-					fields:[""],
+					fields:["module","code","content","member",{name:"reg_date",type:"int"},{name:"point",type:"int"},{name:"accumulation",type:"int"}],
 					listeners:{
 						load:function(store,records,success,e) {
 							if (success == false) {
@@ -671,10 +671,18 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						menu.add('<div class="x-menu-title">'+record.data.member+'</div>');
 						
 						menu.add({
-							iconCls:"xi xi-form",
+							iconCls:"xi xi-wallet",
 							text:Member.getText("admin/point/history"),
 							handler:function() {
 								Member.point.history(record.data.midx);
+							}
+						});
+						
+						menu.add({
+							iconCls:"xi xi-time-back",
+							text:Member.getText("admin/activity/history"),
+							handler:function() {
+								Member.activity.history(record.data.idx);
 							}
 						});
 						
@@ -705,7 +713,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					sorters:[{property:"reg_date",direction:"DESC"}],
 					autoLoad:true,
 					pageSize:50,
-					fields:[""],
+					fields:["module","code","content","member",{name:"reg_date",type:"int"},{name:"exp",type:"int"},{name:"accumulation",type:"int"},"ip"],
 					listeners:{
 						load:function(store,records,success,e) {
 							if (success == false) {
@@ -761,6 +769,10 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 					renderer:function(value) {
 						return Ext.util.Format.number(value,"0,000");
 					}
+				},{
+					text:Member.getText("admin/activity/columns/ip"),
+					width:120,
+					dataIndex:"ip"
 				}],
 				selModel:new Ext.selection.CheckboxModel(),
 				bbar:new Ext.PagingToolbar({
@@ -778,7 +790,7 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 				}),
 				listeners:{
 					itemdblclick:function(grid,record) {
-						Member.point.history(record.data.midx);
+						Member.activity.history(record.data.midx);
 					},
 					itemcontextmenu:function(grid,record,item,index,e) {
 						var menu = new Ext.menu.Menu();
@@ -786,10 +798,18 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						menu.add('<div class="x-menu-title">'+record.data.member+'</div>');
 						
 						menu.add({
-							iconCls:"xi xi-form",
-							text:Member.getText("admin/activity/history"),
+							iconCls:"xi xi-wallet",
+							text:Member.getText("admin/point/history"),
 							handler:function() {
 								Member.point.history(record.data.midx);
+							}
+						});
+						
+						menu.add({
+							iconCls:"xi xi-time-back",
+							text:Member.getText("admin/activity/history"),
+							handler:function() {
+								Member.activity.history(record.data.idx);
 							}
 						});
 						

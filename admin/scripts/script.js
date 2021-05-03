@@ -576,10 +576,10 @@ var Member = {
 								reader:{type:"json"}
 							},
 							remoteSort:true,
-							sorters:[{property:"idx",direction:"ASC"}],
+							sorters:[{property:"reg_date",direction:"DESC"}],
 							autoLoad:true,
 							pageSize:50,
-							fields:["idx","point","reg_date"],
+							fields:[{name:"reg_date",type:"int"},"content",{name:"point",type:"int"},{name:"accumulation",type:"int"}],
 							listeners:{
 								load:function(store,records,success,e) {
 									if (success == false) {
@@ -670,10 +670,10 @@ var Member = {
 								reader:{type:"json"}
 							},
 							remoteSort:true,
-							sorters:[{property:"idx",direction:"ASC"}],
+							sorters:[{property:"reg_date",direction:"DESC"}],
 							autoLoad:true,
 							pageSize:50,
-							fields:["idx","exp","reg_date"],
+							fields:[{name:"reg_date",type:"int"},"content",{name:"exp",type:"int"},{name:"accumulation",type:"int"},"ip"],
 							listeners:{
 								load:function(store,records,success,e) {
 									if (success == false) {
@@ -716,6 +716,10 @@ var Member = {
 							renderer:function(value) {
 								return Ext.util.Format.number(value,"0,000");
 							}
+						},{
+							text:Member.getText("admin/activity/columns/ip"),
+							width:120,
+							dataIndex:"ip"
 						}],
 						bbar:new Ext.PagingToolbar({
 							store:null,

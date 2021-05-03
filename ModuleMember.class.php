@@ -2917,6 +2917,16 @@ class ModuleMember {
 			
 			return json_encode($data);
 		}
+		
+		if ($action == 'activity_history') {
+			switch ($data->code) {
+				case 'login' :
+					return '회원로그인'.($data->content->referer ? '('.$data->content->referer.')' : '');
+					
+				case 'signup' :
+					return '회원가입'.($data->content->referer ? '('.$data->content->referer.')' : '');
+			}
+		}
 	}
 	
 	/**

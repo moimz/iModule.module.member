@@ -19,7 +19,7 @@ $keyword = Request('keyword');
 
 $lists = $this->db()->select($this->table->activity.' a','a.*')->join($this->table->member.' m','m.idx=a.midx','LEFT');
 if ($idx) $lists->where('a.midx',$idx);
-if ($keyword) $lists->where('(')->where('m.name','%'.$keyword.'%','LIKE')->orWhere('m.nickname','%'.$keyword.'%','LIKE')->orWhere('m.email','%'.$keyword.'%','LIKE')->where(')');
+if ($keyword) $lists->where('(')->where('m.name','%'.$keyword.'%','LIKE')->orWhere('m.nickname','%'.$keyword.'%','LIKE')->orWhere('m.email','%'.$keyword.'%','LIKE')->where('a.ip','%'.$keyword.'%','LIKE')->where(')');
 $total = $lists->copy()->count();
 $lists = $lists->orderBy('a.reg_date','desc')->limit($start,$limit)->get();
 for ($i=0, $loop=count($lists);$i<$loop;$i++) {
