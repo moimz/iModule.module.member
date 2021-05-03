@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2020. 4. 9.
+ * @modified 2021. 5. 3.
  */
 if (defined('__IM__') == false) exit;
 ?>
@@ -559,6 +559,121 @@ Ext.onReady(function () { Ext.getCmp("iModuleAdminPanel").add(
 						}
 					})
 				]
+			}),
+			new Ext.grid.Panel({
+				id:"ModuleMemberPointList",
+				title:Member.getText("admin/point/title"),
+				iconCls:"xi xi-wallet",
+				border:false,
+				tbar:[
+					Admin.searchField("ModuleMemberPointKeyword",200,Member.getText("admin/point/keyword"),function(keyword) {
+						Ext.getCmp("ModuleMemberPointList").getStore().getProxy().setExtraParam("keyword",keyword);
+						Ext.getCmp("ModuleMemberPointList").getStore().loadPage(1);
+					})
+				],
+				store:new Ext.data.JsonStore({
+					proxy:{
+						type:"ajax",
+						simpleSortMode:true,
+						url:ENV.getProcessUrl("member","@getPoints"),
+						reader:{type:"json"}
+					},
+					remoteSort:true,
+					sorters:[{property:"reg_date",direction:"DESC"}],
+					autoLoad:true,
+					pageSize:50,
+					fields:[""],
+					listeners:{
+						load:function(store,records,success,e) {
+							if (success == false) {
+								if (e.getError()) {
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:e.getError(),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+								} else {
+									Ext.Msg.show({title:Admin.getText("alert/error"),msg:Admin.getErrorText("DATA_LOAD_FAILED"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+								}
+							}
+						}
+					}
+				}),
+				columns:[{
+					text:Member.getText("admin/point/columns/module"),
+					width:120,
+					dataIndex:"module_title"
+				},{
+					text:Member.getText("admin/point/columns/code"),
+					width:140,
+					dataIndex:"code"
+				},{
+					text:Member.getText("admin/point/columns/content"),
+					minWidth:200,
+					flex:1,
+					dataIndex:"content"
+				},{
+					text:Member.getText("admin/point/columns/member"),
+					width:140,
+					dataIndex:"member",
+					renderer:function(value,p,record) {
+						return '<i style="display:inline-block; width:26px; height:26px; vertical-align:middle; background:url('+record.data.photo+') no-repeat 50% 50%; background-size:cover; border-radius:50%; border:1px solid #ccc; box-sizing:border-box; margin:-4px 5px -3px -5px;"></i>' + value;
+					}
+				},{
+					text:Member.getText("admin/point/columns/reg_date"),
+					width:140,
+					dataIndex:"reg_date",
+					renderer:function(value) {
+						return moment(value).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
+					}
+				},{
+					text:Member.getText("admin/point/columns/point"),
+					width:100,
+					dataIndex:"point",
+					align:"right",
+					renderer:function(value) {
+						return Ext.util.Format.number(value,"0,000");
+					}
+				},{
+					text:Member.getText("admin/point/columns/accumulation"),
+					width:100,
+					dataIndex:"accumulation",
+					align:"right",
+					renderer:function(value) {
+						return Ext.util.Format.number(value,"0,000");
+					}
+				}],
+				selModel:new Ext.selection.CheckboxModel(),
+				bbar:new Ext.PagingToolbar({
+					store:null,
+					displayInfo:false,
+					items:[
+						"->",
+						{xtype:"tbtext",text:Member.getText("admin/point/grid_help")}
+					],
+					listeners:{
+						beforerender:function(tool) {
+							tool.bindStore(Ext.getCmp("ModuleMemberPointList").getStore());
+						}
+					}
+				}),
+				listeners:{
+					itemdblclick:function(grid,record) {
+						Member.point.history(record.data.midx);
+					},
+					itemcontextmenu:function(grid,record,item,index,e) {
+						var menu = new Ext.menu.Menu();
+						
+						menu.add('<div class="x-menu-title">'+record.data.content+'</div>');
+						
+						menu.add({
+							iconCls:"xi xi-form",
+							text:Member.getText("admin/point/history"),
+							handler:function() {
+								Member.point.history(record.data.midx);
+							}
+						});
+						
+						e.stopEvent();
+						menu.showAt(e.getXY());
+					}
+				}
 			})
 		]
 	})

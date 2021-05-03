@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2020. 4. 9.
+ * @modified 2021. 5. 3.
  */
 var Member = {
 	login:function(midx,name) {
@@ -593,7 +593,7 @@ var Member = {
 							}
 						}),
 						columns:[{
-							text:"적립일시",
+							text:Member.getText("admin/point/columns/reg_date"),
 							dataIndex:"reg_date",
 							width:160,
 							sortable:true,
@@ -601,12 +601,12 @@ var Member = {
 								return moment(value).locale($("html").attr("lang")).format("YYYY.MM.DD(dd) HH:mm");
 							}
 						},{
-							text:"적립사유",
+							text:Member.getText("admin/point/columns/content"),
 							dataIndex:"content",
 							minWidth:200,
 							flex:1
 						},{
-							text:Member.getText("admin/point/point"),
+							text:Member.getText("admin/point/columns/point"),
 							width:100,
 							dataIndex:"point",
 							align:"right",
@@ -614,7 +614,7 @@ var Member = {
 								return Ext.util.Format.number(value,"0,000");
 							}
 						},{
-							text:Member.getText("admin/point/accumulation"),
+							text:Member.getText("admin/point/columns/accumulation"),
 							width:100,
 							dataIndex:"accumulation",
 							align:"right",
