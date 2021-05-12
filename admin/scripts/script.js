@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.1.0
- * @modified 2021. 5. 3.
+ * @modified 2021. 5. 12.
  */
 var Member = {
 	login:function(midx,name) {
@@ -1269,7 +1269,7 @@ var Member = {
 								fieldLabel:Member.getText("admin/field/form/content"),
 								layout:"hbox",
 								items:[
-									Admin.wysiwygField("","content")
+									Admin.wysiwygField("","content",{allowBlank:true})
 								],
 								afterBodyEl:'<div class="x-form-help">'+Member.getText("admin/field/form/content_help")+'</div>'
 							}),
