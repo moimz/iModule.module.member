@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 4. 24.
+ * @modified 2021. 5. 25.
  */
 class ModuleMember {
 	/**
@@ -518,6 +518,9 @@ class ModuleMember {
 				
 				header('Content-Type: '.$mime);
 				header('Content-Length: '.filesize($path));
+				header('Expires: '.gmdate('D, d M Y H:i:s', time() + 600).' GMT');
+				header('Cache-Control: max-age=600');
+				header('Pragma: public');
 				
 				readfile($path);
 				exit;
@@ -1471,7 +1474,7 @@ class ModuleMember {
 		/**
 		 * 회원사진이 없다면 갱신한다.
 		 */
-		if (file_exists($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == false) {
+		if (is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == false) {
 			if (SaveFileFromUrl($logged->user->photo,$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg','image') == true) {
 				$this->IM->getModule('attachment')->createThumbnail($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',250,250,false,'jpg');
 			}
@@ -1679,7 +1682,7 @@ class ModuleMember {
 			} else {
 				$member->name = $member->name ? $member->name : $member->nickname;
 				$member->nickname = $member->nickname ? $member->nickname : $member->name;
-				$member->photo = $this->IM->getModuleUrl('member','photo',$member->idx,false).'/profile.jpg';
+				$member->photo = $this->getMemberPhotoUrl($member->idx);
 				$member->nickcon = is_file($this->IM->getAttachmentPath().'/nickcon/'.$midx.'.gif') == true ? $this->IM->getAttachmentDir().'/nickcon/'.$midx.'.gif' : null;
 				$member->level = $this->getLevel($member->exp);
 				$temp = explode('-',$member->birthday);
