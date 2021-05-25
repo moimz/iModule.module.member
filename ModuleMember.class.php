@@ -518,8 +518,8 @@ class ModuleMember {
 				
 				header('Content-Type: '.$mime);
 				header('Content-Length: '.filesize($path));
-				header('Expires: '.gmdate('D, d M Y H:i:s', time() + 600).' GMT');
-				header('Cache-Control: max-age=600');
+				header('Expires: '.gmdate('D, d M Y H:i:s',time() + 1800).' GMT');
+				header('Cache-Control: max-age=1800');
 				header('Pragma: public');
 				
 				readfile($path);
