@@ -15,11 +15,8 @@ if (defined('__IM__') == false) exit;
 $site = $this->getOAuth($action);
 if ($site == null) $this->printError('OAUTH_API_ERROR',null,null,true);
 
-$_auth_url = 'https://slack.com/oauth/authorize';
-$_token_url = 'https://slack.com/api/oauth.access';
-
 $oauth = new OAuthClient();
-$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setScope($site->scope)->setAccessType('offline')->setAuthUrl($_auth_url)->setTokenUrl($_token_url)->setHeader(array())->setApprovalPrompt('auto');
+$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setScope($site->scope)->setAccessType('offline')->setAuthUrl($site->auth_url)->setTokenUrl($site->token_url)->setHeader(array())->setApprovalPrompt('auto');
 
 if (isset($_GET['code']) == true) {
 	if ($oauth->authenticate($_GET['code']) == true) {

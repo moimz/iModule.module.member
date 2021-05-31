@@ -15,11 +15,8 @@ if (defined('__IM__') == false) exit;
 $site = $this->getOAuth($action);
 if ($site == null) $this->printError('OAUTH_API_ERROR',null,null,true);
 
-$_auth_url = 'https://kauth.kakao.com/oauth/authorize';
-$_token_url = 'https://kauth.kakao.com/oauth/token';
-
 $oauth = new OAuthClient();
-$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setMethod('get')->setScope($site->scope)->setAccessType('offline')->setAuthUrl($_auth_url)->setTokenUrl($_token_url)->setApprovalPrompt('auto');
+$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setMethod('get')->setScope($site->scope)->setAccessType('offline')->setAuthUrl($site->auth_url)->setTokenUrl($site->token_url)->setApprovalPrompt('auto');
 
 if (isset($_GET['code']) == true) {
 	if ($oauth->authenticate($_GET['code']) == true) {

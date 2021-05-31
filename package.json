@@ -502,19 +502,28 @@
 					"length":20,
 					"comment":"소셜미디어명"
 				},
-				"client_id":{
+				"auth_url":{
 					"type":"varchar",
-					"length":100,
+					"length":200,
+					"is_null":true,
+					"comment":"인증요청 URL"
+				},
+				"token_url":{
+					"type":"varchar",
+					"length":200,
+					"is_null":true,
+					"comment":"토큰요청 URL"
+				},
+				"client_id":{
+					"type":"text",
 					"comment":"OAuth client_id"
 				},
 				"client_secret":{
-					"type":"varchar",
-					"length":100,
+					"type":"text",
 					"comment":"OAuth client_secret"
 				},
 				"scope":{
-					"type":"varchar",
-					"length":255,
+					"type":"text",
 					"is_null":true,
 					"comment":"OAuth scope"
 				},

@@ -15,11 +15,8 @@ if (defined('__IM__') == false) exit;
 $site = $this->getOAuth($action);
 if ($site == null) $this->printError('OAUTH_API_ERROR',null,null,true);
 
-$_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth';
-$_token_url = 'https://oauth2.googleapis.com/token';
-
 $oauth = new OAuthClient();
-$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setScope($site->scope)->setAccessType('offline')->setAuthUrl($_auth_url)->setTokenUrl($_token_url)->setApprovalPrompt('auto');
+$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setScope($site->scope)->setAccessType('offline')->setAuthUrl($site->auth_url)->setTokenUrl($site->token_url)->setApprovalPrompt('auto');
 
 if (isset($_GET['code']) == true) {
 	if ($oauth->authenticate($_GET['code']) == true) {

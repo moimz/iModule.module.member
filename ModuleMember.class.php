@@ -2917,15 +2917,32 @@ class ModuleMember {
 	/**
 	 * OAuth 엑세스토큰을 가져온다.
 	 *
-	 * @param string $site 소셜사이트명 (google, facebook, twitter, kakao, naver, github 등)
+	 * @param string $site OAuth 사이트명
 	 * @param int $midx 회원고유값
 	 * @return string $token
 	 */
 	function getOAuthAccessToken($site,$midx=null) {
+		$midx = $midx == null ? $this->getLogged() : $midx;
 		$token = $this->getOAuthToken($site,$midx);
 		if ($token == null) return null;
 		
-		return $token->access_token;
+		if ($token->access_token_expired == 0 || $token->access_token_expired > time() - 10) {
+			return $token->access_token;
+		} else {
+			$site = $this->getOAuth($site);
+			$oauth = new OAuthClient();
+			$oauth->setUserAgent('iModule OAuth2.0 client')->setClientId($site->client_id)->setClientSecret($site->client_secret)->setScope($token->scope)->setTokenUrl($site->token_url)->setRefreshToken($token->refresh_token)->setGrantType('refresh_token')->setAccessType('offline')->authenticate();
+			
+			$access_token = $oauth->getAccessToken(true);
+			$refresh_token = $oauth->getRefreshToken();
+			
+			if ($access_token != null) {
+				$this->db()->update($this->table->oauth_token,array('access_token'=>$access_token->access_token,'access_token_expired'=>$access_token->expires_in,'refresh_token'=>$refresh_token))->where('site',$site->site)->where('midx',$midx)->execute();
+				unset($this->oauth_tokens[$site->site.'@'.$midx]);
+				
+				return $this->getOAuthAccessToken($site->site,$midx);
+			}
+		}
 	}
 	
 	/**
