@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2019. 4. 30.
+ * @modified 2021. 5. 31.
  */
 if (defined('__IM__') == false) exit;
 
@@ -20,9 +20,9 @@ if ($forceLogin == true || $me->isLogged() == false) {
 	$footer = PHP_EOL.'</section>'.PHP_EOL;
 	$footer.= '</form>'.PHP_EOL.'<script>$("#'.$Widget->getRandomId().'").inits(Member.login);</script>'.PHP_EOL;
 	
-	$oauths = $me->db()->select($me->getTable('social_oauth').' o','o.site')->join($me->getTable('social_sort').' s','s.site=o.site','LEFT')->where('o.domain',array('*',$IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
+	$oauths = $me->db()->select($me->getTable('oauth').' o','o.site')->join($me->getTable('oauth_sort').' s','s.site=o.site','LEFT')->where('o.domain',array('*',$IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
 	for ($i=0, $loop=count($oauths);$i<$loop;$i++) {
-		$oauths[$i]->link = $me->getSocialLoginUrl($oauths[$i]->site);
+		$oauths[$i]->link = $me->getOAuthLoginUrl($oauths[$i]->site);
 	}
 	
 	$allow_signup = $me->getModule()->getConfig('allow_signup') == true;

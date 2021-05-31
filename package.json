@@ -489,7 +489,7 @@
 			],
 			"comment":"회원 분류별 회원가입폼 설정 테이블"
 		},
-		"member_social_oauth_table":{
+		"member_oauth_table":{
 			"columns":{
 				"domain":{
 					"type":"varchar",
@@ -530,7 +530,7 @@
 			},
 			"comment":"회원 소셜미디어 OAuth 테이블"
 		},
-		"member_social_sort_table":{
+		"member_oauth_sort_table":{
 			"columns":{
 				"site":{
 					"type":"varchar",
@@ -557,18 +557,12 @@
 			],
 			"comment":"회원 소셜미디어 정렬 테이블"
 		},
-		"member_social_token_table":{
+		"member_oauth_token_table":{
 			"columns":{
 				"midx":{
 					"type":"int",
 					"length":11,
 					"comment":"회원고유값"
-				},
-				"domain":{
-					"type":"varchar",
-					"length":100,
-					"default":"*",
-					"comment":"사이트도메인"
 				},
 				"site":{
 					"type":"varchar",
@@ -585,15 +579,19 @@
 					"comment":"OAuth scope"
 				},
 				"access_token":{
-					"type":"varchar",
-					"length":255,
+					"type":"text",
 					"comment":"OAuth 엑세스토큰"
 				},
 				"refresh_token":{
-					"type":"varchar",
-					"length":255,
+					"type":"text",
 					"is_null":true,
 					"comment":"OAuth 리프레시토큰"
+				},
+				"access_token_expired":{
+					"type":"int",
+					"length":11,
+					"default":0,
+					"comment":"엑세스토큰만료일시"
 				},
 				"latest_login":{
 					"type":"int",

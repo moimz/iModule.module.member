@@ -8,11 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2020. 4. 24.
+ * @modified 2021. 5. 31.
  */
 if (defined('__IM__') == false) exit;
 
-$site = $this->db()->select($this->table->social_oauth)->where('site',$action)->where('domain',array('*',$this->IM->domain),'IN')->orderBy('domain','desc')->getOne();
+$site = $this->getOAuth($action);
 if ($site == null) $this->printError('OAUTH_API_ERROR',null,null,true);
 
 $_auth_url = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -52,14 +52,14 @@ if ($data === false || empty($data->email) == true) $this->printError('OAUTH_API
 $_logged->user = new stdClass();
 $_logged->user->id = $data->id;
 $_logged->user->email = $data->email;
-$_logged->user->name = $data->name;
-$_logged->user->nickname = $data->name;
+$_logged->user->name = isset($data->name) == true ? $data->name : array_shift(explode('@',$data->email));
+$_logged->user->nickname = $_logged->user->name;
 
 $_logged->user->photo = str_replace('sz=50','sz=250',$data->picture);
 
-$_logged->token = new stdClass();
-$_logged->token->access = $oauth->getAccessToken();
-$_logged->token->refresh = $oauth->getRefreshToken() == null ? '' : $oauth->getRefreshToken();
+$_logged->access_token = $oauth->getAccessToken(true)->access_token;
+$_logged->access_token_expired = $oauth->getAccessToken(true)->expires_in;
+$_logged->refresh_token = $oauth->getRefreshToken() == null ? '' : $oauth->getRefreshToken();
 
-$this->loginBySocial();
+$this->loginByOAuth($_logged);
 ?>

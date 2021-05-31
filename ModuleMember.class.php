@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2021. 5. 25.
+ * @modified 2021. 5. 31.
  */
 class ModuleMember {
 	/**
@@ -79,9 +79,9 @@ class ModuleMember {
 		$this->table->signup = 'member_signup_table';
 		$this->table->password = 'member_password_table';
 		$this->table->point = 'member_point_table';
-		$this->table->social_oauth = 'member_social_oauth_table';
-		$this->table->social_sort = 'member_social_sort_table';
-		$this->table->social_token = 'member_social_token_table';
+		$this->table->oauth = 'member_oauth_table';
+		$this->table->oauth_sort = 'member_oauth_sort_table';
+		$this->table->oauth_token = 'member_oauth_token_table';
 		$this->table->label = 'member_label_table';
 		$this->table->member_label = 'member_member_label_table';
 		$this->table->token = 'member_token_table';
@@ -518,10 +518,11 @@ class ModuleMember {
 				
 				header('Content-Type: '.$mime);
 				header('Content-Length: '.filesize($path));
+				/*
 				header('Expires: '.gmdate('D, d M Y H:i:s',time() + 1800).' GMT');
 				header('Cache-Control: max-age=1800');
 				header('Pragma: public');
-				
+				*/
 				readfile($path);
 				exit;
 		}
@@ -839,10 +840,10 @@ class ModuleMember {
 			/**
 			 * 소셜계정연결을 가져온다.
 			 */
-			$oauths = $this->db()->select($this->table->social_oauth.' o','o.site')->join($this->table->social_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
+			$oauths = $this->db()->select($this->table->oauth.' o','o.site')->join($this->table->oauth_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
 			for ($i=0, $loop=count($oauths);$i<$loop;$i++) {
-				$site = $this->db()->select($this->table->social_oauth)->where('domain',array('*',$this->IM->domain),'IN')->where('site',$oauths[$i]->site)->getOne();
-				$token = $this->db()->select($this->table->social_token)->where('midx',$this->getLogged())->where('domain',$site->domain)->where('site',$site->site)->getOne();
+				$site = $this->db()->select($this->table->oauth)->where('domain',array('*',$this->IM->domain),'IN')->where('site',$oauths[$i]->site)->getOne();
+				$token = $this->db()->select($this->table->oauth_token)->where('midx',$this->getLogged())->where('domain',$site->domain)->where('site',$site->site)->getOne();
 				
 				$oauths[$i] = new stdClass();
 				$oauths[$i]->site = $site;
@@ -1062,11 +1063,11 @@ class ModuleMember {
 		$content.= '<div data-role="input"><input type="email" name="email" placeholder="'.$this->getText('text/email').'"></div>';
 		$content.= '<div data-role="input"><input type="password" name="password" placeholder="'.$this->getText('text/password').'"></div>';
 		
-		$oauths = $this->db()->select($this->table->social_oauth.' o','o.site')->join($this->table->social_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
+		$oauths = $this->db()->select($this->table->oauth.' o','o.site')->join($this->table->oauth_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
 		if (count($oauths) > 0) {
 			$content.= '<ul data-module="member" data-role="social" class="'.(count($oauths) > 3 ? 'icon' : 'button').'">';
 			foreach ($oauths as $oauth) {
-				$content.= '<li class="'.$oauth->site.'"><a href="'.$this->getSocialLoginUrl($oauth->site).'"><i></i><span>'.str_replace('{SITE}',$this->getText('social/'.$oauth->site),$this->getText('social/login')).'</span></a></li>';
+				$content.= '<li class="'.$oauth->site.'"><a href="'.$this->getOAuthLoginUrl($oauth->site).'"><i></i><span>'.str_replace('{SITE}',$this->getText('social/'.$oauth->site),$this->getText('social/login')).'</span></a></li>';
 			}
 			$content.= '</ul>';
 		}
@@ -1359,42 +1360,33 @@ class ModuleMember {
 	}
 	
 	/**
-	 * 소셜로그인을 통해 로그인을 처리한다.
+	 * OAuth 통해 로그인을 처리한다.
 	 * 가입되어 있지 않은 회원의 경우 자동으로 가입처리를 한다.
 	 *
-	 * @param string $code 소셜사이트
-	 * @param string $client_id OAuth 클라이언트 아이디
-	 * @param string $name 소셜사이트 유저아이디
-	 * @param string $email 이메일
-	 * @param string $photo 프로필 이미지 주소
-	 * @param string $accessToken
-	 * @param string $refreshToken
-	 * @param string $scope OAuth 인증시 요청된 scope
-	 * @param string $redirecUrl 로그인 후 이동될 주소
+	 * @param object $logged OAuth 로그인정보
 	 */
-	function loginBySocial() {
-		/**
-		 * 소셜 로그인 세션을 가져온다.
-		 */
-		$logged = Request('IM_SOCIAL_LOGGED','session');
-		if ($logged == null) {
-			$this->printError('OAUTH_API_ERROR',null,null,true);
-		}
-		
+	function loginByOAuth($logged) {
 		if ($this->isLogged() == true) {
 			$midx = $this->getLogged();
 		} else {
 			/**
 			 * 기존에 해당 소셜계정으로 로그인한 이력이 있는지 확인한다.
 			 */
-			$check = $this->db()->select($this->table->social_token)->where('domain',$logged->site->domain)->where('site',$logged->site->site)->where('id',$logged->user->id)->get();
+			$check = $this->db()->select($this->table->oauth_token.' t')->join($this->table->member.' m','m.idx=t.midx','LEFT')->where('t.site',$logged->site->site)->where('t.id',$logged->user->id)->where('m.status',array('ACTIVATED','WAITING'),'IN');
+			if ($this->IM->getSite(false)->member == 'UNIVERSAL') {
+				$check->where('m.domain','*');
+			} else {
+				$check->where('m.domain',$this->IM->domain);
+			}
+			$check = $check->get();
+			
 			if (count($check) == 0) {
 				/**
 				 * 이메일주소로 기존 회원을 검색한다.
 				 */
 				$check = $this->db()->select($this->table->member)->where('email',$logged->user->email);
-				if ($this->IM->getSite(false)->member == 'UNIVERSAL') $check->where('domain','*');
-				else $check->where('domain',$this->IM->domain);
+				if ($this->IM->getSite(false)->member == 'UNIVERSAL') $check->where('m.domain','*');
+				else $check->where('m.domain',$this->IM->domain);
 				$check = $check->getOne();
 				
 				/**
@@ -1412,11 +1404,14 @@ class ModuleMember {
 						'password'=>'',
 						'name'=>$logged->user->name,
 						'nickname'=>$logged->user->nickname,
-						'exp'=>$this->getModule()->getConfig('exp'),
-						'point'=>$this->getModule()->getConfig('point'),
+						'exp'=>0,
+						'point'=>0,
 						'reg_date'=>time(),
 						'status'=>$this->getModule()->getConfig('approve_signup') == true ? 'WAITING' : 'ACTIVATED'
 					))->execute();
+					
+					$this->sendPoint($midx,$this->getModule()->getConfig('point'),'member','signup',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')),false,$insert['reg_date']);
+					$this->addActivity($midx,$this->getModule()->getConfig('exp'),'member','signup',array('referer'=>(isset($_SERVER['HTTP_REFERER']) == true ? $_SERVER['HTTP_REFERER'] : '')),$insert['reg_date']);
 				} else {
 					$midx = $check->idx;
 				}
@@ -1436,7 +1431,7 @@ class ModuleMember {
 					echo $html;
 					exit;
 				} else {
-					$check = $this->db()->select($this->table->social_token)->where('midx',$midx)->where('site',$logged->site->site)->where('id',$logged->user->id)->getOne();
+					$check = $this->db()->select($this->table->oauth_token)->where('midx',$midx)->where('site',$logged->site->site)->where('id',$logged->user->id)->getOne();
 					if ($check == null) {
 						$this->printError('FORBIDDEN',null,null,true);
 					}
@@ -1453,7 +1448,7 @@ class ModuleMember {
 			/**
 			 * 검색된 회원이 소셜사이트 로그인을 사용한적이 없고, 회원의 패스워드가 존재하는 경우 계정연결 페이지를 띄운다.
 			 */
-			$check = $this->db()->select($this->table->social_token)->where('midx',$member->idx)->where('site',$logged->site->site)->getOne();
+			$check = $this->db()->select($this->table->oauth_token)->where('midx',$member->idx)->where('site',$logged->site->site)->getOne();
 			if ($check == null && strlen($member->password) == 65) {
 				$logged->midx = $member->idx;
 				
@@ -1469,7 +1464,12 @@ class ModuleMember {
 		/**
 		 * 엑세스정보를 갱신한다.
 		 */
-		$this->db()->replace($this->table->social_token,array('midx'=>$midx,'domain'=>$logged->site->domain,'site'=>$logged->site->site,'id'=>$logged->user->id,'scope'=>$logged->site->scope,'access_token'=>$logged->token->access,'refresh_token'=>$logged->token->refresh,'latest_login'=>time()))->execute();
+		$check = $this->db()->select($this->table->oauth_token)->where('midx',$midx)->where('site',$logged->site->site)->getOne();
+		if ($check == null) {
+			$this->db()->insert($this->table->oauth_token,array('midx'=>$midx,'site'=>$logged->site->site,'id'=>$logged->user->id,'scope'=>$logged->site->scope,'access_token'=>$logged->access_token,'access_token_expired'=>$logged->access_token_expired,'refresh_token'=>$logged->refresh_token,'latest_login'=>time()))->execute();
+		} else {
+			$this->db()->update($this->table->oauth_token,array('id'=>$logged->user->id,'scope'=>$logged->site->scope,'access_token'=>$logged->access_token,'access_token_expired'=>$logged->access_token_expired,'refresh_token'=>($logged->refresh_token ? $logged->refresh_token : $check->refresh_token),'latest_login'=>time()))->where('midx',$midx)->where('site',$logged->site->site)->execute();
+		}
 		
 		/**
 		 * 회원사진이 없다면 갱신한다.
@@ -2865,16 +2865,66 @@ class ModuleMember {
 	}
 	
 	/**
-	 * 소셜사이트 로그인을 위한 주소를 가져온다.
+	 * OAuth 정보를 가져온다.
 	 *
-	 * @param string $site 소셜사이트명 (google, facebook, twitter, kakao, naver, github)
+	 * @param string $site OAuth 사이트명
+	 * @param string $domain 도메인명
+	 * @return object $oauth
+	 */
+	function getOAuth($site,$domain=null) {
+		if ($domain == null) {
+			$domain = $this->IM->getSite(false)->member == 'UNIVERSAL' ? '*' : $this->IM->domain;
+		}
+		if (isset($this->oauths[$site.'@'.$domain]) == true) return $this->oauths[$site.'@'.$domain];
+		
+		$oauth = $this->db()->select($this->table->oauth)->where('domain',$domain)->where('site',$site)->getOne();
+		$this->oauths[$site.'@'.$domain] = $oauth;
+		
+		return $this->oauths[$site.'@'.$domain];
+	}
+	
+	/**
+	 * OAuth 로그인을 위한 주소를 가져온다.
+	 *
+	 * @param string $site OAuth 사이트명
 	 * @return string $url
 	 */
-	function getSocialLoginUrl($site) {
-		$site = $this->db()->select($this->table->social_oauth)->where('site',$site)->where('domain',array('*',$this->IM->domain),'IN')->orderBy('domain','desc')->getOne();
+	function getOAuthLoginUrl($site) {
+		$site = $this->db()->select($this->table->oauth)->where('site',$site)->where('domain',array('*',$this->IM->domain),'IN')->orderBy('domain','desc')->getOne();
 		if ($site == null) return '#';
 		
 		return $site->callback_domain == '*' || $site->callback_domain == $this->IM->domain ? __IM_DIR__.'/oauth/'.$site->site : $this->IM->getUrl(false,false,false,false,true,$site->callback_domain,false).'/oauth/'.$site->site;
+	}
+	
+	/**
+	 * OAuth 인증정보를 가져온다.
+	 *
+	 * @param $site OAuth 사이트명
+	 * @param int $midx 회원고유값
+	 * @return string $id
+	 */
+	function getOAuthToken($site,$midx=null) {
+		$midx = $midx == null ? $this->getLogged() : $midx;
+		if (isset($this->oauth_tokens[$site.'@'.$midx]) == true) return $this->oauth_tokens[$site.'@'.$midx];
+		
+		$token = $this->db()->select($this->table->oauth_token)->where('site',$site)->where('midx',$midx)->getOne();
+		$this->oauth_tokens[$site.'@'.$midx] = $token;
+		
+		return $this->oauth_tokens[$site.'@'.$midx];
+	}
+	
+	/**
+	 * OAuth 엑세스토큰을 가져온다.
+	 *
+	 * @param string $site 소셜사이트명 (google, facebook, twitter, kakao, naver, github 등)
+	 * @param int $midx 회원고유값
+	 * @return string $token
+	 */
+	function getOAuthAccessToken($site,$midx=null) {
+		$token = $this->getOAuthToken($site,$midx);
+		if ($token == null) return null;
+		
+		return $token->access_token;
 	}
 	
 	/**

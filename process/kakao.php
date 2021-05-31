@@ -8,11 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 4. 6.
+ * @modified 2021. 5. 31.
  */
 if (defined('__IM__') == false) exit;
 
-$site = $this->db()->select($this->table->social_oauth)->where('site',$action)->where('domain',array('*',$this->IM->domain),'IN')->orderBy('domain','desc')->getOne();
+$site = $this->getOAuth($action);
 if ($site == null) $this->printError('OAUTH_API_ERROR',null,null,true);
 
 $_auth_url = 'https://kauth.kakao.com/oauth/authorize';
@@ -56,9 +56,9 @@ $_logged->user->nickname = $data->properties->nickname;
 $_logged->user->email = $data->kaccount_email;
 $_logged->user->photo = $data->properties->profile_image;
 
-$_logged->token = new stdClass();
-$_logged->token->access = $oauth->getAccessToken();
-$_logged->token->refresh = $oauth->getRefreshToken() == null ? '' : $oauth->getRefreshToken();
+$_logged->access_token = $oauth->getAccessToken(true)->access_token;
+$_logged->access_token_expired = $oauth->getAccessToken(true)->expires_in;
+$_logged->refresh_token = $oauth->getRefreshToken() == null ? '' : $oauth->getRefreshToken();
 
-$this->loginBySocial();
+$this->loginByOAuth($_logged);
 ?>
