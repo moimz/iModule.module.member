@@ -1372,8 +1372,9 @@ class ModuleMember {
 			/**
 			 * 기존에 해당 소셜계정으로 로그인한 이력이 있는지 확인한다.
 			 */
+			$siteType = $this->IM->getSite(false)->member;
 			$check = $this->db()->select($this->table->oauth_token.' t')->join($this->table->member.' m','m.idx=t.midx','LEFT')->where('t.site',$logged->site->site)->where('t.id',$logged->user->id)->where('m.status',array('ACTIVATED','WAITING'),'IN');
-			if ($this->IM->getSite(false)->member == 'UNIVERSAL') {
+			if ($siteType == 'UNIVERSAL') {
 				$check->where('m.domain','*');
 			} else {
 				$check->where('m.domain',$this->IM->domain);
@@ -1385,8 +1386,8 @@ class ModuleMember {
 				 * 이메일주소로 기존 회원을 검색한다.
 				 */
 				$check = $this->db()->select($this->table->member)->where('email',$logged->user->email);
-				if ($this->IM->getSite(false)->member == 'UNIVERSAL') $check->where('m.domain','*');
-				else $check->where('m.domain',$this->IM->domain);
+				if ($siteType == 'UNIVERSAL') $check->where('domain','*');
+				else $check->where('domain',$this->IM->domain);
 				$check = $check->getOne();
 				
 				/**
@@ -1398,7 +1399,7 @@ class ModuleMember {
 					}
 					
 					$midx = $this->db()->insert($this->table->member,array(
-						'domain'=>$this->IM->getSite(false)->member == 'UNIVERSAL' ? '*' : $this->IM->domain,
+						'domain'=>$siteType == 'UNIVERSAL' ? '*' : $this->IM->domain,
 						'type'=>'MEMBER',
 						'email'=>$logged->user->email,
 						'password'=>'',
