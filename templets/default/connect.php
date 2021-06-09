@@ -8,9 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2017. 11. 29.
+ * @modified 2021. 6. 9.
  */
 if (defined('__IM__') == false) exit;
+
+$IM->addHeadResource('style',$me->getModule()->getDir().'/styles/container.css');
 $IM->loadWebFont('XEIcon');
 ?>
 <section class="box">

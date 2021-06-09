@@ -8,9 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2018. 1. 25.
+ * @modified 2021. 6. 9.
  */
 if (defined('__IM__') == false) exit;
+
+$IM->addHeadResource('style',$me->getModule()->getDir().'/styles/container.css');
 ?>
 <section class="box">
 	<div>

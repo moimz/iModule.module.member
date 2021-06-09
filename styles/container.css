@@ -1,0 +1,13 @@
+/**
+ * 이 파일은 iModule 회원모듈의 일부입니다. (https://www.imodules.io)
+ *
+ * 회원모듈의 컨테이너 스타일을 정의한다.
+ * 
+ * @file /modules/member/styles/container.css
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.1.0
+ * @modified 2021. 6. 9.
+ */
+html, body {height:100%;}
+body > div[data-role=wrapper] {height:100%;}
