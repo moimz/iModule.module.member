@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2021. 6. 9.
+ * @modified 2021. 6. 10.
  */
 class ModuleMember {
 	/**
@@ -843,7 +843,7 @@ class ModuleMember {
 			$oauths = $this->db()->select($this->table->oauth.' o','o.site')->join($this->table->oauth_sort.' s','s.site=o.site','LEFT')->where('o.domain',array('*',$this->IM->domain),'IN')->groupBy('o.site')->orderBy('s.sort','asc')->get();
 			for ($i=0, $loop=count($oauths);$i<$loop;$i++) {
 				$site = $this->db()->select($this->table->oauth)->where('domain',array('*',$this->IM->domain),'IN')->where('site',$oauths[$i]->site)->getOne();
-				$token = $this->db()->select($this->table->oauth_token)->where('midx',$this->getLogged())->where('domain',$site->domain)->where('site',$site->site)->getOne();
+				$token = $this->db()->select($this->table->oauth_token)->where('midx',$this->getLogged())->where('site',$site->site)->getOne();
 				
 				$oauths[$i] = new stdClass();
 				$oauths[$i]->site = $site;
@@ -1364,8 +1364,9 @@ class ModuleMember {
 	 * 가입되어 있지 않은 회원의 경우 자동으로 가입처리를 한다.
 	 *
 	 * @param object $logged OAuth 로그인정보
+	 * @param boolean $is_redirect 자동 리다이렉트 여부 (리다이렉트 하지 않을 경우, 회원 고유번호화 리다이렉트 주소를 반환한다.)
 	 */
-	function loginByOAuth($logged) {
+	function loginByOAuth($logged,$is_redirect=true) {
 		if ($this->isLogged() == true) {
 			$midx = $this->getLogged();
 		} else {
@@ -1475,7 +1476,7 @@ class ModuleMember {
 		/**
 		 * 회원사진이 없다면 갱신한다.
 		 */
-		if (is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == false) {
+		if (isset($logged->user->photo) == true && $logged->user->photo != null && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == false) {
 			if (SaveFileFromUrl($logged->user->photo,$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg','image') == true) {
 				$this->IM->getModule('attachment')->createThumbnail($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',250,250,false,'jpg');
 			}
@@ -1487,15 +1488,25 @@ class ModuleMember {
 		unset($_SESSION['OAUTH_ACCESS_TOKEN'],$_SESSION['OAUTH_REFRESH_TOKEN'],$_SESSION['IM_SOCIAL_LOGGED']);
 		
 		/**
-		 * 로그인 콜백 도메인과, 이동할 도메인이 다를 경우 로그인토큰을 생성한 뒤 리다이렉트 한다.
+		 * 로그인 콜백 도메인과, 이동할 도메인이 다를 경우 로그인토큰을 생성한 뒤 리다이렉트 주소를 생성한다.
 		 */
 		$parseUrl = parse_url($logged->redirect);
 		if ($parseUrl['host'] != $this->IM->domain) {
-			header('location:'.$logged->redirect.(strpos($logged->redirect,'?') === false ? '?' : '&').'session='.$this->makeSessionToken());
+			$redirect = $logged->redirect.(strpos($logged->redirect,'?') === false ? '?' : '&').'session='.$this->makeSessionToken();
 		} else {
-			header('location:'.$logged->redirect);
+			$redirect = $logged->redirect;
 		}
-		exit;
+		
+		if ($is_redirect == true) {
+			header('location:'.$redirect);
+			exit;
+		} else {
+			$results = new stdClass();
+			$results->midx = $midx;
+			$results->redirect = $redirect;
+			
+			return $results;
+		}
 	}
 	
 	/**
