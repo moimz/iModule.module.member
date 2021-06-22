@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2021. 6. 10.
+ * @modified 2021. 6. 23.
  */
 class ModuleMember {
 	/**
@@ -1814,7 +1814,7 @@ class ModuleMember {
 	 * @return string $photo
 	 */
 	function getMemberPhotoUrl($midx=null,$isFullUrl=false) {
-		$midx = $midx == null ? $this->getLogged() : $midx;
+		$midx = $midx === null ? $this->getLogged() : $midx;
 		return $this->IM->getModuleUrl('member','photo',$midx,'profile.jpg',$isFullUrl);
 	}
 	
