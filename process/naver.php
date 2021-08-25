@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2021. 5. 31.
+ * @modified 2021. 8. 25.
  */
 if (defined('__IM__') == false) exit;
 
@@ -52,7 +52,7 @@ if ($data === false || empty($data->response->email) == true) $this->printError(
 
 $_logged->user = new stdClass();
 $_logged->user->id = $data->response->enc_id;
-$_logged->user->name = $data->response->name;
+$_logged->user->name = isset($data->response->name) == true ? $data->response->name : $data->response->nickname;
 $_logged->user->nickname = $data->response->nickname;
 $_logged->user->email = $data->response->email;
 $_logged->user->photo = $data->response->profile_image;
