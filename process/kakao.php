@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.1.0
- * @modified 2021. 5. 31.
+ * @modified 2021. 8. 25.
  */
 if (defined('__IM__') == false) exit;
 
@@ -43,14 +43,14 @@ if ($_logged == null) {
 	$this->printError('OAUTH_API_ERROR',null,null,true);
 }
 
-$data = $oauth->get('https://kapi.kakao.com/v1/user/me');
-if ($data === false || empty($data->kaccount_email) == true) $this->printError('OAUTH_API_ERROR');
+$data = $oauth->get('https://kapi.kakao.com/v2/user/me');
+if ($data === false || empty($data->kakao_account->email) == true) $this->printError('OAUTH_API_ERROR');
 
 $_logged->user = new stdClass();
 $_logged->user->id = $data->id;
 $_logged->user->name = $data->properties->nickname;
 $_logged->user->nickname = $data->properties->nickname;
-$_logged->user->email = $data->kaccount_email;
+$_logged->user->email = $data->kakao_account->email;
 $_logged->user->photo = $data->properties->profile_image;
 
 $_logged->access_token = $oauth->getAccessToken(true)->access_token;

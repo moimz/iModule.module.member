@@ -24,7 +24,7 @@ if ($this->isLogged() == false) {
 	
 	$mHash = new Hash();
 	$password = Decoder(Request('password'));
-	if ($password === false || $mHash->password_validate($password,$member->password) == false) {
+	if ($member->password && ($password === false || $mHash->password_validate($password,$member->password) == false)) {
 		$results->success = false;
 		$results->error = $this->getErrorText('INCORRECT_PASSWORD');
 		return;
