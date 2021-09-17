@@ -1476,7 +1476,7 @@ class ModuleMember {
 		/**
 		 * 회원사진이 없다면 갱신한다.
 		 */
-		if (isset($logged->user->photo) == true && $logged->user->photo != null && is_file($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg') == false) {
+		if (isset($logged->user->photo) == true && $logged->user->photo != null) {
 			if (SaveFileFromUrl($logged->user->photo,$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg','image') == true) {
 				$this->IM->getModule('attachment')->createThumbnail($this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',$this->IM->getAttachmentPath().'/member/'.$midx.'.jpg',250,250,false,'jpg');
 			}
