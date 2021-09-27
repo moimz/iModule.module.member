@@ -30,6 +30,7 @@ for ($i=0, $loop=count($lists);$i<$loop;$i++) {
 	if (method_exists($mModule,'syncMember') == true) {
 		$data = new stdClass();
 		$data->code = $lists[$i]->code;
+		$data->midx = $lists[$i]->midx;
 		$data->content = $lists[$i]->content;
 		$content = $mModule->syncMember('point_history',$data);
 		$lists[$i]->content = $content == null ? $lists[$i]->content : $content;
